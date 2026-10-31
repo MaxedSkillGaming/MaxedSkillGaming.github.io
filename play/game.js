@@ -1,5 +1,7 @@
 'use strict';
 
+/* Heroes of the Wealdmark. Copyright (c) 2026 Eternity Squared Technologies. All rights reserved. */
+
 /**
  * The world view: draws the map, players, and monsters on a canvas; plays turn-based fights
  * on the same tiles; and shows skills, bag, wallet, and sound panels. All truth comes from
@@ -7,6 +9,7 @@
  */
 (function () {
   const TILE = 16;
+  const WATERMARK = 'Heroes of the Wealdmark © 2026 Eternity Squared Technologies';
   const BUBBLE_MS = 6000;
   const LOG_LINES = 80;
   const MOVE_STEP_MS = 130;
@@ -3795,6 +3798,16 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       $('hp-text').textContent = `HP ${hp}/${maxHp}`;
       $('mp-text').textContent = `Mana ${mp}/${maxMp}`;
     }
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.font = '10px "Courier New", monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = '#000';
+    ctx.fillText(WATERMARK, w - 5, h - 3);
+    ctx.fillStyle = '#e8e0f0';
+    ctx.fillText(WATERMARK, w - 6, h - 4);
+    ctx.restore();
     G.raf = requestAnimationFrame(frame);
   }
 
