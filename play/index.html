@@ -112,11 +112,19 @@
     <div id="vitals">
       <div class="meter hp"><div id="hp-fill" class="meter-fill"></div><span id="hp-text"></span></div>
       <div class="meter mp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div>
+      <div class="meter xp"><div id="xp-fill" class="meter-fill"></div><span id="xp-text"></span></div>
       <div id="wallet">
         <span class="coin iron" title="Iron bits"></span><span id="w-iron">0</span>
         <span class="coin gold" title="Gold coins"></span><span id="w-gold">0</span>
         <span class="coin favor" title="Favor tokens"></span><span id="w-favor">0</span>
       </div>
+    </div>
+
+    <div id="buffs"></div>
+
+    <div id="rhud" aria-hidden="true">
+      <canvas id="minimap" width="123" height="123"></canvas>
+      <div id="tracker" class="hidden"></div>
     </div>
 
     <div id="toolbar">

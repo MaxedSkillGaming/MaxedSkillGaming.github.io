@@ -66,6 +66,75 @@
   const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8 };
 const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder', 'exhaust', 'dust_choked', 'blinded']);
   const TIER_LEVELS = [1, 10, 20, 30];
+  /** Procedural 24px icons for abilities and statuses, drawn once and cached as data URLs. */
+  const poly = (c, pts) => {
+    c.beginPath();
+    pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+    c.closePath();
+    c.fill();
+  };
+  const ICON_SHAPES = {
+    sword: (c) => { poly(c, [[5, 19], [15, 5], [19, 5], [19, 9], [7, 21]]); poly(c, [[3, 15], [9, 21], [8, 22], [2, 16]]); },
+    arrow: (c) => { c.lineWidth = 3; c.beginPath(); c.moveTo(4, 20); c.lineTo(15, 9); c.stroke(); poly(c, [[21, 3], [21, 13], [11, 3]]); },
+    flame: (c) => { c.beginPath(); c.moveTo(12, 2); c.bezierCurveTo(21, 10, 20, 21, 12, 22); c.bezierCurveTo(4, 21, 3, 14, 8, 9); c.bezierCurveTo(9, 12, 11, 11, 12, 2); c.fill(); },
+    snow: (c) => { c.lineWidth = 2.5; for (let i = 0; i < 3; i++) { const a = (i * Math.PI) / 3; c.beginPath(); c.moveTo(12 - Math.cos(a) * 9, 12 - Math.sin(a) * 9); c.lineTo(12 + Math.cos(a) * 9, 12 + Math.sin(a) * 9); c.stroke(); } },
+    bolt: (c) => poly(c, [[14, 2], [5, 13], [11, 13], [9, 22], [19, 9], [13, 9]]),
+    cross: (c) => { c.fillRect(9, 3, 6, 18); c.fillRect(3, 9, 18, 6); },
+    shield: (c) => poly(c, [[12, 3], [20, 6], [19, 14], [12, 21], [5, 14], [4, 6]]),
+    up: (c) => poly(c, [[12, 3], [21, 12], [15, 12], [15, 21], [9, 21], [9, 12], [3, 12]]),
+    down: (c) => poly(c, [[12, 21], [21, 12], [15, 12], [15, 3], [9, 3], [9, 12], [3, 12]]),
+    drop: (c) => { c.beginPath(); c.moveTo(12, 3); c.bezierCurveTo(20, 12, 19, 22, 12, 22); c.bezierCurveTo(5, 22, 4, 12, 12, 3); c.fill(); },
+    fist: (c) => { c.fillRect(5, 9, 14, 11); for (let i = 0; i < 4; i++) c.fillRect(5 + i * 4, 5, 3, 5); },
+    burst: (c) => { c.lineWidth = 2.5; c.beginPath(); c.arc(12, 12, 6, 0, Math.PI * 2); c.stroke(); for (let i = 0; i < 8; i++) { const a = (i * Math.PI) / 4; c.beginPath(); c.moveTo(12 + Math.cos(a) * 8.5, 12 + Math.sin(a) * 8.5); c.lineTo(12 + Math.cos(a) * 11, 12 + Math.sin(a) * 11); c.stroke(); } },
+    eye: (c) => { c.beginPath(); c.moveTo(2, 12); c.quadraticCurveTo(12, 2, 22, 12); c.quadraticCurveTo(12, 22, 2, 12); c.fill(); c.fillStyle = '#0c0912'; c.beginPath(); c.arc(12, 12, 3.5, 0, Math.PI * 2); c.fill(); },
+  };
+  /** [shape, colour] per ability; anything not listed gets a plain burst. */
+  const ABILITY_ICON = {
+    punch: ['fist', '#e0b48c'], slash: ['sword', '#cfd6e4'], pine_nut_throw: ['drop', '#b08a52'], pick_throw: ['arrow', '#b0b6c4'],
+    wretch_bite: ['drop', '#7bd88f'], crushing_strike: ['fist', '#e07070'], dust_cloud: ['burst', '#c8b090'], wing_buffet: ['burst', '#9aa0c0'], gore: ['sword', '#d8c8a0'],
+    multi_strike: ['sword', '#f0a070'], power_strike: ['sword', '#f0c860'], rend: ['sword', '#e05a5a'], sunder_strike: ['shield', '#e05a5a'], war_cry: ['up', '#f0c860'],
+    whirlwind: ['burst', '#cfd6e4'], execute: ['sword', '#ff6a6a'], shot: ['arrow', '#9ad87b'], multi_shot: ['arrow', '#c8e87b'], aimed_shot: ['arrow', '#f0c860'],
+    poison_arrow: ['arrow', '#7bd88f'], snare: ['down', '#9ad8e8'], rain_of_arrows: ['burst', '#9ad87b'], backstep: ['up', '#7ab0f0'], deadeye: ['eye', '#f0c860'],
+    fireball: ['flame', '#ff9a4a'], ice_storm: ['snow', '#8ae0ff'], heal: ['cross', '#7bd88f'], mana_shield: ['shield', '#6a9ef0'], chain_lightning: ['bolt', '#ffe36a'],
+    arcane_surge: ['bolt', '#c08aff'], shield_bash: ['shield', '#cfd6e4'], fortify: ['shield', '#7ab0f0'], second_wind: ['cross', '#9ae8c0'], parry: ['shield', '#f0c860'],
+    stoneskin: ['shield', '#a8a8b8'], retaliate: ['burst', '#ff9a4a'], unbreakable: ['shield', '#f0c860'], summon_familiar: ['burst', '#c08aff'],
+  };
+  const STATUS_ICON = {
+    stagger: ['down', '#e0b48c'], slow: ['down', '#9ad8e8'], bleed: ['drop', '#e05a5a'], poison: ['drop', '#7bd88f'], burn: ['flame', '#ff9a4a'], sunder: ['shield', '#e05a5a'],
+    exhaust: ['down', '#e07070'], dust_choked: ['burst', '#c8b090'], blinded: ['eye', '#e07070'], war_cry: ['up', '#f0c860'], deadeye: ['eye', '#f0c860'],
+    mana_shield: ['shield', '#6a9ef0'], arcane_surge: ['bolt', '#c08aff'], fortify: ['shield', '#7ab0f0'], retaliate: ['burst', '#ff9a4a'], parry: ['shield', '#f0c860'],
+    stoneskin: ['shield', '#a8a8b8'], unbreakable: ['shield', '#f0c860'],
+  };
+  const iconCache = new Map();
+  function iconUrl([shape, color]) {
+    const key = shape + color;
+    let url = iconCache.get(key);
+    if (!url) {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 24;
+      const c = cv.getContext('2d');
+      c.fillStyle = '#17112a';
+      c.fillRect(0, 0, 24, 24);
+      c.strokeStyle = color;
+      c.globalAlpha = 0.5;
+      c.lineWidth = 2;
+      c.strokeRect(1, 1, 22, 22);
+      c.globalAlpha = 1;
+      c.fillStyle = color;
+      c.strokeStyle = color;
+      c.lineCap = 'round';
+      c.save();
+      c.translate(3, 3);
+      c.scale(0.75, 0.75);
+      (ICON_SHAPES[shape] || ICON_SHAPES.burst)(c);
+      c.restore();
+      url = cv.toDataURL();
+      iconCache.set(key, url);
+    }
+    return url;
+  }
+  const abilityIcon = (id) => iconUrl(ABILITY_ICON[id] || ['burst', '#c9b8f0']);
+  const statusIcon = (id) => iconUrl(STATUS_ICON[id] || (DEBUFFS.has(id) ? ['down', '#e07070'] : ['up', '#7bd88f']));
   /** Equipment layout, three across: the figure's head, body, and legs down the middle. */
   const PAPERDOLL = ['weapon2', 'head', 'amulet', 'weapon', 'body', 'offhand', 'cloak', 'legs', 'belt', 'ring', 'boon', null];
   const SLOT_LABELS = [
@@ -2022,7 +2091,10 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         for (const st of a.statuses) {
           const tag = document.createElement('span');
           tag.className = 'st ' + (DEBUFFS.has(st.id) ? 'debuff' : 'buff');
-          tag.textContent = `${pretty(st.id)} ${st.rounds}`;
+          const ic = new Image();
+          ic.src = statusIcon(st.id);
+          ic.alt = '';
+          tag.append(ic, document.createTextNode(`${pretty(st.id)} ${st.rounds}`));
           row.appendChild(tag);
         }
         chip.appendChild(row);
@@ -2035,15 +2107,14 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     const f = G.fight;
     if (!f) return;
     renderTurns();
+    renderBuffs();
     renderAutoBtn();
     const info = $('fightinfo');
     const h = hero();
     const opts = f.options;
-    const statuses = h ? h.statuses.map((s) => `${pretty(s.id)} (${s.rounds})`).join(', ') : '';
     info.textContent =
       `Round ${f.round}: ` +
-      (opts && opts.actor === G.selfId ? `Your turn, ${opts.moveLeft} moves left` : 'Waiting for the other side') +
-      (statuses ? `  -  ${statuses}` : '');
+      (opts && opts.actor === G.selfId ? `Your turn, ${opts.moveLeft} moves left` : 'Waiting for the other side');
 
     const box = $('actions');
     const util = $('fight-util');
@@ -2058,7 +2129,12 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       const info = ABILITY_INFO[a.id];
       const why = a.usable ? '' : a.reason === 'mana' ? 'Not enough mana' : a.reason === 'cooldown' ? `Ready in ${a.cooldown} rounds` : a.reason === 'acted' ? 'Already acted' : 'No enemy in reach';
       b.title = [info ? info[1] : '', a.mana ? `Costs ${a.mana} mana.` : '', why].filter(Boolean).join('\n');
-      b.textContent = `${i === 9 ? 0 : i < 9 ? i + 1 : '-'} ${a.name}${a.mana ? ` (${a.mana})` : ''}${a.cooldown ? ` ${a.cooldown}r` : ''}`;
+      const img = new Image();
+      img.src = abilityIcon(a.id);
+      img.alt = '';
+      b.append(img, el('span', 'hk', String(i === 9 ? 0 : i < 9 ? i + 1 : '-')), el('span', 'nm', a.name));
+      if (a.mana) b.append(el('span', 'cost', String(a.mana)));
+      if (a.cooldown) b.append(el('span', 'cd', String(a.cooldown)));
       b.addEventListener('click', () => selectAbility(a.id));
       box.appendChild(b);
     });
@@ -2076,6 +2152,111 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     extra('E Eat', () => (foodSlot() < 0 ? toast('You have no food.') : sendFight({ t: 'eat', slot: foodSlot() })), opts.acted);
     extra('F Flee', () => sendFight({ t: 'flee' }), opts.acted);
     extra('Space End turn', () => sendFight({ t: 'end' }), false);
+  }
+
+  /** The hero's own buffs and debuffs as icons with rounds left, under the vitals. */
+  function renderBuffs() {
+    const box = $('buffs');
+    box.textContent = '';
+    const h = G.fight && hero();
+    if (!h) return;
+    for (const st of h.statuses) {
+      const b = el('span', 'buff ' + (DEBUFFS.has(st.id) ? 'debuff' : 'good'));
+      const img = new Image();
+      img.src = statusIcon(st.id);
+      img.alt = '';
+      b.title = `${pretty(st.id)}, ${st.rounds} rounds left`;
+      b.append(img, el('span', 'n', String(st.rounds)));
+      box.appendChild(b);
+    }
+  }
+
+  /** Thin experience bar under mana. */
+  function renderXpBar() {
+    const s = G.stats;
+    if (!s) return;
+    const xp = (s.skills.combat && s.skills.combat.xp) || 0;
+    const cur = xpForLevel(s.combatLevel);
+    const next = xpForLevel(s.combatLevel + 1);
+    const max = s.combatLevel >= MAX_LEVEL;
+    $('xp-fill').style.width = `${max ? 100 : Math.max(0, Math.min(100, ((xp - cur) / Math.max(1, next - cur)) * 100))}%`;
+    $('xp-text').textContent = max ? `Level ${s.combatLevel}` : `Level ${s.combatLevel}  ${xp - cur}/${next - cur} XP`;
+  }
+
+  /** Corner map: the ground around the hero, with dots for people, monsters and townsfolk. */
+  const MM = { span: 41, px: 3, key: null, base: null };
+  function renderMinimap(map) {
+    const cv = $('minimap');
+    const c = cv.getContext('2d');
+    if (MM.key !== map) {
+      MM.key = map;
+      MM.base = document.createElement('canvas');
+      MM.base.width = map.width;
+      MM.base.height = map.height;
+      const b = MM.base.getContext('2d');
+      b.fillStyle = '#0c0912';
+      b.fillRect(0, 0, map.width, map.height);
+      for (let y = 0; y < map.height; y++) {
+        for (let x = 0; x < map.width; x++) {
+          b.fillStyle = map.blocked[y][x] === '1' ? '#2a2236' : '#4d7a52';
+          b.fillRect(x, y, 1, 1);
+        }
+      }
+      for (const z of map.zones) {
+        b.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.22)' : 'rgba(224,90,90,0.12)';
+        b.fillRect(z.x, z.y, z.w, z.h);
+      }
+    }
+    const me = G.self();
+    if (!me) return;
+    const half = (MM.span - 1) / 2;
+    const ox = Math.round(me.x) - half;
+    const oy = Math.round(me.y) - half;
+    c.imageSmoothingEnabled = false;
+    c.fillStyle = '#0c0912';
+    c.fillRect(0, 0, cv.width, cv.height);
+    c.drawImage(MM.base, ox, oy, MM.span, MM.span, 0, 0, MM.span * MM.px, MM.span * MM.px);
+    for (const e of G.entities.values()) {
+      const col = e.id === G.selfId ? '#ffffff' : e.kind === 'player' ? '#6ab0ff' : e.kind === 'monster' ? '#ff6a6a' : e.kind === 'npc' ? '#f0c860' : null;
+      if (!col) continue;
+      const x = Math.round(e.x) - ox;
+      const y = Math.round(e.y) - oy;
+      if (x < 0 || y < 0 || x >= MM.span || y >= MM.span) continue;
+      c.fillStyle = '#000';
+      c.fillRect(x * MM.px - 1, y * MM.px - 1, MM.px + 2, MM.px + 2);
+      c.fillStyle = col;
+      c.fillRect(x * MM.px, y * MM.px, MM.px, MM.px);
+    }
+  }
+
+  /** Up to three active jobs pinned on screen. */
+  let trackerKey = '';
+  function renderTracker() {
+    const box = $('tracker');
+    if (!G.data || !G.quests) return;
+    const states = questStates();
+    const rows = [];
+    for (const q of G.data.quests.values()) {
+      const st = states.get(q.id);
+      if (!st || st.done || !q.steps[st.step]) continue;
+      const step = q.steps[st.step];
+      const prog = progressText(step.need, st);
+      const ready = needMet(step.need, st);
+      const giver = G.data.npcs.get(step.npc);
+      rows.push([q.name, ready && giver ? `Report to ${giver.name}` : step.todo, prog, ready]);
+      if (rows.length === 3) break;
+    }
+    const key = JSON.stringify(rows);
+    if (key === trackerKey) return;
+    trackerKey = key;
+    box.textContent = '';
+    box.classList.toggle('hidden', !rows.length);
+    for (const [name, todo, prog, ready] of rows) {
+      const row = el('div', 'tq');
+      row.append(el('b', '', name), el('div', '', todo));
+      if (prog) row.append(el('div', ready ? 'ok' : 'short', prog));
+      box.appendChild(row);
+    }
   }
 
   function renderStats() {
@@ -3093,6 +3274,16 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
 
     const used = G.storage.items.filter(Boolean).length;
     box.appendChild(el('h3', '', `Storage (${used}/${G.storage.slots})`));
+    if (typeof G.storage.nextCost === 'number') {
+      const cost = G.storage.nextCost;
+      const gold = cost >= GOLD_RATE ? ` (${cost / GOLD_RATE} gold)` : '';
+      const up = el('button', 'act', `Add 10 places: ${cost.toLocaleString()} iron bits${gold}`);
+      up.type = 'button';
+      up.disabled = w.iron_bits < cost;
+      up.title = `Upgrade ${(G.storage.tier || 0) + 1} of 5. Iron bits only; change gold coins back first if you need to.`;
+      up.addEventListener('click', () => window.coe.send({ t: 'storage_upgrade' }));
+      box.appendChild(up);
+    } else if (typeof G.storage.tier === 'number') box.appendChild(el('p', 'muted', 'Every storage upgrade is bought.'));
     const grid = el('div', 'slot-grid');
     G.storage.items.forEach((ref, i) => {
       grid.appendChild(slotButton(ref, (ev) => window.coe.send({ t: 'store', dir: 'out', slot: i, qty: ev.shiftKey ? 999 : 1 })));
@@ -3797,6 +3988,13 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       $('mp-fill').style.width = `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`;
       $('hp-text').textContent = `HP ${hp}/${maxHp}`;
       $('mp-text').textContent = `Mana ${mp}/${maxMp}`;
+      renderXpBar();
+      renderTracker();
+      $('rhud').classList.toggle('hidden', Boolean(G.fight));
+      if (!G.fight) {
+        if ($('buffs').childElementCount) $('buffs').textContent = '';
+        renderMinimap(map);
+      }
     }
     ctx.save();
     ctx.globalAlpha = 0.4;

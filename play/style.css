@@ -182,6 +182,25 @@ footer { margin-top: 16px; text-align: right; }
 .meter-fill { height: 100%; width: 0; transition: width 180ms steps(6); }
 .meter.hp .meter-fill { background: #4fae6a; }
 .meter.mp .meter-fill { background: #4a7fd8; }
+.meter.xp { height: 12px; margin-bottom: 2px; }
+.meter.xp .meter-fill { background: #b072e6; }
+.meter.xp span { line-height: 8px; font-size: 9px; }
+#buffs { position: absolute; top: 205px; left: 10px; display: flex; flex-wrap: wrap; gap: 3px; width: 210px; }
+#buffs:empty { display: none; }
+#buffs .buff { position: relative; width: 28px; height: 28px; border: 2px solid #000; background: #17112a; }
+#buffs .buff.good { border-color: #2f6b3a; }
+#buffs .buff.debuff { border-color: #8a2f2f; }
+#buffs .buff img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+#buffs .buff .n { position: absolute; right: -2px; bottom: -3px; font-size: 10px; line-height: 10px; padding: 0 2px; background: #000; color: #fff; }
+.chip .st img { width: 12px; height: 12px; image-rendering: pixelated; vertical-align: -2px; margin-right: 3px; }
+#rhud { position: absolute; top: 56px; right: 10px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: none; }
+#rhud.hidden { display: none; }
+#minimap { width: 123px; height: 123px; border: 3px solid var(--edge); background: #0c0912; image-rendering: pixelated; opacity: 0.92; }
+#tracker { width: 190px; padding: 5px 7px; background: rgba(20, 16, 28, 0.85); border: 3px solid var(--edge); font-size: 12px; }
+#tracker .tq + .tq { margin-top: 5px; padding-top: 4px; border-top: 1px solid #3a2f55; }
+#tracker b { color: var(--gold); font-weight: normal; }
+#tracker .ok { color: #7bd88f; }
+#tracker .short { color: #e8c070; }
 .meter span { position: absolute; inset: 0; text-align: center; line-height: 12px; font-size: 11px; text-shadow: 1px 1px 0 #000; }
 #wallet { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
 #wallet span:not(.coin) { margin-right: 8px; min-width: 14px; }
@@ -249,8 +268,14 @@ footer { margin-top: 16px; text-align: right; }
 #hover-tip .tip-title { color: var(--gold); font-size: 13px; margin-bottom: 2px; }
 #hover-tip .tip-line { color: var(--muted); }
 #fightinfo { font-size: 12px; color: var(--muted); margin-bottom: 4px; min-height: 1.3em; }
-#actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 3px; }
-#actions button.act { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 5px; font-size: 12px; }
+#actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 3px; }
+#actions button.act { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; overflow: hidden; padding: 3px 2px 2px; font-size: 10px; line-height: 12px; }
+#actions button.act img { width: 32px; height: 32px; image-rendering: pixelated; border: 1px solid #000; }
+#actions button.act .nm { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#actions button.act .hk { position: absolute; left: 3px; top: 2px; font-size: 10px; line-height: 10px; padding: 0 2px; background: #000; color: #f0c860; }
+#actions button.act .cost { position: absolute; right: 3px; top: 2px; font-size: 10px; line-height: 10px; padding: 0 2px; background: #1c3a78; color: #cfe0ff; }
+#actions button.act .cd { position: absolute; left: 0; right: 0; top: 0; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 16px; background: rgba(0, 0, 0, 0.65); }
+#actions button.act:disabled img { filter: grayscale(0.8) brightness(0.7); }
 button.act { margin: 0; padding: 6px 9px; font-size: 13px; }
 button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
 
@@ -534,6 +559,10 @@ button.link:hover { opacity: 1; }
   #toolbar button { flex: none; min-height: 36px; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
   #hud { display: none; }
   #vitals { top: 52px; left: 6px; width: 170px; padding: 6px 8px; }
+  #buffs { top: 176px; left: 6px; width: 170px; }
+  #rhud { top: 52px; right: 6px; }
+  #minimap { width: 84px; height: 84px; }
+  #tracker { width: 140px; font-size: 11px; }
   #turns { top: 52px; left: 186px; transform: none; max-width: calc(100vw - 250px); flex-wrap: wrap; }
   #toast { top: 100px; max-width: calc(100vw - 24px); }
   #chat { left: 6px; bottom: 6px; width: calc(100vw - 80px); }
