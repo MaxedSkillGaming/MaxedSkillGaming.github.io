@@ -1534,6 +1534,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       case 'miss':
         return 330;
       case 'heal':
+      case 'mana':
         return 420;
       case 'death':
         return 520;
@@ -1639,6 +1640,14 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         if (a) a.hp = ev.hp;
         floater(ev.actor, `+${ev.amount}`, '#7bd88f');
         addLog(`${who(ev.actor)} recover${ev.actor === G.selfId ? '' : 's'} ${ev.amount} health.`, 'mine');
+        play('heal');
+        break;
+      }
+      case 'mana': {
+        const a = act(ev.actor);
+        if (a) a.mana = ev.mana;
+        floater(ev.actor, `+${ev.amount}`, '#6aa0ff');
+        addLog(`${who(ev.actor)} recover${ev.actor === G.selfId ? '' : 's'} ${ev.amount} mana.`, 'mine');
         play('heal');
         break;
       }
@@ -1779,6 +1788,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
   const cheb = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 
   function renderAutoBtn() {
+    G.barSig = null;
     const b = $('auto-btn');
     if (!b) return;
     const blocked = bossFight();
@@ -1793,14 +1803,14 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     clearTimeout(G.autoTimer);
     G.autoTimer = null;
     renderAutoBtn();
-    if (on) scheduleAuto();
+    if (on && G.fight) scheduleAuto();
   }
 
   function toggleAuto() {
-    if (!G || !G.fight) return;
-    if (bossFight()) return toast('Auto combat is not available against bosses and minibosses.');
+    if (!G) return;
+    if (G.fight && bossFight()) return toast('Auto combat is not available against bosses and minibosses.');
     setAuto(!G.auto);
-    toast(G.auto ? 'Combat: Auto. Press X for Manual.' : 'Combat: Manual. Press X for Auto.');
+    toast(G.auto ? 'Auto combat on. Press X to turn it off.' : 'Auto combat off. Press X to turn it on.');
   }
 
   function scheduleAuto() {
@@ -2030,8 +2040,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     const f = G.fight;
     const k = key.length === 1 ? key.toLowerCase() : key;
     if (/^[0-9]$/.test(k)) {
-      const opt = f.options.abilities[k === '0' ? 9 : Number(k) - 1];
-      if (opt) selectAbility(opt.id);
+      if (k !== '0' && k !== '9') useBarSlot(Number(k) - 1, true);
       return true;
     }
     if (k === 'q') {
@@ -2259,6 +2268,344 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     }
   }
 
+  // ---- bottom bar: globes, action bar, quick slots
+
+  const BAR_SLOTS = 8;
+  /** Quick slots beside the globes. `item` is the default item; 'any' means the first food in the bag. */
+  const QUICK = [
+    { id: 'hp', key: 'h', label: 'Health potion', item: 'minor_health_potion', match: (d) => d.kind === 'potion' && d.heal && !d.mana },
+    { id: 'food', key: 'u', label: 'Food', item: 'any', match: (d) => d.kind === 'food' },
+    { id: 'mp', key: 'n', label: 'Mana potion', item: 'minor_mana_potion', match: (d) => d.kind === 'potion' && d.mana },
+    { id: 'spare', key: 'b', label: 'Spare slot', item: null, match: (d) => d.kind === 'food' || d.kind === 'potion' },
+  ];
+
+  function barState() {
+    const me = G.self();
+    const key = `coe.bar.${me ? me.name : ''}`;
+    if (G.bar && G.bar.key === key) return G.bar;
+    let saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem(key));
+    } catch {
+      saved = null;
+    }
+    G.bar = { key, slots: saved && Array.isArray(saved.slots) ? saved.slots : null, quick: (saved && saved.quick) || {} };
+    return G.bar;
+  }
+
+  function saveBar() {
+    try {
+      localStorage.setItem(G.bar.key, JSON.stringify({ slots: G.bar.slots, quick: G.bar.quick }));
+    } catch {
+      /* private window or blocked storage: the layout lasts until the page closes */
+    }
+  }
+
+  const heldWeapon = () => (G.inv && G.inv.equipment && G.inv.equipment.weapon) || null;
+
+  /** Every ability the hero has unlocked: the basic attacks, then each skill with a rank in it. */
+  function unlockedAbilities() {
+    const ids = [...BASIC_ATTACKS];
+    const ranks = (G.stats && G.stats.ranks) || {};
+    for (const id of Object.keys(ranks)) if (ranks[id] > 0 && ABILITY_INFO[id] && !ids.includes(id)) ids.push(id);
+    return ids;
+  }
+
+  function weaponClassOf(ref) {
+    const def = ref && G.data && G.data.items.get(ref.id);
+    return (def && def.weaponClass) || null;
+  }
+
+  /** The bar until the player changes it: the attack for the weapon in hand, then every ranked skill. */
+  function defaultBar() {
+    const basic = { blade: 'slash', dagger: 'slash', bow: 'shot', staff: 'fireball' }[weaponClassOf(heldWeapon())] || 'punch';
+    const ids = [basic, ...unlockedAbilities().filter((id) => !BASIC_ATTACKS.includes(id))];
+    return ids.slice(0, BAR_SLOTS).map((id) => ({ k: 'ability', id }));
+  }
+
+  const barSlots = () => {
+    const b = barState();
+    const slots = b.slots || defaultBar();
+    return Array.from({ length: BAR_SLOTS }, (_, i) => slots[i] || null);
+  };
+
+  /** Inventory index of the first stack of an item, or of any food. */
+  function bagIndex(item) {
+    if (!G.inv || !G.data) return -1;
+    if (item === 'any') return foodSlot();
+    return G.inv.items.findIndex((s) => s && s.id === item);
+  }
+
+  function bagCountOf(item) {
+    if (!G.inv || !G.data) return 0;
+    return G.inv.items.reduce((n, s) => (s && (item === 'any' ? G.data.items.get(s.id)?.kind === 'food' : s.id === item) ? n + s.qty : n), 0);
+  }
+
+  const quickItem = (q) => {
+    const set = barState().quick;
+    return q.id in set ? set[q.id] : q.item;
+  };
+
+  function useBarSlot(i, fromKey) {
+    const entry = barSlots()[i];
+    if (!entry) return fromKey ? undefined : openBarPicker('bar', i);
+    if (entry.k === 'weapon') {
+      const idx = bagIndex(entry.id);
+      const held = heldWeapon();
+      if (held && held.id === entry.id) return toast('You are already holding it.');
+      if (G.fight) {
+        if (!isMyTurn()) return toast('Not your turn to act.');
+        const alt = G.inv && G.inv.equipment && G.inv.equipment.weapon2;
+        if (alt && alt.id === entry.id) return G.fight.options.canSwap ? sendFight({ t: 'swap' }) : toast('You have already acted this turn.');
+        return toast('In a fight you can only swap to the weapon in your swap slot.');
+      }
+      if (idx < 0) return toast(G.inv && G.inv.equipment && G.inv.equipment.weapon2 && G.inv.equipment.weapon2.id === entry.id ? 'That weapon is in your swap slot. Take it off in Gear (E) to hold it.' : 'That weapon is not in your bag.');
+      return window.coe.send({ t: 'equip', slot: idx });
+    }
+    const info = ABILITY_INFO[entry.id];
+    if (!G.fight) return fromKey ? undefined : toast(info ? `${info[0]}: ${info[1]}` : 'Nothing to do outside a fight.');
+    if (!isMyTurn()) return toast('Not your turn to act.');
+    if (!G.fight.options.abilities.some((a) => a.id === entry.id)) return toast(`${info ? info[0] : 'That ability'} needs a different weapon or shield.`);
+    selectAbility(entry.id);
+  }
+
+  function useQuick(q) {
+    const item = quickItem(q);
+    const idx = item ? bagIndex(item) : -1;
+    if (!item) return openBarPicker('quick', q.id);
+    if (idx < 0) return toast(`You have none of that. Click the slot to change it.`);
+    if (G.fight) {
+      if (!isMyTurn() || G.fight.options.acted) return toast('Not your turn to act.');
+      return sendFight({ t: 'eat', slot: idx });
+    }
+    window.coe.send({ t: 'use', slot: idx });
+  }
+
+  function closeBarPicker() {
+    const p = $('bar-picker');
+    if (p) p.classList.add('hidden');
+  }
+
+  /** A small list above a slot: pick what goes in it. */
+  function openBarPicker(kind, which) {
+    const box = $('bar-picker');
+    box.textContent = '';
+    const b = barState();
+    const choose = (apply) => {
+      apply();
+      saveBar();
+      closeBarPicker();
+      G.barSig = null;
+      renderBar();
+    };
+    const row = (label, icon, onPick) => {
+      const r = el('button', 'pick');
+      r.type = 'button';
+      if (icon) r.appendChild(icon);
+      r.appendChild(document.createTextNode(label));
+      r.addEventListener('click', onPick);
+      box.appendChild(r);
+    };
+    const itemImg = (def) => {
+      const cv = iconCanvas(def);
+      cv.className = 'icon';
+      return cv;
+    };
+    if (kind === 'bar') {
+      box.appendChild(el('h4', '', `Action bar slot ${which + 1}`));
+      const put = (entry) => choose(() => {
+        const slots = b.slots || defaultBar();
+        b.slots = Array.from({ length: BAR_SLOTS }, (_, n) => slots[n] || null);
+        b.slots[which] = entry;
+      });
+      for (const id of unlockedAbilities()) {
+        const img = new Image();
+        img.src = abilityIcon(id);
+        row(ABILITY_NAMES[id] || pretty(id), img, () => put({ k: 'ability', id }));
+      }
+      const seen = new Set();
+      const weapons = [];
+      for (const ref of [...((G.inv && G.inv.items) || []), heldWeapon(), G.inv && G.inv.equipment && G.inv.equipment.weapon2]) {
+        const def = ref && G.data && G.data.items.get(ref.id);
+        if (def && def.kind === 'weapon' && !seen.has(def.id)) {
+          seen.add(def.id);
+          weapons.push(def);
+        }
+      }
+      for (const def of weapons) row(`${def.name} (weapon)`, itemImg(def), () => put({ k: 'weapon', id: def.id }));
+      row('Clear this slot', null, () => put(null));
+    } else {
+      const q = QUICK.find((x) => x.id === which);
+      box.appendChild(el('h4', '', q.label));
+      const put = (item) => choose(() => (b.quick[q.id] = item));
+      if (q.id === 'food') row('Any food in my bag', null, () => put('any'));
+      const have = new Map();
+      for (const ref of (G.inv && G.inv.items) || []) {
+        const def = ref && G.data && G.data.items.get(ref.id);
+        if (def && q.match(def)) have.set(def.id, (have.get(def.id) || 0) + ref.qty);
+      }
+      for (const [id, n] of have) row(`${itemName({ id })} x${n}`, itemImg(G.data.items.get(id)), () => put(id));
+      if (!have.size) box.appendChild(el('p', 'muted', 'Nothing in your bag fits here.'));
+      row('Clear this slot', null, () => put(''));
+    }
+    box.classList.remove('hidden');
+  }
+
+  function barSlotEl(i, entry) {
+    const b = el('button', 'bslot' + (entry ? '' : ' empty'));
+    b.type = 'button';
+    b.dataset.i = String(i);
+    const key = el('span', 'hk', String(i + 1));
+    if (entry) {
+      let on = true;
+      if (entry.k === 'weapon') {
+        const def = G.data && G.data.items.get(entry.id);
+        if (def) {
+          const cv = iconCanvas(def);
+          cv.className = 'icon';
+          b.appendChild(cv);
+          b.title = `${def.name}. Click to hold it. Right-click to change.`;
+        }
+        const held = heldWeapon();
+        if (held && held.id === entry.id) b.classList.add('held');
+        if (!bagCountOf(entry.id) && !(held && held.id === entry.id)) on = false;
+      } else {
+        const img = new Image();
+        img.src = abilityIcon(entry.id);
+        img.alt = '';
+        b.appendChild(img);
+        const info = ABILITY_INFO[entry.id];
+        const opt = G.fight && G.fight.options ? G.fight.options.abilities.find((a) => a.id === entry.id) : null;
+        const lines = [info ? `${info[0]}: ${info[1]}` : entry.id];
+        if (G.fight) {
+          if (!opt) {
+            on = false;
+            lines.push('Needs a different weapon or shield.');
+          } else {
+            if (opt.mana) {
+              b.appendChild(el('span', 'cost', String(opt.mana)));
+              lines.push(`Costs ${opt.mana} mana.`);
+            }
+            if (!opt.usable) on = false;
+            if (opt.cooldown) b.appendChild(el('span', 'cd', String(opt.cooldown)));
+            if (G.fight.selected === entry.id) b.classList.add('selected');
+          }
+        }
+        lines.push('Right-click to change.');
+        b.title = lines.join('\n');
+      }
+      if (!on) b.classList.add('off');
+    } else b.title = 'Empty. Click to choose an ability or weapon.';
+    b.appendChild(key);
+    b.addEventListener('click', () => useBarSlot(i, false));
+    return b;
+  }
+
+  function wirePicker(btn, open) {
+    let timer = null;
+    btn.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault();
+      open();
+    });
+    btn.addEventListener('pointerdown', (ev) => {
+      if (ev.pointerType === 'mouse') return;
+      timer = setTimeout(() => {
+        timer = null;
+        btn.dataset.long = '1';
+        open();
+      }, 500);
+    });
+    for (const t of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(t, () => timer && (clearTimeout(timer), (timer = null)));
+    btn.addEventListener(
+      'click',
+      (ev) => {
+        if (btn.dataset.long) {
+          delete btn.dataset.long;
+          ev.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
+  }
+
+  /** Rebuild the bar only when something it shows has changed. */
+  function renderBar() {
+    const host = $('hotbar');
+    if (!host || !G.data) return;
+    const slots = barSlots();
+    const opts = G.fight && G.fight.options;
+    const sig = JSON.stringify([
+      slots,
+      G.auto && !bossFight(),
+      bossFight(),
+      opts ? [opts.actor, opts.acted, G.fight.selected, opts.abilities.map((a) => [a.id, a.usable, a.cooldown, a.mana])] : 0,
+      heldWeapon() && heldWeapon().id,
+      G.inv ? G.inv.items.map((s) => s && s.id + s.qty) : 0,
+      QUICK.map(quickItem),
+    ]);
+    if (sig === G.barSig) return;
+    G.barSig = sig;
+    host.textContent = '';
+    slots.forEach((entry, i) => {
+      const b = barSlotEl(i, entry);
+      wirePicker(b, () => openBarPicker('bar', i));
+      host.appendChild(b);
+    });
+    const auto = el('button', 'bslot auto' + (G.auto && !bossFight() ? ' on' : ''));
+    auto.type = 'button';
+    auto.disabled = false;
+    auto.append(el('b', '', 'AUTO'), el('span', 'st', G.auto && !bossFight() ? 'ON' : 'OFF'), el('span', 'hk', 'X'));
+    auto.title = bossFight() ? 'Auto combat is not available against bosses and minibosses.' : 'Auto combat (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. It stays on between fights until you turn it off.';
+    auto.addEventListener('click', toggleAuto);
+    host.appendChild(auto);
+
+    for (const q of QUICK) {
+      const slot = document.querySelector(`.qslot[data-q="${q.id}"]`);
+      if (!slot) continue;
+      slot.textContent = '';
+      const item = quickItem(q);
+      const def = item && item !== 'any' && G.data.items.get(item);
+      const n = item ? bagCountOf(item) : 0;
+      if (item === 'any') {
+        const first = G.inv && G.inv.items.find((s) => s && G.data.items.get(s.id)?.kind === 'food');
+        const fd = first && G.data.items.get(first.id);
+        if (fd) {
+          const cv = iconCanvas(fd);
+          cv.className = 'icon';
+          slot.appendChild(cv);
+        } else slot.appendChild(el('span', 'plus', 'Food'));
+      } else if (def) {
+        const cv = iconCanvas(def);
+        cv.className = 'icon';
+        slot.appendChild(cv);
+      } else slot.appendChild(el('span', 'plus', '+'));
+      slot.classList.toggle('off', Boolean(item) && n === 0);
+      if (item) slot.appendChild(el('span', 'cnt', String(n)));
+      slot.appendChild(el('span', 'hk', q.key.toUpperCase()));
+      slot.title = `${q.label}${item ? (item === 'any' ? ': the first food in your bag' : `: ${def ? def.name : item}`) : ': empty'}. Click to use. Right-click to change.`;
+    }
+  }
+
+  function setupBar() {
+    for (const q of QUICK) {
+      const slot = document.querySelector(`.qslot[data-q="${q.id}"]`);
+      if (!slot) continue;
+      slot.addEventListener('click', () => useQuick(q));
+      wirePicker(slot, () => openBarPicker('quick', q.id));
+    }
+    on(document, 'pointerdown', (ev) => {
+      const p = $('bar-picker');
+      if (p && !p.classList.contains('hidden') && !p.contains(ev.target) && !ev.target.closest('.bslot, .qslot')) closeBarPicker();
+    });
+  }
+
+  function renderGlobes(hp, maxHp, mp, maxMp) {
+    $('globe-hp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`);
+    $('globe-mp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`);
+    $('globe-hp-text').textContent = `${hp}/${maxHp}`;
+    $('globe-mp-text').textContent = `${mp}/${maxMp}`;
+  }
+
   function renderStats() {
     const s = G.stats;
     if (!s) return;
@@ -2430,7 +2777,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       lines.push(`${pretty(def.slot || 'armor')}${def.armor ? `, armor ${def.armor}` : ''}`);
       if (def.flatReduction) lines.push(`Blocks ${def.flatReduction} damage from every hit`);
     }
-    if (def.kind === 'food') lines.push(`Restores ${def.heal} health`);
+    if (def.kind === 'food' || def.kind === 'potion') lines.push([def.heal ? `Restores ${def.heal} health` : '', def.mana ? `Restores ${def.mana} mana` : ''].filter(Boolean).join(', '));
     else if (def.kind === 'tool') lines.push(`${pretty(def.toolType)}, tier ${def.tier}. Kept in your bag; it is not worn.`);
     else if (def.kind === 'material') lines.push('Crafting material');
     else {
@@ -2670,6 +3017,16 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
   function paintItem(r, def) {
     const t = Math.max(0, Math.min(3, (def.tier || 1) - 1));
     if (paintWorkItem(r, def)) return;
+    if (def.kind === 'potion') {
+      const liquid = def.mana ? '#4a7fd8' : '#d84a4a';
+      const light = def.mana ? '#8ab4f0' : '#f08a8a';
+      r(6, 2, 4, 2, '#8a6a44');
+      r(7, 4, 2, 2, '#cfd6e4');
+      r(4, 6, 8, 8, '#cfd6e4');
+      r(5, 7, 6, 6, liquid);
+      r(5, 7, 2, 4, light);
+      return;
+    }
     if (def.kind === 'food') {
       r(3, 7, 10, 5, '#e8884a');
       r(4, 6, 7, 1, '#f4a468');
@@ -2879,7 +3236,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         slotButton(ref, (ev) => {
           const def = G.data && G.data.items.get(ref.id);
           if (!def) return;
-          if (def.kind === 'food') {
+          if (def.kind === 'food' || def.kind === 'potion') {
             if (G.fight) {
               if (isMyTurn() && !G.fight.options.acted) sendFight({ t: 'eat', slot: i });
               else toast('Not your turn to act.');
@@ -3989,6 +4346,8 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       $('hp-text').textContent = `HP ${hp}/${maxHp}`;
       $('mp-text').textContent = `Mana ${mp}/${maxMp}`;
       renderXpBar();
+      renderGlobes(hp, maxHp, mp, maxMp);
+      renderBar();
       renderTracker();
       $('rhud').classList.toggle('hidden', Boolean(G.fight));
       if (!G.fight) {
@@ -4210,6 +4569,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       return;
     }
     if (ev.key === 'Escape') {
+      closeBarPicker();
       closeNodeMenu();
       if (!$('buy-confirm').classList.contains('hidden')) return closeBuyConfirm();
       closePanels();
@@ -4235,6 +4595,10 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     if (k === 'i') return togglePanel('panel-bag');
     if (k === 'c') return togglePanel('panel-stats');
     if (k === 'e' && !G.fight) return togglePanel('panel-equip');
+    const quick = QUICK.find((x) => x.key === k);
+    if (quick) return useQuick(quick);
+    if (k === 'x' && !G.fight) return toggleAuto();
+    if (!G.fight && /^[1-8]$/.test(k)) return useBarSlot(Number(k) - 1, true);
     if (G.fight) {
       if (k === 'x') return toggleAuto();
       if (fightKey(ev.key)) ev.preventDefault();
@@ -5046,6 +5410,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     on($('chat-next'), 'click', () => $('chatlog').scrollBy({ top: Math.max(40, $('chatlog').clientHeight - 20), behavior: 'smooth' }));
     on($('btn-trades'), 'click', () => togglePanel('panel-trades'));
     on($('auto-btn'), 'click', toggleAuto);
+    setupBar();
     on($('bc-no'), 'click', closeBuyConfirm);
     on($('bc-yes'), 'click', () => {
       const pending = G.buyPending;
