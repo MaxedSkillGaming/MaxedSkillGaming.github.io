@@ -2,32 +2,32 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://devices-associations-winning-excited.trycloudflare.com",
-  "authUrl": "https://distance-component-chamber-objects.trycloudflare.com",
+  "server": "wss://restrict-bronze-favourite-beast.trycloudflare.com",
+  "authUrl": "https://ourselves-roof-cgi-monte.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
-      "size": 1156,
-      "sha256": "e1a06edd05207fe4939f8f20391ad339428570fdd32044abad43320dc726c0c6",
-      "url": "c/e1a06edd05207fe4939f8f20391ad339428570fdd32044abad43320dc726c0c6"
+      "size": 1153,
+      "sha256": "829a9b2defd8766008f8c9aecb388f7ea21a6fd2ea1f500c205a310ce509da70",
+      "url": "c/829a9b2defd8766008f8c9aecb388f7ea21a6fd2ea1f500c205a310ce509da70"
     },
     {
       "path": "data/game.json",
-      "size": 191,
-      "sha256": "eaa1df4d7e5eafcf7ec8fa201e1dd09c89c1d7646b800cc9cd60ce2d79b54b3d",
-      "url": "c/eaa1df4d7e5eafcf7ec8fa201e1dd09c89c1d7646b800cc9cd60ce2d79b54b3d"
+      "size": 201,
+      "sha256": "91db573198202771be7d3f44630564eaeac6e839c207251d5db681157ad0c71d",
+      "url": "c/91db573198202771be7d3f44630564eaeac6e839c207251d5db681157ad0c71d"
     },
     {
       "path": "data/items.json",
-      "size": 20279,
-      "sha256": "d6f4ae983a99b5c311ae1d5ae722dc9528fcf170de9225cbe49d2bc52cc8e6a3",
-      "url": "c/d6f4ae983a99b5c311ae1d5ae722dc9528fcf170de9225cbe49d2bc52cc8e6a3"
+      "size": 19210,
+      "sha256": "be30bf8bda180e5024eaa43d35c687d75f960b6bfb9cce6eb03d4f27484c5a1a",
+      "url": "c/be30bf8bda180e5024eaa43d35c687d75f960b6bfb9cce6eb03d4f27484c5a1a"
     },
     {
       "path": "data/monsters.json",
-      "size": 11013,
-      "sha256": "fe74d52641f90315da9fd39a345d99dee8ae803ca38e3ca6e187424d27008463",
-      "url": "c/fe74d52641f90315da9fd39a345d99dee8ae803ca38e3ca6e187424d27008463"
+      "size": 11007,
+      "sha256": "a374d612a729dc15bfc64311c38bd60803b99f94882418cdad3c10a9b1766380",
+      "url": "c/a374d612a729dc15bfc64311c38bd60803b99f94882418cdad3c10a9b1766380"
     },
     {
       "path": "data/nodes.json",
@@ -37,15 +37,15 @@
     },
     {
       "path": "data/npcs.json",
-      "size": 42983,
-      "sha256": "5517fba850b0c5362ffe41560714104121bfed992617b6ed588da70cf4e83db3",
-      "url": "c/5517fba850b0c5362ffe41560714104121bfed992617b6ed588da70cf4e83db3"
+      "size": 45034,
+      "sha256": "0d18aa741b67b1aad3af31e4445f21c734d93f2d827aeba28b2a5b82b9560608",
+      "url": "c/0d18aa741b67b1aad3af31e4445f21c734d93f2d827aeba28b2a5b82b9560608"
     },
     {
       "path": "data/quests.json",
-      "size": 32461,
-      "sha256": "54ce6c90118c077029ac9f7212bc365cea5422243cb15480a37fc6737945acab",
-      "url": "c/54ce6c90118c077029ac9f7212bc365cea5422243cb15480a37fc6737945acab"
+      "size": 33661,
+      "sha256": "3e83c835b2ad196af294a59c084a49c543de1fe889c03a502ac85d5b355edff6",
+      "url": "c/3e83c835b2ad196af294a59c084a49c543de1fe889c03a502ac85d5b355edff6"
     },
     {
       "path": "data/recipes.json",
@@ -55,21 +55,21 @@
     },
     {
       "path": "data/shops.json",
-      "size": 13385,
-      "sha256": "1c943d861268da39b2c8a94a3f39bf2a2f6617439f37b3da12486c8ac75c13c9",
-      "url": "c/1c943d861268da39b2c8a94a3f39bf2a2f6617439f37b3da12486c8ac75c13c9"
+      "size": 13370,
+      "sha256": "a537143cdb7870c5f55555f29f24cb5df11a7ef0ab87bf794ce3f716efc01ec6",
+      "url": "c/a537143cdb7870c5f55555f29f24cb5df11a7ef0ab87bf794ce3f716efc01ec6"
     },
     {
       "path": "data/stations.json",
-      "size": 9482,
-      "sha256": "342d638b204ce112e666a3c9a8e10b1b6cf6941ff6582b3fcfad235b0fb1a12e",
-      "url": "c/342d638b204ce112e666a3c9a8e10b1b6cf6941ff6582b3fcfad235b0fb1a12e"
+      "size": 14643,
+      "sha256": "eabf650a961b9376ab80fb9cae5fc3a3e51d81a2c518639199794c8b975af08c",
+      "url": "c/eabf650a961b9376ab80fb9cae5fc3a3e51d81a2c518639199794c8b975af08c"
     },
     {
       "path": "maps/mossgate.json",
-      "size": 235257,
-      "sha256": "e871b13fc888eaf96569841fc5e53778d8f6ac3daf49789c2b53a4d87780f4b5",
-      "url": "c/e871b13fc888eaf96569841fc5e53778d8f6ac3daf49789c2b53a4d87780f4b5"
+      "size": 235954,
+      "sha256": "486ce374320f1f605751b96ad035d628fd8ea7507416f20730841f47731f88b4",
+      "url": "c/486ce374320f1f605751b96ad035d628fd8ea7507416f20730841f47731f88b4"
     },
     {
       "path": "tiles/placeholder.png",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 184857,
-      "sha256": "5e5d11ec0c734cbcc0fcae4f435b732e59faa0f218fc9e1d98be4b5b7a348c02",
-      "url": "c/5e5d11ec0c734cbcc0fcae4f435b732e59faa0f218fc9e1d98be4b5b7a348c02"
+      "size": 210017,
+      "sha256": "49e94260df4eb8c4785567199fe903435385dbcd1b9b1537ac4e4269c521da6b",
+      "url": "c/49e94260df4eb8c4785567199fe903435385dbcd1b9b1537ac4e4269c521da6b"
     },
     {
       "path": "ui/icon.png",
@@ -97,22 +97,22 @@
     },
     {
       "path": "ui/index.html",
-      "size": 13169,
-      "sha256": "fd9dd06c6cdfd459bac29540ff9b93f73db156210d96cfa91f6dc751a00d40b0",
-      "url": "c/fd9dd06c6cdfd459bac29540ff9b93f73db156210d96cfa91f6dc751a00d40b0"
+      "size": 14195,
+      "sha256": "1fdb4a52bfaef02be6e24bd7a4ea2439889c3f919727ec2b94e825556fb8607d",
+      "url": "c/1fdb4a52bfaef02be6e24bd7a4ea2439889c3f919727ec2b94e825556fb8607d"
     },
     {
       "path": "ui/renderer.js",
-      "size": 15054,
-      "sha256": "4ef18ef1acd8ed3be138de1c7362af3ff3e6279d2f448266d9d2985de3e5c02c",
-      "url": "c/4ef18ef1acd8ed3be138de1c7362af3ff3e6279d2f448266d9d2985de3e5c02c"
+      "size": 15113,
+      "sha256": "4ca55e223b4851f9a6438c22506a77af7cad406208b8ccbd855406be00bd62fd",
+      "url": "c/4ca55e223b4851f9a6438c22506a77af7cad406208b8ccbd855406be00bd62fd"
     },
     {
       "path": "ui/style.css",
-      "size": 19104,
-      "sha256": "67ee669b1e1e1856f3920248258789167f659adfd00862e64e38737a6a91d152",
-      "url": "c/67ee669b1e1e1856f3920248258789167f659adfd00862e64e38737a6a91d152"
+      "size": 24116,
+      "sha256": "a46f33dc050e3000dddff24d6957648bf015b221bddfd021a15f90a6d05d6033",
+      "url": "c/a46f33dc050e3000dddff24d6957648bf015b221bddfd021a15f90a6d05d6033"
     }
   ],
-  "signature": "UMGUf9cnUBAoJlspMZBffsh4iGrVDPNUuLT8bJw2wi7ZiGyBms4K91Pv11dz8hNDMrd54kgz96XMC9r0QOsGDg=="
+  "signature": "2uzDnl9dW9znDCkT277jZGoHzl9Y5RdGHb6x/iQ2O01ZzenFi8F8Aer1X1eL+5mQDPpTaQnRfJ293Z1NkvQoCQ=="
 }
