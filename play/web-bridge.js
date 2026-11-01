@@ -2,8 +2,9 @@
 // The browser's stand-in for preload.cjs. It gives the page the same window.coe the desktop shell gives, but talks to
 // the auth service and game server straight from the page. Only the web build loads this file.
 //
-// Tokens live in this closure and nowhere else: not in window, not in storage. github.io shares one origin across every
-// repo of the account, so anything written to localStorage here could be read by another page on it.
+// Tokens live in this closure. The one exception is the refresh token of a player who ticked "keep me signed in": it goes
+// in localStorage so the next visit can resume. github.io shares one origin across every repo of the account, so that
+// is opt-in, and the server ends such a session 30 days after the login whatever happens.
 (() => {
   const SAFE_IMAGE = /^[a-z0-9_-]+(\/[a-z0-9_.-]+)*\.png$/i;
 
@@ -20,6 +21,17 @@
   let session = null;
   let socket = null;
   let keepalive = null;
+  let remember = false;
+
+  const KEEP_KEY = 'coe.web.session';
+  const keep = (token) => {
+    try {
+      if (token) localStorage.setItem(KEEP_KEY, token);
+      else localStorage.removeItem(KEEP_KEY);
+    } catch {
+      // Storage can be blocked. Then the session just does not last past this visit.
+    }
+  };
 
   const fail = (code, status = 0, retryAfterSec) => Object.assign(new Error(code), { code, status, retryAfterSec });
   const failure = (err) => ({ ok: false, error: err.code || 'unknown_error', ...(err.retryAfterSec ? { retryAfterSec: err.retryAfterSec } : {}) });
@@ -55,9 +67,11 @@
     return t;
   }
 
-  async function signedIn(promise) {
+  async function signedIn(promise, want = false) {
     try {
       session = await promise;
+      remember = want;
+      keep(want ? session.refreshToken : null);
       return { ok: true, username: session.account.username, recoveryKey: session.recoveryKey };
     } catch (err) {
       return failure(err);
@@ -159,11 +173,27 @@
       }
     },
     onPatchProgress: subscribe(progress),
-    // Nothing is kept between visits, so there is never a session to resume.
-    resume: async () => ({ ok: false, error: 'no_session' }),
-    login: (username, password) => {
+    async resume() {
+      let token = null;
+      try {
+        token = localStorage.getItem(KEEP_KEY);
+      } catch {
+        // blocked storage: nothing to resume
+      }
+      if (!token || !config) return { ok: false, error: 'no_session' };
+      try {
+        session = await tokens('/refresh', { refreshToken: token });
+        remember = true;
+        keep(session.refreshToken);
+        return { ok: true, username: session.account.username };
+      } catch (err) {
+        if (err.status === 401) keep(null);
+        return failure(err);
+      }
+    },
+    login: (username, password, want) => {
       if (!isString(username, 32) || !isString(password, 128)) return Promise.resolve({ ok: false, error: 'invalid_request' });
-      return signedIn(tokens('/login', { username, password }));
+      return signedIn(tokens('/login', { username, password }), want === true);
     },
     register: (username, password, _remember, age, gender) => {
       if (!isString(username, 32) || !isString(password, 128)) return Promise.resolve({ ok: false, error: 'invalid_request' });
@@ -182,6 +212,8 @@
       stopGame();
       const token = session && session.refreshToken;
       session = null;
+      remember = false;
+      keep(null);
       if (token) await post('/logout', { refreshToken: token }).catch(() => {});
       return { ok: true };
     },
@@ -193,6 +225,7 @@
       try {
         // Access tokens last 15 minutes, so take a fresh one for every join.
         session = await tokens('/refresh', { refreshToken: session.refreshToken });
+        if (remember) keep(session.refreshToken);
         const welcome = await connect(session.accessToken);
         startKeepalive();
         const map = await getJson(`content/maps/${String(welcome.map).replace(/[^a-z0-9_-]/gi, '')}.json`);
