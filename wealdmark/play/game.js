@@ -2773,6 +2773,45 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   /** Corner map: the ground around the hero, with dots for people, monsters and townsfolk. */
   const MM = { span: 41, px: 3, key: null, base: null };
+  const RSIZES = [
+    { span: 25, track: 150 },
+    { span: 33, track: 170 },
+    { span: 41, track: 190 },
+    { span: 53, track: 240 },
+  ];
+  const rview = { size: 2, map: true, quests: true };
+
+  /** Size and show/hide for the corner map and quest list. The choice is remembered. */
+  function setupCorner() {
+    try {
+      Object.assign(rview, JSON.parse(localStorage.getItem('wealdmark.corner')) || {});
+    } catch {
+      /* no saved choice */
+    }
+    const apply = () => {
+      rview.size = Math.max(0, Math.min(RSIZES.length - 1, Number(rview.size) || 0));
+      const sz = RSIZES[rview.size];
+      MM.span = sz.span;
+      const cv = $('minimap');
+      cv.width = cv.height = sz.span * MM.px;
+      cv.style.width = cv.style.height = `${sz.span * MM.px}px`;
+      cv.style.display = rview.map ? '' : 'none';
+      $('tracker').style.width = `${sz.track}px`;
+      $('tracker').style.display = rview.quests ? '' : 'none';
+      $('r-map').classList.toggle('off', !rview.map);
+      $('r-quests').classList.toggle('off', !rview.quests);
+      try {
+        localStorage.setItem('wealdmark.corner', JSON.stringify(rview));
+      } catch {
+        /* blocked storage */
+      }
+    };
+    on($('r-smaller'), 'click', () => (rview.size--, apply()));
+    on($('r-bigger'), 'click', () => (rview.size++, apply()));
+    on($('r-map'), 'click', () => ((rview.map = !rview.map), apply()));
+    on($('r-quests'), 'click', () => ((rview.quests = !rview.quests), apply()));
+    apply();
+  }
   function renderMinimap(map) {
     const cv = $('minimap');
     const c = cv.getContext('2d');
@@ -2862,10 +2901,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   })) for (const id of ids) ABILITY_STYLE[id] = style;
   /** Quick slots beside the globes. `item` is the default item; 'any' means the first food in the bag. */
   const QUICK = [
-    { id: 'hp', key: 'h', label: 'Health potion', item: 'minor_health_potion', match: (d) => d.kind === 'potion' && d.heal && !d.mana },
+    { id: 'hp', key: 'h', label: 'Health potion or food', item: 'minor_health_potion', match: (d) => (d.kind === 'potion' && d.heal && !d.mana) || d.kind === 'food' },
     { id: 'food', key: 'u', label: 'Food', item: 'any', match: (d) => d.kind === 'food' },
     { id: 'mp', key: 'n', label: 'Mana potion', item: 'minor_mana_potion', match: (d) => d.kind === 'potion' && d.mana },
-    { id: 'spare', key: 'b', label: 'Spare slot', item: null, match: (d) => d.kind === 'food' || d.kind === 'potion' },
   ];
 
   function barState() {
@@ -3126,6 +3164,46 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     );
   }
 
+  /** Go to the previous (dir -1) or next (+1) bar whose weapon you can reach: in a fight only the swap slot counts. */
+  function switchBar(style, dir) {
+    const alt = G.inv && G.inv.equipment && G.inv.equipment.weapon2;
+    for (let step = 1; step < STYLES.length; step++) {
+      const want = STYLES[(STYLES.indexOf(style) + dir * step + STYLES.length * 2) % STYLES.length];
+      if (G.fight) {
+        if (alt && (CLASS_SKILL[weaponClassOf(alt)] || 'melee') === want) {
+          if (!isMyTurn()) return toast('Not your turn to act.');
+          return G.fight.options.canSwap ? sendFight({ t: 'swap' }) : toast('You have already acted this turn.');
+        }
+        continue;
+      }
+      const idx = ((G.inv && G.inv.items) || []).findIndex((s) => {
+        const def = s && G.data.items.get(s.id);
+        return def && def.kind === 'weapon' && CLASS_SKILL[def.weaponClass] === want;
+      });
+      if (idx >= 0) return window.wealdmark.send({ t: 'equip', slot: idx });
+    }
+    toast(G.fight ? 'Your swap slot has no weapon for another bar.' : 'You carry no weapon for another bar.');
+  }
+
+  /** One marker for the bar that is up (1 melee, 2 ranged, 3 magic), with arrows to change it. */
+  function barSwitcher(style) {
+    const n = STYLES.indexOf(style) + 1;
+    const box = el('div', 'barsw');
+    const mk = (cls, text, dir, title) => {
+      const b = el('button', cls, text);
+      b.type = 'button';
+      b.title = title;
+      if (dir) b.addEventListener('click', () => switchBar(style, dir));
+      return b;
+    };
+    box.append(
+      mk('up', '▲', -1, 'Previous ability bar. The bar follows the weapon in your hand.'),
+      mk('num', String(n), 0, `Ability bar ${n} of 3: ${style}.`),
+      mk('down', '▼', 1, 'Next ability bar. The bar follows the weapon in your hand.'),
+    );
+    return box;
+  }
+
   /** Rebuild the bar only when something it shows has changed. */
   function renderBar() {
     const host = $('hotbar');
@@ -3140,6 +3218,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       bossFight(),
       opts ? [opts.actor, opts.acted, G.fight.selected, opts.abilities.map((a) => [a.id, a.usable, a.cooldown, a.mana])] : 0,
       heldWeapon() && heldWeapon().id,
+      G.inv && G.inv.equipment && G.inv.equipment.weapon2 && G.inv.equipment.weapon2.id,
       G.inv ? G.inv.items.map((s) => s && s.id + s.qty) : 0,
       QUICK.map(quickItem),
     ]);
@@ -3152,13 +3231,38 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       wirePicker(b, () => openBarPicker('bar', i));
       host.appendChild(b);
     });
-    const auto = el('button', 'bslot auto' + (G.auto && !bossFight() ? ' on' : ''));
+    const auto = el('button', 'sslot auto' + (G.auto && !bossFight() ? ' on' : ''));
     auto.type = 'button';
     auto.disabled = false;
     auto.append(el('b', '', 'AUTO'), el('span', 'st', G.auto && !bossFight() ? 'ON' : 'OFF'), el('span', 'hk', 'X'));
     auto.title = bossFight() ? 'Auto combat is not available against bosses and minibosses.' : 'Auto combat (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. It stays on between fights until you turn it off.';
     auto.addEventListener('click', toggleAuto);
-    host.appendChild(auto);
+    const left = $('side-l');
+    const right = $('side-r');
+    left.textContent = '';
+    right.textContent = '';
+    left.append(auto);
+
+    const alt = G.inv && G.inv.equipment && G.inv.equipment.weapon2;
+    const swap = el('button', 'sslot swap' + (alt ? '' : ' off'));
+    swap.type = 'button';
+    const altDef = alt && G.data.items.get(alt.id);
+    if (altDef) {
+      const cv = iconCanvas(altDef);
+      cv.className = 'icon';
+      swap.appendChild(cv);
+    } else swap.appendChild(el('span', 'plus', 'Swap'));
+    swap.appendChild(el('span', 'hk', 'Q'));
+    swap.title = alt ? `Swap to ${altDef ? altDef.name : 'your second weapon'} (Q). In a fight it uses your action.` : 'Swap weapon (Q). Shift-click a weapon in your bag to place it in the swap slot.';
+    swap.addEventListener('click', () => {
+      if (G.fight) {
+        if (!isMyTurn()) return toast('Not your turn to act.');
+        if (!G.fight.options.canSwap) return toast(G.fight.options.acted ? 'You have already acted this turn.' : 'You have no second weapon. Shift-click a weapon in your bag to place it in the swap slot.');
+        return sendFight({ t: 'swap' });
+      }
+      toast('You can swap weapons in a fight. Out of one, change your weapon in Gear (E) or from the bar.');
+    });
+    right.append(swap, barSwitcher(style));
 
     for (const q of QUICK) {
       const slot = document.querySelector(`.qslot[data-q="${q.id}"]`);
@@ -3948,11 +4052,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function placeWindow(el) {
     if (el.dataset.moved) return;
-    const box = el.offsetParent || document.body;
     const slot = Math.max(0, openOrder.indexOf(el.id));
-    const w = el.offsetWidth || 260;
-    el.style.right = 'auto';
-    el.style.left = `${Math.max(0, box.clientWidth - w - 10 - slot * 24)}px`;
+    el.style.left = 'auto';
+    el.style.right = `${10 + slot * 24}px`;
     el.style.top = `${56 + slot * 28}px`;
   }
 
@@ -4003,6 +4105,37 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       el.insertBefore(x, el.firstChild);
       if (!el.classList.contains('side')) continue;
       el.addEventListener('pointerdown', () => raise(el));
+      // Remember where the player put each window and how big they made it.
+      const wkey = `wealdmark.win.${p}`;
+      const saveWin = () => {
+        if (el.classList.contains('hidden') || (el.offsetParent || document.body).clientWidth < 300 || window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) return;
+        try {
+          localStorage.setItem(wkey, JSON.stringify({ l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }));
+        } catch {
+          /* blocked storage: the layout lasts until the page closes */
+        }
+      };
+      try {
+        const s = JSON.parse(localStorage.getItem(wkey));
+        if (s && Number.isFinite(s.l) && Number.isFinite(s.t) && Number.isFinite(s.w) && Number.isFinite(s.h)) {
+          const box = el.offsetParent || document.body;
+          el.style.right = 'auto';
+          el.style.left = `${Math.min(Math.max(0, s.l), Math.max(0, box.clientWidth - 80))}px`;
+          el.style.top = `${Math.min(Math.max(0, s.t), Math.max(0, box.clientHeight - 60))}px`;
+          el.style.width = `${Math.max(200, s.w)}px`;
+          el.style.height = `${Math.max(90, s.h)}px`;
+          el.dataset.moved = '1';
+        }
+      } catch {
+        /* no saved layout */
+      }
+      if (typeof ResizeObserver === 'function') {
+        let t = null;
+        new ResizeObserver(() => {
+          clearTimeout(t);
+          t = setTimeout(saveWin, 300);
+        }).observe(el);
+      }
       const bar = el.querySelector('h2');
       if (!bar) continue;
       bar.classList.add('grip');
@@ -4022,6 +4155,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           document.removeEventListener('pointermove', move);
           document.removeEventListener('pointerup', up);
           document.removeEventListener('pointercancel', up);
+          saveWin();
         };
         document.addEventListener('pointermove', move);
         document.addEventListener('pointerup', up);
@@ -5216,13 +5350,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('mb-zout'), 'click', () => setZoom(G.zoom - 1));
     on($('mb-map'), 'click', () => setZoom(G.zoom === -12 ? 0 : -12));
     on($('mb-chat'), 'click', () => $('chatinput').focus());
-    on($('mb-close'), 'click', () => {
-      closeNodeMenu();
-      if (!$('buy-confirm').classList.contains('hidden')) return closeBuyConfirm();
-      closePanels();
-      if (G.busy) window.wealdmark.send({ t: 'stop' });
-      closeTown(true);
-    });
   }
 
   function onMouseMove(ev) {
@@ -6176,6 +6303,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('chatform'), 'submit', onChat);
     on($('chat-prev'), 'click', () => $('chatlog').scrollBy({ top: -Math.max(40, $('chatlog').clientHeight - 20), behavior: 'smooth' }));
     on($('chat-next'), 'click', () => $('chatlog').scrollBy({ top: Math.max(40, $('chatlog').clientHeight - 20), behavior: 'smooth' }));
+    setupCorner();
+    on($('menu-btn'), 'click', (ev) => {
+      ev.stopPropagation();
+      $('menu-list').classList.toggle('hidden');
+    });
+    // Picking an entry, or clicking anywhere else, folds the menu back up.
+    on($('menu-list'), 'click', () => $('menu-list').classList.add('hidden'));
+    on(document, 'pointerdown', (ev) => {
+      if (!ev.target.closest('#toolbar')) $('menu-list').classList.add('hidden');
+    });
     on($('btn-trades'), 'click', () => togglePanel('panel-trades'));
     on($('auto-btn'), 'click', toggleAuto);
     setupBar();

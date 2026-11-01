@@ -164,7 +164,10 @@ footer { margin-top: 16px; text-align: right; }
   font: inherit;
   font-size: 13px;
 }
-#toolbar { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; }
+#toolbar { position: absolute; top: 10px; right: 10px; z-index: 20; }
+/* Desktop: the usual row of buttons. The Menu button is for touch screens and small windows. */
+#menu-btn { display: none; }
+#menu-list, #menu-list.hidden { display: flex; gap: 6px; }
 #toolbar button { margin: 0; padding: 6px 10px; font-size: 13px; }
 
 #vitals {
@@ -195,6 +198,9 @@ footer { margin-top: 16px; text-align: right; }
 .chip .st img { width: 12px; height: 12px; image-rendering: pixelated; vertical-align: -2px; margin-right: 3px; }
 #rhud { position: absolute; top: 56px; right: 10px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: none; }
 #rhud.hidden { display: none; }
+#rctl { display: flex; gap: 3px; pointer-events: auto; }
+#rctl button { margin: 0; padding: 1px 6px; min-width: 22px; font-size: 11px; line-height: 16px; }
+#rctl button.off { opacity: 0.55; }
 #vitals .meter.hp, #vitals .meter.mp, #actions, #auto-btn { display: none; }
 #buffs { top: 170px; }
 #bhud { position: absolute; left: calc(min(380px, 34vw) + 24px); right: 10px; bottom: 10px; max-width: 760px; display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
@@ -205,19 +211,20 @@ footer { margin-top: 16px; text-align: right; }
 .globe.mp:before { background: #3f6fd0; }
 .globe span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; text-shadow: 1px 1px 0 #000; }
 .qcol { display: flex; flex-direction: column; gap: 4px; flex: none; }
-.qslot, .bslot { position: relative; margin: 0; padding: 0; border: 2px solid #000; background: #17112a; color: var(--ink); font: inherit; cursor: pointer; }
-.qslot { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+.qslot, .sslot, .bslot { position: relative; margin: 0; padding: 0; border: 2px solid #000; background: #17112a; color: var(--ink); font: inherit; cursor: pointer; }
+.qslot, .sslot { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
 #hotcol { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 #hotcol .meter.xp { margin: 0 0 15px; }
+#hotrow { display: flex; align-items: flex-end; gap: 4px; }
 #hotbar { position: relative; flex: 1; min-width: 0; display: flex; gap: 4px; }
 #hotbar:before { content: attr(data-style) " bar"; position: absolute; left: 2px; top: -13px; font-size: 9px; line-height: 10px; letter-spacing: 1px; text-transform: uppercase; color: #8a80a8; text-shadow: 1px 1px 0 #000; pointer-events: none; }
 .bslot { flex: 1; max-width: 48px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-.bslot img, .bslot canvas.icon, .qslot canvas.icon { width: 80%; height: 80%; image-rendering: pixelated; }
-.bslot.off, .qslot.off { filter: grayscale(0.8) brightness(0.65); }
+.bslot img, .bslot canvas.icon, .qslot canvas.icon, .sslot canvas.icon { width: 80%; height: 80%; image-rendering: pixelated; }
+.bslot.off, .qslot.off, .sslot.off { filter: grayscale(0.8) brightness(0.65); }
 .bslot.empty { border-style: dashed; border-color: #3a2f55; }
 .bslot.selected { outline: 3px solid var(--gold); }
 .bslot.held { border-color: var(--gold); }
-.bslot .hk, .qslot .hk { position: absolute; left: 1px; top: 0; font-size: 9px; line-height: 10px; padding: 0 2px; background: #000; color: #f0c860; }
+.bslot .hk, .qslot .hk, .sslot .hk { position: absolute; left: 1px; top: 0; font-size: 9px; line-height: 10px; padding: 0 2px; background: #000; color: #f0c860; }
 .bslot .cost { position: absolute; right: 1px; bottom: 0; font-size: 9px; line-height: 10px; padding: 0 2px; background: #1c3a78; color: #cfe0ff; }
 .bslot .cd { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; background: rgba(0, 0, 0, 0.65); }
 .qslot .cnt { position: absolute; right: 1px; bottom: 0; font-size: 10px; line-height: 11px; padding: 0 2px; background: #000; color: #fff; }
@@ -232,7 +239,7 @@ footer { margin-top: 16px; text-align: right; }
 #bar-picker .pick { display: flex; align-items: center; gap: 6px; width: 100%; margin: 2px 0; padding: 3px 6px; text-align: left; font-size: 12px; }
 #bar-picker .pick img, #bar-picker .pick canvas { width: 20px; height: 20px; image-rendering: pixelated; }
 #minimap { width: 123px; height: 123px; border: 3px solid var(--edge); background: #0c0912; image-rendering: pixelated; opacity: 0.92; }
-#tracker { width: 190px; padding: 5px 7px; background: rgba(20, 16, 28, 0.85); border: 3px solid var(--edge); font-size: 12px; }
+#tracker { width: 190px; pointer-events: auto; padding: 5px 7px; background: rgba(20, 16, 28, 0.85); border: 3px solid var(--edge); font-size: 12px; }
 #tracker .tq + .tq { margin-top: 5px; padding-top: 4px; border-top: 1px solid #3a2f55; }
 #tracker b { color: var(--gold); font-weight: normal; }
 #tracker .ok { color: #7bd88f; }
@@ -311,10 +318,10 @@ button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
   position: absolute;
   top: 56px;
   right: 10px;
-  width: 260px;
+  width: 240px;
   min-width: 200px;
   min-height: 90px;
-  max-height: calc(100% - 60px);
+  max-height: calc(100% - 190px);
   resize: both;
   overflow: auto;
   padding: 10px 12px;
@@ -356,7 +363,7 @@ button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
 #gear-stats dt { color: var(--muted); }
 #gear-stats dd { margin: 0; text-align: right; }
 #gear-stats p { margin: 4px 0 0; color: #9fd8ff; font-style: italic; }
-#bag-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 6px; }
+#bag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 5px; margin-top: 6px; }
 button.slot {
   position: relative;
   margin: 0;
@@ -405,7 +412,7 @@ button.slot i { position: absolute; right: 3px; bottom: 1px; font-style: normal;
 
 /* ---- towns: dialogue, shops, storage, stations, journal */
 
-.side.wide { width: 320px; }
+.side.wide { width: 300px; }
 .side h3 { margin: 10px 0 4px; font-size: 13px; color: var(--gold); }
 .wallet-line { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
 .price { display: inline-flex; align-items: center; gap: 4px; color: var(--ink); }
@@ -582,9 +589,14 @@ button.link:hover { opacity: 1; }
   body { touch-action: manipulation; }
   #mbar { display: flex; flex-direction: column; gap: 6px; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); z-index: 5; }
   #mbar button { margin: 0; min-width: 48px; min-height: 44px; padding: 6px 8px; font-size: 14px; }
-  #toolbar { left: 6px; right: 6px; top: 6px; flex-wrap: nowrap; overflow-x: auto; gap: 4px; scrollbar-width: none; }
-  #toolbar::-webkit-scrollbar { display: none; }
-  #toolbar button { flex: none; min-height: 36px; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
+  #toolbar { right: 6px; top: 6px; }
+  #menu-btn { display: block; }
+  #menu-list, #menu-list.hidden { position: absolute; top: 100%; right: 0; margin-top: 4px; min-width: 150px; flex-direction: column; gap: 3px; padding: 5px; background: rgba(20, 16, 28, 0.97); border: 2px solid var(--edge); }
+  #menu-list.hidden { display: none; }
+  #menu-list button { text-align: left; }
+  #leave { margin-top: 4px; }
+  #toolbar button { min-height: 36px; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
+  #menu-list button { min-height: 40px; font-size: 14px; }
   #hud { display: none; }
   #vitals { top: 52px; left: 6px; width: 170px; padding: 6px 8px; }
   #buffs { top: 130px; left: 6px; width: 170px; }
@@ -616,3 +628,23 @@ button.link:hover { opacity: 1; }
 #party-body .meter.mini span { position: absolute; inset: 0; text-align: center; font-size: 10px; line-height: 14px; }
 #party-name { width: 60%; }
 #panel-dungeon .bad { color: #e07070; }
+.sslot { font-size: 10px; line-height: 1.1; flex-direction: column; gap: 1px; }
+.sslot.num { font-size: 18px; color: var(--gold); }
+.sslot.auto.on { border-color: #6fcf7f; }
+.sslot.auto b { font-weight: normal; color: #e8e0f0; }
+.sslot .cnt { position: absolute; right: 1px; bottom: 0; font-size: 10px; line-height: 11px; padding: 0 2px; background: #000; color: #fff; }
+/* a visible corner to drag when resizing a window */
+.side::-webkit-resizer { background: linear-gradient(135deg, transparent 50%, var(--gold) 50%); border: 0; }
+.side { scrollbar-color: #4a3d6a #17112a; }
+/* Wide desktop windows: the window buttons sit as a compact block to the right of the ability bar. */
+@media (min-width: 1500px) and (pointer: fine) {
+  /* The block starts where the ability bar ends (its left edge plus its 760px max width), so there is no gap. */
+  #toolbar { top: auto; bottom: 10px; right: auto; left: calc(min(380px, 34vw) + 24px + 768px); width: min(440px, calc(100vw - min(380px, 34vw) - 24px - 768px - 10px)); }
+  #menu-list, #menu-list.hidden { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  #toolbar button { padding: 8px 2px; font-size: 13px; line-height: 1.2; white-space: nowrap; }
+}
+.barsw { display: flex; flex-direction: column; width: 24px; height: 84px; flex: none; border: 2px solid #000; background: #17112a; }
+.barsw button { margin: 0; padding: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 10px; cursor: pointer; flex: 1; }
+.barsw button:hover { background: #2a2040; }
+.barsw .num { flex: 1.2; font-size: 16px; color: var(--gold); cursor: default; }
+#side-r { flex-direction: row; align-items: flex-end; }
