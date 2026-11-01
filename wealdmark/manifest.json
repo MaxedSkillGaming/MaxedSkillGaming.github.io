@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://focusing-bean-partners-concentrate.trycloudflare.com",
-  "authUrl": "https://replies-programs-premium-tramadol.trycloudflare.com",
+  "server": "wss://commitment-pieces-immediate-announced.trycloudflare.com",
+  "authUrl": "https://rolling-mysterious-deutsche-lakes.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 250426,
-      "sha256": "81a6d9601840af35f20cabd050b40d16ab772cf3858ffa0991c2c9e3c558b1d3",
-      "url": "c/81a6d9601840af35f20cabd050b40d16ab772cf3858ffa0991c2c9e3c558b1d3"
+      "size": 256583,
+      "sha256": "381471ca23d647463547e3fa7cfa82f26b3746b9408dd2cd64cb2f76e6122cc1",
+      "url": "c/381471ca23d647463547e3fa7cfa82f26b3746b9408dd2cd64cb2f76e6122cc1"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 15824,
-      "sha256": "83122610ea969d985edb9e5dda0eb30be708216a43b0a691cbc824c238af0ea9",
-      "url": "c/83122610ea969d985edb9e5dda0eb30be708216a43b0a691cbc824c238af0ea9"
+      "size": 16357,
+      "sha256": "534a887de303bb46b46fbbfffcb5e9f1530901b451ecf846692333f07db25a59",
+      "url": "c/534a887de303bb46b46fbbfffcb5e9f1530901b451ecf846692333f07db25a59"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 26725,
-      "sha256": "1b8018671b9f8ad08b5e00ed6f2004a199e0d9735721a9329b3664c88840fe51",
-      "url": "c/1b8018671b9f8ad08b5e00ed6f2004a199e0d9735721a9329b3664c88840fe51"
+      "size": 29225,
+      "sha256": "d4f065be88a65192f53295abf1687620f884cc79f23998306b233a785853da76",
+      "url": "c/d4f065be88a65192f53295abf1687620f884cc79f23998306b233a785853da76"
     }
   ],
-  "signature": "qyU4VliS9XA3Ha16rslzgZyytM+ivJXYgDx15PXySceSJOraAzk9cX+WUR1dZ9Oxd4a+qyTstu7ICfRHHCCSBQ=="
+  "signature": "3DsmAb8v1dQ0oaY4KTvOfvQi2WsWeVut9kbDL4Wk8P4n2pZ8lQFbe75aQuaA2eRjMXE8JClzWsxPQWVKn6EUAQ=="
 }
