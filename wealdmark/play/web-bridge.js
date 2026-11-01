@@ -195,9 +195,9 @@
       if (!isString(username, 32) || !isString(password, 128)) return Promise.resolve({ ok: false, error: 'invalid_request' });
       return signedIn(tokens('/login', { username, password }), want === true);
     },
-    register: (username, password, _remember, age, gender) => {
+    register: (username, password, want, age, gender) => {
       if (!isString(username, 32) || !isString(password, 128)) return Promise.resolve({ ok: false, error: 'invalid_request' });
-      return signedIn(tokens('/register', { username, password, ageConfirmed: age === true, gender: gender === 'f' ? 'f' : gender === 'm' ? 'm' : '' }));
+      return signedIn(tokens('/register', { username, password, ageConfirmed: age === true, gender: gender === 'f' ? 'f' : gender === 'm' ? 'm' : '' }), want === true);
     },
     resetPassword: (username, code, password) => {
       if (!isString(username, 32) || !isString(code, 32) || !isString(password, 128)) return Promise.resolve({ ok: false, error: 'invalid_request' });

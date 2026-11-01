@@ -221,6 +221,7 @@ footer { margin-top: 16px; text-align: right; }
 .bslot .cost { position: absolute; right: 1px; bottom: 0; font-size: 9px; line-height: 10px; padding: 0 2px; background: #1c3a78; color: #cfe0ff; }
 .bslot .cd { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; background: rgba(0, 0, 0, 0.65); }
 .qslot .cnt { position: absolute; right: 1px; bottom: 0; font-size: 10px; line-height: 11px; padding: 0 2px; background: #000; color: #fff; }
+.qslot.town { font-size: 10px; color: #cfe0ff; }
 .qslot .plus { font-size: 11px; color: #8a80a8; }
 .bslot.auto { flex-direction: column; gap: 1px; border-color: #6a5a9a; font-size: 9px; line-height: 1.1; }
 .bslot.auto b { font-weight: normal; color: #e8e0f0; }
@@ -273,7 +274,7 @@ footer { margin-top: 16px; text-align: right; }
   background: rgba(20, 16, 28, 0.92);
   border: 2px solid var(--edge);
 }
-#fightbar.hidden { display: none; }
+#fightbar, #fightbar.hidden { display: none; }
 #fight-util { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
 #fight-util button.act { padding: 2px 6px; font-size: 11px; }
 #hover-tip {

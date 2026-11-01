@@ -44,7 +44,7 @@
           <li id="hint-pass">Password: at least 10 characters with letters and numbers, or 16 or more of anything. Nothing common, and not your username.</li>
         </ul>
         <label class="check"><input id="show-password" type="checkbox" /> Show password</label>
-        <label class="check hidden"><input id="remember" type="checkbox" /> Keep me signed in on this computer</label>
+        <label class="check hidden"><input id="remember" type="checkbox" checked /> Keep me signed in on this computer</label>
         <fieldset class="hidden" id="gender-row">
           <legend>Body shape (cannot be changed later)</legend>
           <label class="check"><input type="radio" name="gender" value="m" /> Male</label>
@@ -136,6 +136,7 @@
       <div class="qcol">
         <button class="qslot" data-q="mp" type="button"></button>
         <button class="qslot" data-q="spare" type="button"></button>
+        <button id="q-town" class="qslot town" type="button" title="Teleport to town (T)">Town<span class="hk">T</span></button>
       </div>
     </div>
     <div id="bar-picker" class="hidden"></div>

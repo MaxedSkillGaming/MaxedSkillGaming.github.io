@@ -6210,6 +6210,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     });
     for (const id of ['shop-close', 'storage-close', 'station-close', 'perks-close', 'anchor-close']) on($(id), 'click', () => closeTown(true));
     on($('btn-town'), 'click', goToTown);
+    on($('q-town'), 'click', goToTown);
     on($('btn-look'), 'click', () => {
       togglePanel('panel-look');
       renderLook();
