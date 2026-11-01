@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://chart-bundle-computing-lanka.trycloudflare.com",
-  "authUrl": "https://celebs-promotional-controlled-arrange.trycloudflare.com",
+  "server": "wss://situations-quotations-dryer-funky.trycloudflare.com",
+  "authUrl": "https://acres-tracks-disciplines-surrounding.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "dzSCPvC6TzpHutVUrtulgJiusqCM69aDFRXUcXyv4voMLHuAohPEs0btd+MUTZQYwyIMFp6h0c3sqq/wYuMECw=="
+  "signature": "SxGUbnk0yV8VPt4lCpNM37bHn8QSCKOf252HQZcCjhxWiwChVAkwmz5bwgnHXiYDiM2TcagamWD92Mu7/grxBQ=="
 }
