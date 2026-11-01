@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://eternitysquaredtechnologies.github.io/heroes-of-the-wealdmark-downloads/sitemap.xml
+Sitemap: https://eternitysquaredtechnologies.github.io/wealdmark/sitemap.xml

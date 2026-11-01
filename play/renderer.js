@@ -148,6 +148,8 @@ async function runPatch() {
     enterHome(resumed.username);
   } else {
     show('login');
+    // The landing page's "Create account" button links here with #register.
+    if (location.hash === '#register') setMode('register');
     $('username').focus();
   }
 }

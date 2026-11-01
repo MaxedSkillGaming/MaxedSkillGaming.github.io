@@ -333,11 +333,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
    */
   function drawFigure(ctx, x, y, s, l, step, bob, held) {
     held = held || {};
-    const key = ['p4', l.g, l.skin, l.body, l.hair, l.hat, step, held.weapon || '', held.element || '', held.shield ? 1 : 0, held.offPistol ? 1 : 0].join('|');
+    const key = ['p4', l.g, l.skin, l.body, l.hair, l.hat, step, held.wid || '', held.element || '', held.oid || '', held.hid || '', held.bid || '', held.cid || ''].join('|');
     const c = sprite(key, (r) => {
       const fem = l.g === 'f';
       const boot = '#4a2e1c';
       const pant = '#3a3048';
+      if (held.cid) paintCloak(r, held.cid);
       r(9, 18, 3, 3, pant);
       r(13, 18, 3, 3, pant);
       r(8, 21 - (step === 1 ? 1 : 0), 4, 2, boot);
@@ -361,6 +362,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       r(17, 12, 2, 5, l.bodyShade);
       r(6, 17, 2, 2, l.skin);
       r(17, 17, 2, 2, l.skinShade);
+      if (held.bid) paintBody(r, held.bid, fem);
+      if (held.cid) paintClasp(r, held.cid);
       // head
       r(6, 3, 12, 9, l.skin);
       r(7, 2, 10, 1, l.skin);
@@ -382,7 +385,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         r(14, 5, 2, 1, l.hair);
       }
       // headgear
-      if (l.hat === 1) {
+      if (held.hid) paintHelm(r, held.hid);
+      else if (l.hat === 1) {
         r(5, 0, 14, 5, l.body);
         r(5, 5, 2, 7, l.body);
         r(17, 5, 2, 7, l.bodyShade);
@@ -411,58 +415,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       r(11, 10, 3, 1, '#a8705a');
       r(8, 10, 2, 1, '#e89a8a');
       r(15, 10, 2, 1, '#d88a7a');
+      if (held.hid === 'pickmans_bone_mask') paintMask(r);
       // held gear
-      if (held.weapon === 'blade') {
-        r(4, 4, 2, 13, '#dfe6f2');
-        r(4, 4, 1, 2, '#ffffff');
-        r(3, 17, 5, 1, '#c89a3c');
-        r(4, 18, 2, 2, '#6a4020');
-      } else if (held.weapon === 'dagger') {
-        r(4, 12, 2, 5, '#dfe6f2');
-        r(3, 17, 4, 1, '#c89a3c');
-        r(4, 18, 2, 2, '#6a4020');
-      } else if (held.weapon === 'bow') {
-        r(3, 5, 2, 1, '#8a5a2c');
-        r(2, 6, 2, 10, '#8a5a2c');
-        r(3, 16, 2, 1, '#8a5a2c');
-        r(5, 6, 1, 10, '#ece8d6');
-      } else if (held.weapon === 'mace') {
-        r(4, 8, 2, 11, '#6a4020');
-        r(2, 3, 6, 5, '#9aa0b0');
-        r(2, 3, 6, 1, '#dfe6f2');
-        r(3, 8, 4, 1, '#5a5f70');
-      } else if (held.weapon === 'spear') {
-        r(4, 3, 2, 18, '#8a5a2c');
-        r(3, 0, 4, 4, '#dfe6f2');
-        r(4, 0, 2, 1, '#ffffff');
-        r(3, 4, 4, 1, '#c89a3c');
-      } else if (held.weapon === 'crossbow') {
-        r(2, 9, 8, 2, '#6a4020');
-        r(1, 6, 2, 4, '#8a5a2c');
-        r(9, 6, 2, 4, '#8a5a2c');
-        r(3, 5, 6, 1, '#ece8d6');
-        r(5, 8, 2, 4, '#4a3018');
-      } else if (held.weapon === 'pistol') {
-        r(3, 9, 6, 2, '#5a5f70');
-        r(7, 11, 2, 4, '#6a4020');
-        r(2, 8, 3, 1, '#8a90a0');
-      } else if (held.weapon === 'staff') {
-        const orb = ELEMENT_COLOR[held.element] || '#5ac8ff';
-        r(4, 5, 2, 16, '#8a5a2c');
-        r(2, 0, 6, 5, orb);
-        r(3, 1, 2, 1, '#ffffff');
-        r(5, 3, 2, 1, '#00000044');
-      }
+      if (held.weapon) paintWeapon(r, held.weapon, held.wid);
       if (held.offPistol) {
         r(17, 13, 6, 2, '#5a5f70');
         r(17, 15, 2, 4, '#6a4020');
       }
-      if (held.shield) {
-        r(17, 13, 5, 7, '#8a5a2c');
-        r(17, 13, 5, 1, '#c89a3c');
-        r(18, 14, 1, 5, '#a06a34');
-        r(19, 15, 1, 3, '#d8d8e0');
-      }
+      if (held.shield) paintShield(r, held.oid);
     }, 28);
     blit(ctx, c, x, y, s, bob);
   }
@@ -1288,12 +1248,578 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     blitTile(ctx, c, x, y, s);
   }
 
+  // ---- gear looks: every worn item draws from its own id. Metal follows the tier, wood follows the name, leather and mail follow the set.
+
+  const GEAR_METALS = [
+    null,
+    { m: '#c07a38', l: '#e8b068', d: '#7a4a1c', trim: '#8a5a2c' }, // bronze
+    { m: '#9aa0ae', l: '#c8ccd8', d: '#5e6272', trim: '#5e6272' }, // iron
+    { m: '#dfe6f2', l: '#ffffff', d: '#98a2b8', trim: '#c89a3c' }, // steel
+    { m: '#8ad8f0', l: '#e8fcff', d: '#3c8cb4', trim: '#e8c050' }, // mithril
+  ];
+  const GEAR_WOODS = {
+    pine: ['#c09858', '#8a6a38'], birch: ['#e4d8b8', '#b8a880'], oak: ['#8a5a2c', '#5e3a1a'], willow: ['#7a9858', '#4e6a38'],
+    hazel: ['#a8743c', '#6e4822'], rowan: ['#9a4a3a', '#6a2c22'], yew: ['#5e4a3a', '#382a20'], elder: ['#7a5a8e', '#4e3a60'],
+  };
+  const TIER_WOOD = ['', 'hazel', 'oak', 'yew', 'elder'];
+  const STAFF_ORB = { hazel: '#8ad06a', rowan: '#e0505a', yew: '#b08ae0', elder: '#f4f0dc' };
+
+  function itemDef(id) {
+    return id && G && G.data ? G.data.items.get(id) || null : null;
+  }
+
+  function woodOf(id, tier) {
+    const first = String(id).split('_')[0];
+    return GEAR_WOODS[GEAR_WOODS[first] ? first : TIER_WOOD[tier] || 'oak'];
+  }
+
+  /** The held-gear description the figure sprite is cut from. `g` holds item ids: w, o, h, b, c. */
+  function gearHeld(g) {
+    const w = itemDef(g.w);
+    const o = itemDef(g.o);
+    return {
+      weapon: w ? w.weaponClass || 'blade' : null,
+      wid: w ? g.w : '',
+      element: w && w.element ? w.element : '',
+      shield: Boolean(o && o.kind === 'armor'),
+      offPistol: Boolean(o && o.weaponClass === 'pistol'),
+      oid: o ? g.o : '',
+      hid: itemDef(g.h) ? g.h : '',
+      bid: itemDef(g.b) ? g.b : '',
+      cid: itemDef(g.c) ? g.c : '',
+    };
+  }
+
+  function paintWeapon(r, cls, id) {
+    const def = itemDef(id) || {};
+    const t = Math.max(1, Math.min(4, def.tier || 1));
+    const M = GEAR_METALS[t];
+    const [w, wd] = woodOf(id, t);
+    const gold = '#c89a3c';
+    const leather = '#6a4020';
+    if (cls === 'blade') {
+      const len = 9 + t;
+      const top = 17 - len;
+      r(4, top, 2, len, M.m);
+      r(4, top, 1, len, M.l);
+      r(5, top + 2, 1, len - 2, M.d);
+      r(4, top, 2, 1, M.l);
+      if (t === 4) r(3, top + 3, 1, 3, '#e8fcff66');
+      r(t >= 3 ? 2 : 3, 17, t >= 3 ? 6 : 4, 1, t >= 3 ? M.trim : wd);
+      if (t === 2) r(3, 17, 4, 1, M.d);
+      r(4, 18, 2, 2, leather);
+      if (t >= 3) r(4, 20, 2, 1, t === 4 ? '#ff6aa0' : gold);
+    } else if (cls === 'dagger') {
+      const len = 3 + t;
+      r(4, 17 - len, 2, len, M.m);
+      r(4, 17 - len, 1, len, M.l);
+      if (t >= 2) r(5, 18 - len, 1, len - 1, M.d);
+      r(3, 17, 4, 1, t >= 3 ? M.trim : wd);
+      r(4, 18, 2, 2, t === 4 ? '#3c3060' : leather);
+      if (t === 4) r(4, 20, 2, 1, '#ff6aa0');
+    } else if (cls === 'bow') {
+      const tip = t >= 2 ? M.trim : w;
+      r(3, 5, 2, 1, w);
+      r(2, 6, 2, 10, w);
+      r(3, 16, 2, 1, w);
+      r(2, 6, 1, 10, wd);
+      r(5, 6, 1, 10, '#ece8d6');
+      if (t >= 2) {
+        r(3, 4, 2, 1, tip);
+        r(3, 17, 2, 1, tip);
+        r(2, 10, 2, 2, t === 2 ? '#c89a3c' : '#4a3018');
+      }
+      if (t >= 3) r(1, 9, 1, 4, w);
+      if (t === 4) r(4, 8, 1, 1, '#9affc0');
+    } else if (cls === 'mace') {
+      const hammer = String(id).includes('hammer');
+      r(4, 8, 2, 11, w);
+      r(4, 8, 1, 11, wd);
+      if (hammer) {
+        r(1, 3, 8, 4, M.m);
+        r(1, 3, 8, 1, M.l);
+        r(1, 6, 8, 1, M.d);
+        r(4, 1, 2, 2, M.l);
+        r(0, 4, 1, 2, M.d);
+        r(9, 4, 1, 2, M.d);
+        r(3, 7, 4, 1, M.trim);
+        if (t === 4) r(4, 4, 2, 2, '#e8fcff');
+      } else {
+        r(2, 3, 6, 5, M.m);
+        r(2, 3, 6, 1, M.l);
+        r(2, 7, 6, 1, M.d);
+        r(4, 2, 2, 1, M.l);
+        r(1, 5, 1, 1, M.l);
+        r(8, 5, 1, 1, M.l);
+        r(3, 8, 4, 1, M.d);
+        if (t === 2) r(3, 5, 4, 1, M.d);
+      }
+    } else if (cls === 'spear') {
+      r(4, 3, 2, 18, w);
+      r(4, 3, 1, 18, wd);
+      const head = [null, [4, 1, 2, 3], [3, 0, 4, 4], [3, 0, 4, 4], [3, -1, 4, 5]][t];
+      r(head[0], head[1], head[2], head[3], M.m);
+      r(head[0], head[1], 1, head[3], M.l);
+      r(4, head[1], 2, 1, M.l);
+      if (t === 1) r(4, 4, 2, 1, leather);
+      if (t === 2) {
+        r(3, 4, 4, 1, M.d);
+        r(3, 5, 1, 2, '#b8402c');
+        r(6, 5, 1, 2, '#b8402c');
+      }
+      if (t >= 3) r(3, 4, 4, 1, gold);
+      if (t === 4) {
+        r(2, 2, 1, 2, '#e8fcff66');
+        r(7, 2, 1, 2, '#e8fcff66');
+        r(4, 5, 2, 1, '#ff6aa0');
+      }
+    } else if (cls === 'crossbow') {
+      r(2, 9, 8, 2, wd);
+      r(1, 6, 2, 4, w);
+      r(9, 6, 2, 4, w);
+      r(3, 5, 6, 1, '#ece8d6');
+      r(5, 8, 2, 4, '#4a3018');
+      if (t >= 2) {
+        r(1, 5, 2, 1, M.m);
+        r(9, 5, 2, 1, M.m);
+        r(3, 9, 6, 1, w);
+      }
+      if (t >= 3) r(5, 7, 2, 1, gold);
+      if (t === 4) r(3, 7, 6, 1, M.l);
+    } else if (cls === 'pistol') {
+      const barrel = 4 + t;
+      r(9 - barrel, 9, barrel, 2, M.d);
+      r(9 - barrel, 9, barrel, 1, M.m);
+      r(8 - barrel, 8, 3, 1, M.l);
+      r(7, 11, 2, 4, w);
+      r(7, 11, 1, 4, wd);
+      if (t >= 3) r(5, 9, 1, 2, M.trim);
+      if (t === 4) r(9 - barrel, 8, 1, 1, '#ff6aa0');
+    } else if (cls === 'staff') {
+      const orb = ELEMENT_COLOR[def.element] || STAFF_ORB[String(id).split('_')[0]] || '#5ac8ff';
+      r(4, 5, 2, 16, w);
+      r(4, 5, 1, 16, wd);
+      if (t === 1) {
+        r(3, 1, 4, 4, orb);
+        r(4, 2, 1, 1, '#ffffff');
+      } else if (t === 2) {
+        r(2, 0, 6, 5, orb);
+        r(3, 1, 2, 1, '#ffffff');
+        r(2, 5, 6, 1, '#c89a3c');
+      } else if (t === 3) {
+        r(2, 0, 6, 5, orb);
+        r(3, 1, 2, 1, '#ffffff');
+        r(1, 1, 1, 4, '#c89a3c');
+        r(8, 1, 1, 4, '#c89a3c');
+        r(3, 5, 4, 1, '#c89a3c');
+      } else {
+        r(2, 0, 6, 5, orb);
+        r(3, 1, 2, 2, '#ffffff');
+        r(1, 0, 1, 5, '#e8c050');
+        r(8, 0, 1, 5, '#e8c050');
+        r(3, 5, 4, 1, '#e8c050');
+        r(0, 2, 1, 1, orb);
+        r(9, 2, 1, 1, orb);
+        r(5, -1, 1, 1, orb);
+      }
+      r(5, 3, 2, 1, '#00000044');
+    }
+  }
+
+  /** The offhand, drawn on the right arm. Each set has its own shield; a few named items have their own. */
+  function paintShield(r, id) {
+    const def = itemDef(id) || {};
+    const t = Math.max(1, Math.min(4, def.tier || 1));
+    if (id === 'nutcracker_buckler') {
+      r(18, 13, 3, 1, '#8a5a2c');
+      r(17, 14, 5, 5, '#a8743c');
+      r(18, 19, 3, 1, '#6e4822');
+      r(19, 14, 1, 5, '#4a2e14');
+      r(17, 16, 5, 1, '#e8a040');
+      r(18, 15, 1, 1, '#d8c890');
+      r(20, 17, 1, 1, '#d8c890');
+    } else if (id === 'tidal_aegis') {
+      r(18, 13, 3, 1, '#2a7a8c');
+      r(17, 14, 5, 5, '#3aa0b0');
+      r(18, 19, 3, 1, '#2a7a8c');
+      r(17, 14, 5, 1, '#b8f0f0');
+      r(17, 16, 2, 1, '#e8fcff');
+      r(19, 17, 2, 1, '#e8fcff');
+      r(19, 15, 1, 1, '#e8fcff');
+      r(19, 16, 1, 1, '#f4f0dc');
+      r(21, 15, 1, 3, '#1c5a6a');
+    } else if (t === 1) {
+      r(18, 13, 3, 1, '#a0703c');
+      r(17, 14, 5, 5, '#a0703c');
+      r(18, 19, 3, 1, '#7a4e2a');
+      r(18, 15, 1, 3, '#b88450');
+      r(19, 16, 1, 1, '#d8c890');
+      r(21, 14, 1, 5, '#7a4e2a');
+    } else if (t === 2) {
+      r(18, 13, 3, 1, '#9aa0ae');
+      r(17, 14, 5, 5, '#5e3a1e');
+      r(18, 19, 3, 1, '#9aa0ae');
+      r(17, 14, 1, 5, '#9aa0ae');
+      r(21, 14, 1, 5, '#7a808e');
+      r(18, 15, 1, 1, '#c8ccd8');
+      r(20, 15, 1, 1, '#c8ccd8');
+      r(18, 17, 1, 1, '#c8ccd8');
+      r(20, 17, 1, 1, '#c8ccd8');
+      r(19, 16, 1, 1, '#e8c860');
+    } else if (t === 3) {
+      r(17, 13, 5, 1, '#c8ccd8');
+      r(17, 14, 5, 4, '#8a90a0');
+      r(18, 18, 3, 1, '#8a90a0');
+      r(19, 19, 1, 1, '#6e7484');
+      r(19, 14, 1, 5, '#dfe6f2');
+      r(17, 16, 5, 1, '#dfe6f2');
+      r(17, 14, 1, 1, '#5e6272');
+      r(21, 14, 1, 1, '#5e6272');
+      r(18, 15, 1, 1, '#5e6272');
+      r(20, 17, 1, 1, '#5e6272');
+    } else {
+      r(17, 13, 5, 1, '#e8c050');
+      r(17, 14, 5, 4, '#5cb8e0');
+      r(18, 18, 3, 1, '#5cb8e0');
+      r(19, 19, 1, 1, '#3c8cb4');
+      r(17, 14, 1, 4, '#8ad8f0');
+      r(21, 14, 1, 4, '#3c8cb4');
+      r(19, 14, 1, 4, '#e8fcff');
+      r(18, 15, 3, 1, '#e8c050');
+      r(19, 16, 1, 1, '#ff6aa0');
+    }
+  }
+
+  /** Cloak, painted behind the hero so only the flare shows beside the arms and below the hem of the tunic. */
+  function paintCloak(r, id) {
+    const t = Math.max(1, Math.min(4, (itemDef(id) || {}).tier || 1));
+    const [m, d, l] = [['#7a4e2a', '#5a3a1e', '#9a6a3a'], ['#4e3018', '#33200e', '#6a4428'], ['#6a7080', '#4a5060', '#9aa0b0'], ['#2a6aa8', '#1c4a80', '#5cb8e0']][t - 1];
+    r(6, 11, 13, 9, m);
+    r(5, 15, 15, 6, m);
+    r(5, 20, 15, 1, d);
+    r(5, 15, 1, 5, d);
+    r(19, 15, 1, 5, d);
+    r(7, 11, 11, 1, l);
+    if (t === 2) {
+      r(6, 17, 1, 3, d);
+      r(18, 17, 1, 3, d);
+    }
+    if (t === 3) for (let x = 5; x < 20; x += 2) r(x, 20, 1, 1, l);
+    if (t === 4) {
+      r(5, 21, 15, 1, '#e8c050');
+      r(5, 15, 1, 6, '#e8c050');
+      r(19, 15, 1, 6, '#e8c050');
+    }
+  }
+
+  /** The clasp that holds the cloak, over the shoulders. */
+  function paintClasp(r, id) {
+    const t = (itemDef(id) || {}).tier || 1;
+    r(10, 12, 5, 1, t === 4 ? '#e8c050' : t === 3 ? '#c8ccd8' : '#3a2410');
+    r(12, 12, 1, 1, t === 4 ? '#ff6aa0' : '#e8c860');
+  }
+
+  /** Body armor over the tunic: arms and torso, with a skirt for the dress-shaped build. */
+  function paintBody(r, id, fem) {
+    const t = Math.max(1, Math.min(4, (itemDef(id) || {}).tier || 1));
+    const skirt = (c) => fem && r(7, 16, 11, 3, c);
+    const belt = fem ? 15 : 17;
+    if (t === 1) {
+      r(8, 12, 9, fem ? 4 : 7, '#8a5a30');
+      skirt('#8a5a30');
+      r(6, 12, 2, 5, '#7a4e2a');
+      r(17, 12, 2, 5, '#5e3c1e');
+      r(8, 12, 4, 2, '#a87642');
+      r(12, 13, 1, fem ? 3 : 5, '#d8c898');
+      r(8, belt, 9, 1, '#5e3c1e');
+    } else if (t === 2) {
+      r(8, 12, 9, fem ? 4 : 7, '#5e3a1e');
+      skirt('#4a2e14');
+      r(6, 12, 2, 5, '#4a2e14');
+      r(17, 12, 2, 5, '#33200e');
+      r(5, 11, 3, 2, '#7a4e2a');
+      r(17, 11, 3, 2, '#5e3c1e');
+      for (const [x, y] of [[9, 13], [15, 13], [9, 15], [15, 15], [12, 14]]) r(x, y, 1, 1, '#c8ccd8');
+      r(8, belt, 9, 1, '#33200e');
+      r(11, belt, 3, 1, '#e8c860');
+    } else if (t === 3) {
+      r(8, 12, 9, fem ? 4 : 7, '#8a90a0');
+      skirt('#7a808e');
+      r(6, 12, 2, 5, '#8a90a0');
+      r(17, 12, 2, 5, '#6e7484');
+      for (let y = 12; y < (fem ? 16 : 19); y++) for (let x = 8 + (y % 2); x < 17; x += 2) r(x, y, 1, 1, '#c8ccd8');
+      for (let y = 12; y < 17; y += 2) {
+        r(6, y, 1, 1, '#c8ccd8');
+        r(17, y + 1, 1, 1, '#a0a6b6');
+      }
+      if (fem) for (let x = 8; x < 18; x += 2) r(x, 17, 1, 1, '#c8ccd8');
+      r(8, belt, 9, 1, '#5e6272');
+      r(11, belt, 3, 1, '#c89a3c');
+    } else {
+      r(8, 12, 9, fem ? 4 : 7, '#5cb8e0');
+      skirt('#3c8cb4');
+      r(6, 12, 2, 5, '#5cb8e0');
+      r(17, 12, 2, 5, '#3c8cb4');
+      r(5, 11, 3, 3, '#8ad8f0');
+      r(17, 11, 3, 3, '#5aa8d0');
+      r(5, 11, 3, 1, '#e8fcff');
+      r(17, 11, 3, 1, '#e8fcff');
+      r(8, 12, 9, 1, '#e8c050');
+      r(9, 13, 3, 2, '#e8fcff');
+      r(12, 13, 1, fem ? 3 : 5, '#e8c050');
+      r(12, 14, 1, 2, '#ff6aa0');
+      r(8, belt, 9, 1, '#e8c050');
+    }
+  }
+
+  /** Headgear drawn over the hair. The bone mask gets its face part from paintMask, after the face. */
+  function paintHelm(r, id) {
+    if (id === 'pickmans_bone_mask') {
+      r(6, 0, 12, 3, '#d8d0b8');
+      r(5, 2, 2, 4, '#d8d0b8');
+      r(17, 2, 2, 4, '#b8b09a');
+      r(7, 0, 4, 1, '#f4f0dc');
+      r(4, 0, 2, 3, '#ece4cc');
+      r(18, 0, 2, 3, '#ece4cc');
+    } else if (id === 'foremans_hardhat') {
+      r(5, 0, 14, 4, '#f0c020');
+      r(4, 4, 16, 1, '#d8a010');
+      r(11, 0, 2, 4, '#d8a010');
+      r(7, 1, 4, 1, '#fff0a0');
+      r(10, 1, 4, 3, '#fffbe0');
+      r(11, 2, 2, 1, '#ffd860');
+    } else {
+      const t = (itemDef(id) || {}).tier || 1;
+      if (t === 1) {
+        r(6, 0, 12, 4, '#8a5a30');
+        r(5, 3, 1, 3, '#7a4e2a');
+        r(18, 3, 1, 3, '#5e3c1e');
+        r(6, 4, 12, 1, '#6a4020');
+        r(8, 1, 4, 1, '#a87642');
+        r(13, 2, 3, 1, '#d8c898');
+      } else if (t === 2) {
+        r(5, 0, 14, 5, '#5e3a1e');
+        r(5, 5, 2, 6, '#4a2e14');
+        r(17, 5, 2, 6, '#33200e');
+        r(6, 4, 12, 1, '#33200e');
+        r(7, 1, 4, 1, '#7a4e2a');
+        for (const x of [7, 11, 15]) r(x, 2, 1, 1, '#c8ccd8');
+      } else if (t === 3) {
+        r(5, 0, 14, 5, '#8a90a0');
+        r(5, 5, 2, 8, '#8a90a0');
+        r(17, 5, 2, 8, '#6e7484');
+        r(7, 12, 10, 1, '#6e7484');
+        for (let y = 0; y < 13; y += 2) {
+          r(5 + (y % 4 ? 1 : 0), y, 1, 1, '#c8ccd8');
+          r(17 + (y % 4 ? 0 : 1), y + 1, 1, 1, '#a0a6b6');
+        }
+        for (let x = 6; x < 18; x += 2) r(x, 1, 1, 1, '#c8ccd8');
+        r(6, 4, 12, 1, '#5e6272');
+      } else {
+        r(5, 0, 14, 5, '#8ad8f0');
+        r(5, 5, 2, 6, '#5cb8e0');
+        r(17, 5, 2, 6, '#3c8cb4');
+        r(5, 4, 14, 1, '#e8c050');
+        r(7, 0, 5, 1, '#e8fcff');
+        r(11, 5, 3, 3, '#5cb8e0');
+        r(3, 0, 2, 4, '#efe4c4');
+        r(19, 0, 2, 4, '#d8caa4');
+        r(11, 1, 3, 2, '#ff6aa0');
+        r(11, -1, 3, 1, '#e8c050');
+      }
+    }
+  }
+
+  /** The pickman's mask covers the lower face and leaves dark sockets where the eyes are. */
+  function paintMask(r) {
+    r(6, 5, 12, 7, '#ece4cc');
+    r(17, 5, 1, 7, '#b8b09a');
+    r(8, 6, 3, 3, '#1a1426');
+    r(14, 6, 3, 3, '#1a1426');
+    r(9, 7, 1, 1, '#ff7a3a');
+    r(15, 7, 1, 1, '#ff7a3a');
+    r(12, 9, 1, 2, '#8a8470');
+    r(8, 11, 9, 1, '#fffdf0');
+    for (let x = 9; x < 17; x += 2) r(x, 11, 1, 1, '#8a8470');
+  }
+
+  // ---- companions: cosmetic followers drawn in code on the same 16 pixel tile. They face right; the draw flips them.
+
+  const PETS = [
+    { id: 'fox', name: 'Fox kit' },
+    { id: 'cat', name: 'Hearth cat' },
+    { id: 'owl', name: 'Barn owl' },
+    { id: 'slime', name: 'Moss slime' },
+    { id: 'wisp', name: 'Lantern wisp' },
+    { id: 'drake', name: 'Ember drake' },
+  ];
+
+  function paintPet(r, id, step) {
+    const up = (n) => (step === n ? 1 : 0);
+    if (id === 'fox') {
+      r(0, 8, 4, 3, '#e07a30');
+      r(0, 8, 2, 2, '#f4f0dc');
+      r(3, 9, 8, 4, '#e07a30');
+      r(4, 12, 6, 1, '#f4e8d0');
+      r(9, 6, 5, 5, '#e07a30');
+      r(13, 8, 2, 2, '#f4e8d0');
+      r(14, 8, 1, 1, '#1a1426');
+      r(9, 4, 2, 3, '#e07a30');
+      r(12, 4, 2, 3, '#c8602a');
+      r(10, 5, 1, 1, '#3a2018');
+      r(11, 8, 1, 1, '#1a1426');
+      r(4, 13 - up(1), 2, 2, '#5a2e14');
+      r(9, 13 - up(2), 2, 2, '#5a2e14');
+    } else if (id === 'cat') {
+      r(1, 5, 2, 6, '#8a8e98');
+      r(1, 5, 2, 1, '#e8eaf0');
+      r(2, 10, 3, 2, '#8a8e98');
+      r(3, 9, 8, 4, '#8a8e98');
+      r(5, 9, 1, 3, '#60646e');
+      r(8, 9, 1, 3, '#60646e');
+      r(4, 12, 6, 1, '#e8eaf0');
+      r(9, 6, 5, 5, '#9a9ea8');
+      r(9, 4, 2, 3, '#8a8e98');
+      r(12, 4, 2, 3, '#8a8e98');
+      r(10, 5, 1, 1, '#e89aa0');
+      r(11, 7, 1, 1, '#7ae85a');
+      r(13, 7, 1, 1, '#7ae85a');
+      r(12, 9, 1, 1, '#e89aa0');
+      r(4, 13 - up(2), 2, 2, '#60646e');
+      r(9, 13 - up(1), 2, 2, '#60646e');
+    } else if (id === 'owl') {
+      r(3, 8, 2, 5, '#7a5430');
+      r(11, 8, 2, 5, '#6a4624');
+      r(4, 4, 8, 10, '#9a7048');
+      r(6, 8, 4, 5, '#e8d8b0');
+      r(4, 2, 2, 3, '#7a5430');
+      r(10, 2, 2, 3, '#6a4624');
+      r(5, 5, 3, 3, '#f4f0dc');
+      r(9, 5, 3, 3, '#f4f0dc');
+      r(6, 6, 1, 2, '#1a1426');
+      r(10, 6, 1, 2, '#1a1426');
+      r(7, 8, 2, 2, '#e8a020');
+      r(5, 14, 2, 1, '#e8a020');
+      r(9, 14, 2, 1, '#e8a020');
+      if (step) r(2, 9, 1, 3, '#7a5430');
+    } else if (id === 'slime') {
+      const sq = step ? 1 : 0;
+      r(3, 9 + sq, 10, 5 - sq, '#5ad08a');
+      r(4, 8 + sq, 8, 1, '#5ad08a');
+      r(5, 7 + sq, 6, 1, '#7ae8a8');
+      r(4, 13, 8, 1, '#3aa066');
+      r(5, 8 + sq, 2, 1, '#c8ffe0');
+      r(5, 10 + sq, 2, 2, '#1a2a20');
+      r(9, 10 + sq, 2, 2, '#1a2a20');
+      r(5, 10 + sq, 1, 1, '#ffffff');
+      r(9, 10 + sq, 1, 1, '#ffffff');
+      r(7, 12 + sq, 2, 1, '#3aa066');
+      r(2, 12, 1, 2, '#3aa066');
+    } else if (id === 'wisp') {
+      r(5, 4, 6, 6, '#8ae0ff');
+      r(6, 3, 4, 1, '#8ae0ff');
+      r(6, 5, 4, 4, '#e8fcff');
+      r(7, 10, 2, 2, '#8ae0ff');
+      r(7, 12 + up(1), 1, 1, '#5ac8ff');
+      r(4, 6, 1, 3, '#8ae0ff88');
+      r(11, 6, 1, 3, '#8ae0ff88');
+      r(7, 6, 1, 2, '#1a1426');
+      r(9, 6, 1, 2, '#1a1426');
+      if (step) {
+        r(3, 5, 1, 1, '#e8fcffcc');
+        r(12, 8, 1, 1, '#e8fcffcc');
+      } else {
+        r(12, 4, 1, 1, '#e8fcffcc');
+        r(3, 8, 1, 1, '#e8fcffcc');
+      }
+    } else if (id === 'drake') {
+      r(0, 10, 4, 2, '#c04a3a');
+      r(0, 9, 1, 1, '#f0c880');
+      r(3, 9, 8, 4, '#c04a3a');
+      r(4, 12, 6, 1, '#f0c880');
+      r(4, 5 + up(1), 4, 4, '#8a2c20');
+      r(5, 6 + up(1), 2, 2, '#d85a48');
+      r(10, 6, 4, 4, '#c04a3a');
+      r(13, 7, 2, 2, '#c04a3a');
+      r(14, 8, 1, 1, '#1a1426');
+      r(10, 4, 1, 2, '#f0e0b0');
+      r(12, 4, 1, 2, '#f0e0b0');
+      r(12, 7, 1, 1, '#ffe060');
+      r(4, 13 - up(1), 2, 2, '#8a2c20');
+      r(9, 13 - up(2), 2, 2, '#8a2c20');
+    }
+  }
+
+  function drawPet(ctx, id, x, y, s, step, face, lift) {
+    const c = sprite(`pet|${id}|${step}`, (r) => paintPet(r, id, step));
+    ctx.fillStyle = 'rgba(20,10,5,0.28)';
+    ctx.beginPath();
+    ctx.ellipse(x + 8 * s, y + 14.6 * s, 4.2 * s, 1.4 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+    if (face < 0) {
+      ctx.save();
+      ctx.translate(2 * (x + 8 * s), 0);
+      ctx.scale(-1, 1);
+      blitTile(ctx, c, x, y + lift * s, s);
+      ctx.restore();
+    } else blitTile(ctx, c, x, y + lift * s, s);
+  }
+
+  /**
+   * One companion per hero that has one, trailing a little behind. Followers live only in the client: the
+   * server just says which pet a hero owns. Hidden players keep their pets hidden too.
+   */
+  function petsFor(list, now) {
+    if (!G.pets) G.pets = new Map();
+    const dt = Math.min(0.1, G.petClock ? (now - G.petClock) / 1000 : 0);
+    G.petClock = now;
+    const out = [];
+    const seen = new Set();
+    for (const r of list) {
+      if (r.kind !== 'player') continue;
+      const e = G.entities.get(r.id);
+      const pet = e && e.pet;
+      if (!pet || hidden({ kind: 'player', id: r.id })) continue;
+      seen.add(r.id);
+      let p = G.pets.get(r.id);
+      if (!p) {
+        p = { x: r.x - 0.7, y: r.y + 0.2, ox: r.x, heading: 1, face: 1 };
+        G.pets.set(r.id, p);
+      }
+      if (Math.abs(r.x - p.ox) > 0.02) p.heading = r.x > p.ox ? 1 : -1;
+      p.ox = r.x;
+      const tx = r.x - 0.7 * p.heading;
+      const ty = r.y + 0.2;
+      const dx = tx - p.x;
+      const dy = ty - p.y;
+      const dist = Math.hypot(dx, dy);
+      let moving = false;
+      if (dist > 6) {
+        p.x = tx;
+        p.y = ty;
+      } else if (dist > 0.06) {
+        const v = Math.min(dist, Math.min(dist * 6, 5.5) * dt);
+        p.x += (dx / dist) * v;
+        p.y += (dy / dist) * v;
+        moving = dist > 0.2;
+      }
+      if (Math.abs(dx) > 0.03) p.face = dx > 0 ? 1 : -1;
+      const step = moving ? (Math.floor(now / 140) % 2) + 1 : 0;
+      const lift = pet === 'wisp' ? -3 + Math.sin(now / 300) * 1.2 : pet === 'owl' && !moving ? Math.sin(now / 900) * 0.3 : moving && step === 1 ? -0.8 : 0;
+      out.push({ id: `pet${r.id}`, kind: 'pet', pet, x: p.x, y: p.y, step, face: p.face, lift, alpha: r.alpha });
+    }
+    for (const id of [...G.pets.keys()]) if (!seen.has(id)) G.pets.delete(id);
+    return out;
+  }
+
   function heldGear(id) {
-    if (id !== G.selfId) return { weapon: 'blade' };
-    const eq = (G.inv && G.inv.equipment) || {};
-    const def = eq.weapon && G.data && G.data.items.get(eq.weapon.id);
-    const off = eq.offhand && G.data && G.data.items.get(eq.offhand.id);
-    return { weapon: def ? def.weaponClass || 'blade' : null, element: def && def.element ? def.element : '', shield: Boolean(off && off.kind === 'armor'), offPistol: Boolean(off && off.weaponClass === 'pistol') };
+    if (id === G.selfId) {
+      const eq = (G.inv && G.inv.equipment) || {};
+      const idOf = (ref) => (ref ? ref.id : undefined);
+      return gearHeld({ w: idOf(eq.weapon), o: idOf(eq.offhand), h: idOf(eq.head), b: idOf(eq.body), c: idOf(eq.cloak) });
+    }
+    const e = G.entities.get(id);
+    return gearHeld((e && e.gear) || {});
   }
 
   // ---- state
@@ -1308,6 +1834,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       ref: v.ref,
       depleted: Boolean(v.depleted),
       title: v.title,
+      gear: v.gear,
+      pet: v.pet,
       fight: Boolean(v.fight),
       x: v.x,
       y: v.y,
@@ -1418,6 +1946,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           me.look = look(me.name, msg.look);
         }
         return;
+      }
+      case 'pet': {
+        const me = G.self();
+        if (me) me.pet = msg.id || undefined;
+        return renderLook();
       }
       case 'inventory':
         G.inv = msg;
@@ -3347,6 +3880,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       b.addEventListener('click', () => chooseLook({ skin: i }));
       row.appendChild(b);
     });
+    const pets = $('look-pet');
+    pets.textContent = '';
+    for (const pet of [{ id: '', name: 'No companion' }, ...PETS]) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = pet.name;
+      b.dataset.pet = pet.id;
+      b.addEventListener('click', () => {
+        const me = G && G.self();
+        if (me) me.pet = pet.id || undefined;
+        renderLook();
+        window.coe.send({ t: 'pet', id: pet.id || null });
+      });
+      pets.appendChild(b);
+    }
   }
 
   function chooseLook(change) {
@@ -3364,6 +3912,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!me) return;
     $('look-gender').textContent = `Body shape: ${me.look.g === 'f' ? 'female' : 'male'}. Chosen at sign-up; it cannot be changed.`;
     for (const b of $('look-skin').querySelectorAll('button')) b.classList.toggle('on', SKIN_TONES[Number(b.dataset.skin)] === me.look.skin);
+    for (const b of $('look-pet').querySelectorAll('button')) b.classList.toggle('on', (b.dataset.pet || '') === (me.pet || ''));
     const c = $('look-preview');
     const ctx = c.getContext('2d');
     ctx.clearRect(0, 0, c.width, c.height);
@@ -4127,6 +4676,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         });
       }
     }
+    for (const p of petsFor(list, now)) list.push(p);
     return list;
   }
 
@@ -4280,6 +4830,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const step = r.moving ? (Math.floor(now / 150) % 2) + 1 : 0;
         const bob = r.moving && step === 1 ? -1 : 0;
         ctx.globalAlpha = r.alpha;
+        if (r.kind === 'pet') {
+          drawPet(ctx, r.pet, offX + r.x * px, offY + r.y * px - s, s, r.step, r.face, r.lift);
+          ctx.globalAlpha = 1;
+          continue;
+        }
         if (r.kind === 'node' || r.kind === 'station') {
           const def = G.data && (r.kind === 'node' ? G.data.nodes : G.data.stations).get(r.ref);
           if (def && r.kind === 'node') drawNode(ctx, def, r.depleted, offX + r.x * px, offY + r.y * px, s, now);
@@ -4316,7 +4871,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.font = `bold ${Math.max(10, 4 * s)}px "Courier New", monospace`;
     const mp = worldPos(G.self(), now);
     for (const r of list) {
-      if (r.alpha <= 0.05) continue;
+      if (r.alpha <= 0.05 || r.kind === 'pet') continue;
       if (roofed(Math.round(r.x), Math.round(r.y))) continue;
       if ((r.kind === 'node' || r.kind === 'station') && !(Math.abs(r.x - mp.x) + Math.abs(r.y - mp.y) <= 3 || (G.hover && Math.round(r.x) === G.hover.x && Math.round(r.y) === G.hover.y))) continue;
       const cx = offX + r.x * px + px / 2;
