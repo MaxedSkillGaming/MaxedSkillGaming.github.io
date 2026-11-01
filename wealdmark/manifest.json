@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://binary-pensions-stand-sorry.trycloudflare.com",
-  "authUrl": "https://twelve-factory-compiled-docs.trycloudflare.com",
+  "server": "wss://preferred-massage-foreign-edmonton.trycloudflare.com",
+  "authUrl": "https://neighbor-coaching-cylinder-geek.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 15646,
-      "sha256": "c966b7fd15cc4fe83bb1564f0e0c53dc39d437aca8b8e6b16a8f14259194d711",
-      "url": "c/c966b7fd15cc4fe83bb1564f0e0c53dc39d437aca8b8e6b16a8f14259194d711"
+      "size": 15687,
+      "sha256": "4883ada9c84bb6bba183b9f88c9620b14ede75299848875201f090c253c4c44c",
+      "url": "c/4883ada9c84bb6bba183b9f88c9620b14ede75299848875201f090c253c4c44c"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 26551,
-      "sha256": "aa0495b6a1629d260b168eb19f5258826c6c0291158d52e531a613b91cd347fb",
-      "url": "c/aa0495b6a1629d260b168eb19f5258826c6c0291158d52e531a613b91cd347fb"
+      "size": 26665,
+      "sha256": "f8feb9c2e4128977bf61174e2f6978571f4f1014fbbba9c11e6c10b55064b0e9",
+      "url": "c/f8feb9c2e4128977bf61174e2f6978571f4f1014fbbba9c11e6c10b55064b0e9"
     }
   ],
-  "signature": "fqCOqR4QcMVmh6MT/m9JeyiNMNJLM23iuNQYw5RGHBGU3hOkBoOF8qW8P7+4w2cSj4WX4LINK+iyjHH/UgCjBg=="
+  "signature": "AWoLq9snAgsCLVtt2GMA6kELG6VifIYwCYnV6/iDTnQzdsJgF7ERPNRGrW0DoKthCRz93s0IdGpp+Qrg1y8MDQ=="
 }
