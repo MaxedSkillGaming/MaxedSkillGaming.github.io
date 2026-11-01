@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://annotation-ancient-ottawa-becomes.trycloudflare.com",
-  "authUrl": "https://role-notify-neon-stephen.trycloudflare.com",
+  "server": "wss://sections-contrast-securities-flow.trycloudflare.com",
+  "authUrl": "https://dig-hospital-exist-seafood.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -19,9 +19,9 @@
     },
     {
       "path": "data/items.json",
-      "size": 26317,
-      "sha256": "cf98caf85b6d0f0f96f90853d5e4b5bf85e1368ee18692270b6c7c5616089f81",
-      "url": "c/cf98caf85b6d0f0f96f90853d5e4b5bf85e1368ee18692270b6c7c5616089f81"
+      "size": 26570,
+      "sha256": "9af2b6fde110d7d4058d5679299d876fe2cc440bb2150aa67c509f9f86d25dcb",
+      "url": "c/9af2b6fde110d7d4058d5679299d876fe2cc440bb2150aa67c509f9f86d25dcb"
     },
     {
       "path": "data/monsters.json",
@@ -67,9 +67,9 @@
     },
     {
       "path": "maps/mossgate.json",
-      "size": 235954,
-      "sha256": "486ce374320f1f605751b96ad035d628fd8ea7507416f20730841f47731f88b4",
-      "url": "c/486ce374320f1f605751b96ad035d628fd8ea7507416f20730841f47731f88b4"
+      "size": 236588,
+      "sha256": "6184b2953754f055d1d54bad9d9f357109fe5e61d5d60107502207cc5a467495",
+      "url": "c/6184b2953754f055d1d54bad9d9f357109fe5e61d5d60107502207cc5a467495"
     },
     {
       "path": "tiles/placeholder.png",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 262569,
-      "sha256": "c54e42ba14bdcb2c85b9d5240a009af974e62c7f994beecd0056765bbab8fb3b",
-      "url": "c/c54e42ba14bdcb2c85b9d5240a009af974e62c7f994beecd0056765bbab8fb3b"
+      "size": 286872,
+      "sha256": "d7f2205659ad4a06cc7b1c5e8aeea4560fad029c1ae4e87d2d7e2315c513639b",
+      "url": "c/d7f2205659ad4a06cc7b1c5e8aeea4560fad029c1ae4e87d2d7e2315c513639b"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 16452,
-      "sha256": "080e6e087dbc070f5bd0a6adc9da89f9416a68450f4d9a09c61c9fc76cf8b387",
-      "url": "c/080e6e087dbc070f5bd0a6adc9da89f9416a68450f4d9a09c61c9fc76cf8b387"
+      "size": 17786,
+      "sha256": "c1896c170cfb6f3f6084202434511314f30dbc888d908c3e76a57dc0e812994a",
+      "url": "c/c1896c170cfb6f3f6084202434511314f30dbc888d908c3e76a57dc0e812994a"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 32499,
-      "sha256": "43ed04baf1d775d759b41221139c7aeb49b91e10772084b2425cdde0077acc5e",
-      "url": "c/43ed04baf1d775d759b41221139c7aeb49b91e10772084b2425cdde0077acc5e"
+      "size": 35754,
+      "sha256": "10ef773d1b84f0de215c91bf7c3caa898d2aa93165b2272bd599eeaafca62dfe",
+      "url": "c/10ef773d1b84f0de215c91bf7c3caa898d2aa93165b2272bd599eeaafca62dfe"
     }
   ],
-  "signature": "bvwiJGqS94OXL1wgOQ7rhKWouDB3moNvWCWhh6lAfdyRhrDZu62NINsP6r5TtYIBWVVdLuR9S/Muos9SYuR4AA=="
+  "signature": "Me2qJMBFKQtB0fcNfvrdeL37JILluHHWQhYWUGhbugRq7TXwz6rRKQLUF/RMUDqJNGnzp0zdZul1K8lpcrOfAA=="
 }
