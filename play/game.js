@@ -2251,6 +2251,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     c.fillRect(0, 0, cv.width, cv.height);
     c.drawImage(MM.base, ox, oy, MM.span, MM.span, 0, 0, MM.span * MM.px, MM.span * MM.px);
     for (const e of G.entities.values()) {
+      if (hidden(e)) continue;
       const col = e.id === G.selfId ? '#ffffff' : e.kind === 'player' ? '#6ab0ff' : e.kind === 'monster' ? '#ff6a6a' : e.kind === 'npc' ? '#f0c860' : null;
       if (!col) continue;
       const x = Math.round(e.x) - ox;
@@ -3465,6 +3466,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     $('vol-sfx').value = s.sfx;
     $('vol-music').value = s.music;
     $('mute').checked = s.muted;
+    $('hide-others').checked = hideOthers.on;
   }
 
   // ---- talking, shopping, storage, crafting, and the journal
@@ -4069,12 +4071,22 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.restore();
   }
 
+  /** Whether other players (and anything that follows them) are left out of the picture. Kept per device. */
+  const hideOthers = { on: false };
+  try {
+    hideOthers.on = localStorage.getItem('coe.hideOthers') === '1';
+  } catch {
+    // blocked storage: show everyone
+  }
+  const hidden = (e) => hideOthers.on && e.kind === 'player' && e.id !== G.selfId;
+
   /** Everything to draw this frame, world and fight alike. */
   function renderables(now) {
     const list = [];
     const inFight = G.fight;
     for (const e of G.entities.values()) {
       if (inFight && inFight.actors.has(e.id)) continue;
+      if (hidden(e)) continue;
       const p = worldPos(e, now);
       list.push({
         id: e.id, name: e.name, kind: e.kind, level: e.level, mon: e.mon, look: e.look, x: p.x, y: p.y, moving: p.moving,
@@ -5517,6 +5529,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('vol-sfx'), 'input', (e) => window.coeAudio.set('sfx', e.target.value));
     on($('vol-music'), 'input', (e) => window.coeAudio.set('music', e.target.value));
     on($('mute'), 'change', (e) => window.coeAudio.set('muted', e.target.checked));
+    on($('hide-others'), 'change', (e) => {
+      hideOthers.on = e.target.checked;
+      try {
+        localStorage.setItem('coe.hideOthers', hideOthers.on ? '1' : '0');
+      } catch {
+        // blocked storage: the choice lasts this visit
+      }
+    });
 
     for (const m of early.splice(0)) handle(m);
     if (welcome.intro) {
