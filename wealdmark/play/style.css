@@ -731,3 +731,6 @@ button.qtrack.on { background: #2f6b3a; }
 #world-scroll { max-height: 520px; overflow: auto; border: 2px solid #000; background: #0c0912; }
 #worldmap { display: block; image-rendering: pixelated; }
 #panel-world.side { user-select: none; }
+
+/* Shop, crafting, storage and dialogue boxes stay above the Bag and other windows. */
+#dialog, #panel-shop, #panel-storage, #panel-station, #panel-perks, #panel-anchor { z-index: 200; }
