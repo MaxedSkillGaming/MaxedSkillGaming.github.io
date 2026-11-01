@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://click-adventure-alpine-styles.trycloudflare.com",
-  "authUrl": "https://css-flight-advertising-motion.trycloudflare.com",
+  "server": "wss://kissing-reload-timeline-shaped.trycloudflare.com",
+  "authUrl": "https://comprehensive-foundation-vatican-tri.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -91,15 +91,15 @@
     },
     {
       "path": "ui/icon.png",
-      "size": 3608,
-      "sha256": "84ac49d1776d32151940a1677899c6bc9f93e9a303b641ecc17a1296e65f2f41",
-      "url": "c/84ac49d1776d32151940a1677899c6bc9f93e9a303b641ecc17a1296e65f2f41"
+      "size": 1608,
+      "sha256": "c5450acfd2f52ab0d87775eacf4b9c27d58b257ac74ef9089d97630743795bcf",
+      "url": "c/c5450acfd2f52ab0d87775eacf4b9c27d58b257ac74ef9089d97630743795bcf"
     },
     {
       "path": "ui/index.html",
-      "size": 15116,
-      "sha256": "05598743125bf085cea455fada1fb69d019810278f005bacf952255340340557",
-      "url": "c/05598743125bf085cea455fada1fb69d019810278f005bacf952255340340557"
+      "size": 14772,
+      "sha256": "a5e9e96c5065cc1d85b5ee02eaf70c8850f49df81888882627e25f63a199c46b",
+      "url": "c/a5e9e96c5065cc1d85b5ee02eaf70c8850f49df81888882627e25f63a199c46b"
     },
     {
       "path": "ui/renderer.js",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "OopHvIZFw0v1dFZjAlBKqK5btNvq9gwepFgIzUfLVEXq6uSaiE7O/cRkYFxwaLTSna9MqJ4Dg68eh84a4sNBCw=="
+  "signature": "B4K8ZoUwasYU30eOmruoBobNkawSBCkB1NL9mM/dQkpaa0gncbyupbnhz1OZ6Qs9bIJ3KW5q8MJvIJ7txF8LCQ=="
 }
