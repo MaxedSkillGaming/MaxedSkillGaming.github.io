@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://say-seating-par-outlet.trycloudflare.com",
-  "authUrl": "https://cambridge-steering-extras-pot.trycloudflare.com",
+  "server": "wss://reg-disclaimers-opens-municipality.trycloudflare.com",
+  "authUrl": "https://universities-infrastructure-clocks-inch.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 14924,
-      "sha256": "51ab38cbdb8fff73507c37d2ab8f9c19e605730a241515fa2a219a4a1aed23e3",
-      "url": "c/51ab38cbdb8fff73507c37d2ab8f9c19e605730a241515fa2a219a4a1aed23e3"
+      "size": 15045,
+      "sha256": "4eb5fec0fff632fa8dd3b5643d42b6e4c4e6ded29333cc92da7332ec508471b9",
+      "url": "c/4eb5fec0fff632fa8dd3b5643d42b6e4c4e6ded29333cc92da7332ec508471b9"
     },
     {
       "path": "ui/renderer.js",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "ukUqFsWYgkB/ci15y75YN0ozcuioRXSY3BS3Z/R7hAZcVnzsZdMn/qn9tOKOtGL8O1yU7DWqfPYUA6tyuAiEDA=="
+  "signature": "gwH7aUqw+eqqCYZpnUVsxadtaS+ZMsdldZiBA+kGTYoxgVOMMIjuRImMN2ehJiY59a1KviDO33maHIJYl5hKBw=="
 }
