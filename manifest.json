@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://rural-unknown-plane-correctly.trycloudflare.com",
-  "authUrl": "https://genome-excessive-behavioral-boulder.trycloudflare.com",
+  "server": "wss://republican-while-normal-pixel.trycloudflare.com",
+  "authUrl": "https://cheque-gazette-phys-carmen.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 225357,
-      "sha256": "12c6a8aa462e4816b416d9fd0696238dc3ce3a434296138bb51d2c559ec9eecb",
-      "url": "c/12c6a8aa462e4816b416d9fd0696238dc3ce3a434296138bb51d2c559ec9eecb"
+      "size": 225952,
+      "sha256": "6666811fe76d3f125fb7ea102a6c647d4945c8d8fe8d686053e7ed3dec7574c0",
+      "url": "c/6666811fe76d3f125fb7ea102a6c647d4945c8d8fe8d686053e7ed3dec7574c0"
     },
     {
       "path": "ui/icon.png",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 27623,
-      "sha256": "0d00001a5d6eb93a44ced7d8caad5b3916bd676e6d5b1c48b44f5a797dd539e2",
-      "url": "c/0d00001a5d6eb93a44ced7d8caad5b3916bd676e6d5b1c48b44f5a797dd539e2"
+      "size": 26784,
+      "sha256": "7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087",
+      "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "hXPADHYv8WQRp1hO5wEa40G0qjm2aDEpkIOSDdmB8HbIKWxD4HK6/gKQ/rT2bANXd41amzjh0rFyqolXz8MlBQ=="
+  "signature": "zkar6TlJ9nMGWz1Se+TbrjwTeadUmdvBKYzFvGTVcz/Tc598k7u+fc1xSguy58bJLEzmJ9XR/d21H9x1bRQ8Aw=="
 }
