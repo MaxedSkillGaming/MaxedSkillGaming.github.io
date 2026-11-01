@@ -2130,23 +2130,6 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     box.textContent = '';
     for (const x of util.querySelectorAll('.x')) x.remove();
     if (!opts || opts.actor !== G.selfId) return;
-    opts.abilities.forEach((a, i) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'act' + (a.id === f.selected ? ' selected' : '');
-      b.disabled = !a.usable;
-      const info = ABILITY_INFO[a.id];
-      const why = a.usable ? '' : a.reason === 'mana' ? 'Not enough mana' : a.reason === 'cooldown' ? `Ready in ${a.cooldown} rounds` : a.reason === 'acted' ? 'Already acted' : 'No enemy in reach';
-      b.title = [info ? info[1] : '', a.mana ? `Costs ${a.mana} mana.` : '', why].filter(Boolean).join('\n');
-      const img = new Image();
-      img.src = abilityIcon(a.id);
-      img.alt = '';
-      b.append(img, el('span', 'hk', String(i === 9 ? 0 : i < 9 ? i + 1 : '-')), el('span', 'nm', a.name));
-      if (a.mana) b.append(el('span', 'cost', String(a.mana)));
-      if (a.cooldown) b.append(el('span', 'cd', String(a.cooldown)));
-      b.addEventListener('click', () => selectAbility(a.id));
-      box.appendChild(b);
-    });
     const extra = (label, onClick, disabled) => {
       const b = document.createElement('button');
       b.type = 'button';
@@ -2271,6 +2254,15 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
   // ---- bottom bar: globes, action bar, quick slots
 
   const BAR_SLOTS = 8;
+  const STYLES = ['melee', 'range', 'magic'];
+  /** Which skill tree each ability belongs to, for filling and filtering the three bars. */
+  const ABILITY_STYLE = {};
+  for (const [style, ids] of Object.entries({
+    melee: ['punch', 'slash', 'multi_strike', 'power_strike', 'rend', 'sunder_strike', 'war_cry', 'whirlwind', 'execute'],
+    range: ['shot', 'multi_shot', 'aimed_shot', 'poison_arrow', 'snare', 'rain_of_arrows', 'backstep', 'deadeye'],
+    magic: ['fireball', 'ice_storm', 'mana_shield', 'chain_lightning', 'arcane_surge'],
+    defense: ['shield_bash', 'fortify', 'second_wind', 'parry', 'stoneskin', 'retaliate', 'unbreakable', 'heal'],
+  })) for (const id of ids) ABILITY_STYLE[id] = style;
   /** Quick slots beside the globes. `item` is the default item; 'any' means the first food in the bag. */
   const QUICK = [
     { id: 'hp', key: 'h', label: 'Health potion', item: 'minor_health_potion', match: (d) => d.kind === 'potion' && d.heal && !d.mana },
@@ -2289,13 +2281,15 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     } catch {
       saved = null;
     }
-    G.bar = { key, slots: saved && Array.isArray(saved.slots) ? saved.slots : null, quick: (saved && saved.quick) || {} };
+    const bars = {};
+    for (const s of STYLES) bars[s] = saved && saved.bars && Array.isArray(saved.bars[s]) ? saved.bars[s] : null;
+    G.bar = { key, bars, quick: (saved && saved.quick) || {} };
     return G.bar;
   }
 
   function saveBar() {
     try {
-      localStorage.setItem(G.bar.key, JSON.stringify({ slots: G.bar.slots, quick: G.bar.quick }));
+      localStorage.setItem(G.bar.key, JSON.stringify({ bars: G.bar.bars, quick: G.bar.quick }));
     } catch {
       /* private window or blocked storage: the layout lasts until the page closes */
     }
@@ -2316,16 +2310,19 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     return (def && def.weaponClass) || null;
   }
 
-  /** The bar until the player changes it: the attack for the weapon in hand, then every ranked skill. */
-  function defaultBar() {
-    const basic = { blade: 'slash', dagger: 'slash', bow: 'shot', staff: 'fireball' }[weaponClassOf(heldWeapon())] || 'punch';
-    const ids = [basic, ...unlockedAbilities().filter((id) => !BASIC_ATTACKS.includes(id))];
+  /** Which bar is showing: the one for the weapon in hand. Fists count as melee. */
+  const barStyle = () => ({ blade: 'melee', dagger: 'melee', bow: 'range', staff: 'magic' }[weaponClassOf(heldWeapon())] || 'melee');
+
+  /** A bar until the player changes it: that style's basic attack and abilities, then defense abilities. */
+  function defaultBar(style) {
+    const basic = { melee: heldWeapon() ? 'slash' : 'punch', range: 'shot', magic: 'fireball' }[style];
+    const have = unlockedAbilities().filter((id) => !BASIC_ATTACKS.includes(id));
+    const ids = [basic, ...have.filter((id) => ABILITY_STYLE[id] === style), ...have.filter((id) => ABILITY_STYLE[id] === 'defense')];
     return ids.slice(0, BAR_SLOTS).map((id) => ({ k: 'ability', id }));
   }
 
-  const barSlots = () => {
-    const b = barState();
-    const slots = b.slots || defaultBar();
+  const barSlots = (style = barStyle()) => {
+    const slots = barState().bars[style] || defaultBar(style);
     return Array.from({ length: BAR_SLOTS }, (_, i) => slots[i] || null);
   };
 
@@ -2365,7 +2362,9 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     const info = ABILITY_INFO[entry.id];
     if (!G.fight) return fromKey ? undefined : toast(info ? `${info[0]}: ${info[1]}` : 'Nothing to do outside a fight.');
     if (!isMyTurn()) return toast('Not your turn to act.');
-    if (!G.fight.options.abilities.some((a) => a.id === entry.id)) return toast(`${info ? info[0] : 'That ability'} needs a different weapon or shield.`);
+    const opt = G.fight.options.abilities.find((a) => a.id === entry.id);
+    if (!opt) return toast(`${info ? info[0] : 'That ability'} needs a different weapon or shield.`);
+    if (opt.reason === 'buff') return toast('Another buff of that kind is still running. Only one damage buff and one defensive buff can be held at a time.');
     selectAbility(entry.id);
   }
 
@@ -2412,13 +2411,14 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
       return cv;
     };
     if (kind === 'bar') {
-      box.appendChild(el('h4', '', `Action bar slot ${which + 1}`));
+      const style = barStyle();
+      box.appendChild(el('h4', '', `${style[0].toUpperCase()}${style.slice(1)} bar, slot ${which + 1}`));
       const put = (entry) => choose(() => {
-        const slots = b.slots || defaultBar();
-        b.slots = Array.from({ length: BAR_SLOTS }, (_, n) => slots[n] || null);
-        b.slots[which] = entry;
+        const slots = barSlots(style);
+        b.bars[style] = slots.slice();
+        b.bars[style][which] = entry;
       });
-      for (const id of unlockedAbilities()) {
+      for (const id of unlockedAbilities().filter((x) => ABILITY_STYLE[x] === style || ABILITY_STYLE[x] === 'defense')) {
         const img = new Image();
         img.src = abilityIcon(id);
         row(ABILITY_NAMES[id] || pretty(id), img, () => put({ k: 'ability', id }));
@@ -2487,6 +2487,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
               lines.push(`Costs ${opt.mana} mana.`);
             }
             if (!opt.usable) on = false;
+            if (opt.reason === 'buff') lines.push('Another buff of that kind is running.');
             if (opt.cooldown) b.appendChild(el('span', 'cd', String(opt.cooldown)));
             if (G.fight.selected === entry.id) b.classList.add('selected');
           }
@@ -2532,9 +2533,11 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
   function renderBar() {
     const host = $('hotbar');
     if (!host || !G.data) return;
-    const slots = barSlots();
+    const style = barStyle();
+    const slots = barSlots(style);
     const opts = G.fight && G.fight.options;
     const sig = JSON.stringify([
+      style,
       slots,
       G.auto && !bossFight(),
       bossFight(),
@@ -2546,6 +2549,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     if (sig === G.barSig) return;
     G.barSig = sig;
     host.textContent = '';
+    host.dataset.style = style;
     slots.forEach((entry, i) => {
       const b = barSlotEl(i, entry);
       wirePicker(b, () => openBarPicker('bar', i));
