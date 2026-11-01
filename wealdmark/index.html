@@ -89,6 +89,12 @@
     .frame .title i { width: .6rem; height: .6rem; background: var(--line); display: inline-block; }
     .frame img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 
+    /* the promise: a solid gold slab so it cannot be missed */
+    .fair { background: var(--gold); color: #1a1205; padding: 2rem 2.25rem; margin-bottom: 3rem; border: 3px solid #1a1205; box-shadow: 8px 8px 0 var(--gold-deep); }
+    .fair h2 { margin: 0 0 .75rem; font-size: clamp(1.8rem, 4.5vw, 2.8rem); }
+    .fair p { margin: 0; max-width: 46rem; font-size: 1.25rem; line-height: 1.5; }
+    @media (max-width: 52rem) { .fair { padding: 1.5rem 1.25rem; box-shadow: 5px 5px 0 var(--gold-deep); } }
+
     /* sections */
     section { padding-block: 3rem; border-top: 3px solid var(--line); }
     h2 { font: 700 clamp(1.6rem, 3.5vw, 2.2rem)/1.1 var(--display); margin: 0 0 1.5rem; text-wrap: balance; }
@@ -129,6 +135,7 @@
   <div class="wrap">
     <header class="bar">
       <a class="brand" href="./"><img src="icon.png" alt="" width="32" height="32" />Heroes of the Wealdmark</a>
+      <a class="nav" href="#fair">No pay to win</a>
       <a class="nav" href="#weapons">Weapons</a>
       <a class="nav" href="#start">Get started</a>
       <a class="nav" href="#join">Join us</a>
@@ -150,6 +157,11 @@
           <div class="title"><i></i><i></i><i></i>&nbsp;Bellstone Plaza</div>
           <img src="shots/plaza.jpg" width="800" height="475" alt="A hero standing in Bellstone Plaza, a cobbled market square with stalls, lamps and townsfolk, in pixel art." />
         </div>
+      </div>
+
+      <div class="fair" id="fair">
+        <h2>No pay to win. Ever.</h2>
+        <p>Nobody can buy a stronger hero. Gold, gear, levels and loot come from playing, and they come the same way for everyone. If we ever sell anything, it will only change how your hero looks. No loot boxes, no paid power, no paid shortcuts past the grind.</p>
       </div>
 
       <section id="weapons">
@@ -195,7 +207,7 @@
 
       <section id="faq">
         <h2>Questions</h2>
-        <details><summary>Does it cost anything?</summary><p>No. The game is free to play.</p></details>
+        <details><summary>Does it cost anything?</summary><p>No. The game is free to play, and there is no pay to win. Anything we sell later will be cosmetic only.</p></details>
         <details><summary>Do I need to install anything?</summary><p>No. It runs in a modern browser on desktop, tablet or phone. Tick "Keep me signed in" at login and you will not need your password again for up to 30 days.</p></details>
         <details><summary>I lost my password.</summary><p>Use "Forgot password?" on the login page, with the recovery key you saved when you made the account.</p></details>
         <details><summary>Who else is playing?</summary><p>Other heroes, on a small server. If the realm shows as full or offline above, try again a little later.</p></details>
