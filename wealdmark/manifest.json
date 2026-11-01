@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://sections-contrast-securities-flow.trycloudflare.com",
-  "authUrl": "https://dig-hospital-exist-seafood.trycloudflare.com",
+  "server": "wss://albums-pal-creature-patterns.trycloudflare.com",
+  "authUrl": "https://once-cologne-coordinate-lessons.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 35754,
-      "sha256": "10ef773d1b84f0de215c91bf7c3caa898d2aa93165b2272bd599eeaafca62dfe",
-      "url": "c/10ef773d1b84f0de215c91bf7c3caa898d2aa93165b2272bd599eeaafca62dfe"
+      "size": 35942,
+      "sha256": "e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c",
+      "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "Me2qJMBFKQtB0fcNfvrdeL37JILluHHWQhYWUGhbugRq7TXwz6rRKQLUF/RMUDqJNGnzp0zdZul1K8lpcrOfAA=="
+  "signature": "D2vFfWSRZrJYGDz0klm0wlstTuwWkDYCdUznK+nez39yUZ/FafwS1SO/jwGN8sH+T+5R9o+//QTZ5G75dBfIBQ=="
 }
