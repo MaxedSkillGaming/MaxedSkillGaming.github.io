@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://random-get-bobby-prediction.trycloudflare.com",
-  "authUrl": "https://testing-compression-anime-sheer.trycloudflare.com",
+  "server": "wss://guests-aspects-files-custody.trycloudflare.com",
+  "authUrl": "https://smilies-open-nat-swap.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -79,15 +79,15 @@
     },
     {
       "path": "ui/audio.js",
-      "size": 13011,
-      "sha256": "e58d8f22f2045e79d769b46bc0378a58d114074341d8292110faa0955ce45b68",
-      "url": "c/e58d8f22f2045e79d769b46bc0378a58d114074341d8292110faa0955ce45b68"
+      "size": 12691,
+      "sha256": "dbd5355267c06e59e901213c2bc715658223a7ef448ea0921c19da5a9c19132e",
+      "url": "c/dbd5355267c06e59e901213c2bc715658223a7ef448ea0921c19da5a9c19132e"
     },
     {
       "path": "ui/game.js",
-      "size": 250032,
-      "sha256": "bd7ceb0c1e0bc60ece9fde277111c6d3efcae3363f141b73f8680ad25f356d1e",
-      "url": "c/bd7ceb0c1e0bc60ece9fde277111c6d3efcae3363f141b73f8680ad25f356d1e"
+      "size": 250386,
+      "sha256": "2540e970c242d111d3f9eef550a80bb920b21e269616180e38e2f79ac8a71c0b",
+      "url": "c/2540e970c242d111d3f9eef550a80bb920b21e269616180e38e2f79ac8a71c0b"
     },
     {
       "path": "ui/icon.png",
@@ -103,9 +103,9 @@
     },
     {
       "path": "ui/renderer.js",
-      "size": 15250,
-      "sha256": "65affd18a453a6bc37a02687e023b22f7d59cf9d2efdf89562ae4aa42ee6a9f6",
-      "url": "c/65affd18a453a6bc37a02687e023b22f7d59cf9d2efdf89562ae4aa42ee6a9f6"
+      "size": 15416,
+      "sha256": "721f9c8bdcb6b3e75e2905cbe5983316ec001e7de23b9f8dc1b6e42199863978",
+      "url": "c/721f9c8bdcb6b3e75e2905cbe5983316ec001e7de23b9f8dc1b6e42199863978"
     },
     {
       "path": "ui/style.css",
@@ -114,5 +114,5 @@
       "url": "c/aa0495b6a1629d260b168eb19f5258826c6c0291158d52e531a613b91cd347fb"
     }
   ],
-  "signature": "wb6ZY/XHDrYEcwe1Q9YFrYhfv4xgw2zzDac7qcJoArUsoDGNoGGnrNkWzuUFg0gJffprlGL3YitJyFpjVwBtDA=="
+  "signature": "pw1qB/6dtwX0JYLAgOwT5BD359jmx+603zenVEVOxeY8pyqJKIrE+IPCyX/ZkRUvZqH2jz8aFw3Mnmd3kpRlCg=="
 }
