@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://guests-aspects-files-custody.trycloudflare.com",
-  "authUrl": "https://smilies-open-nat-swap.trycloudflare.com",
+  "server": "wss://binary-pensions-stand-sorry.trycloudflare.com",
+  "authUrl": "https://twelve-factory-compiled-docs.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/aa0495b6a1629d260b168eb19f5258826c6c0291158d52e531a613b91cd347fb"
     }
   ],
-  "signature": "pw1qB/6dtwX0JYLAgOwT5BD359jmx+603zenVEVOxeY8pyqJKIrE+IPCyX/ZkRUvZqH2jz8aFw3Mnmd3kpRlCg=="
+  "signature": "fqCOqR4QcMVmh6MT/m9JeyiNMNJLM23iuNQYw5RGHBGU3hOkBoOF8qW8P7+4w2cSj4WX4LINK+iyjHH/UgCjBg=="
 }
