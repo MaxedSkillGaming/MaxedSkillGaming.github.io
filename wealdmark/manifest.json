@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://aerial-soldier-cambridge-evaluations.trycloudflare.com",
-  "authUrl": "https://gonna-same-movie-lion.trycloudflare.com",
+  "server": "wss://random-get-bobby-prediction.trycloudflare.com",
+  "authUrl": "https://testing-compression-anime-sheer.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 256343,
-      "sha256": "f5567b1faaac051dd8612fd36871f20edcffebb9401e0d081e6f34b27a27dfd4",
-      "url": "c/f5567b1faaac051dd8612fd36871f20edcffebb9401e0d081e6f34b27a27dfd4"
+      "size": 250032,
+      "sha256": "bd7ceb0c1e0bc60ece9fde277111c6d3efcae3363f141b73f8680ad25f356d1e",
+      "url": "c/bd7ceb0c1e0bc60ece9fde277111c6d3efcae3363f141b73f8680ad25f356d1e"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 15668,
-      "sha256": "65ad940db8c19a6ca0b6299166831337b22d5c311a93e8631dc24d799fef3c1b",
-      "url": "c/65ad940db8c19a6ca0b6299166831337b22d5c311a93e8631dc24d799fef3c1b"
+      "size": 15646,
+      "sha256": "c966b7fd15cc4fe83bb1564f0e0c53dc39d437aca8b8e6b16a8f14259194d711",
+      "url": "c/c966b7fd15cc4fe83bb1564f0e0c53dc39d437aca8b8e6b16a8f14259194d711"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 27171,
-      "sha256": "b9fc12cfddfff077e64ce4a8976cc6fde2cd91e1acd40a41ffe9e9bd8e27fe1f",
-      "url": "c/b9fc12cfddfff077e64ce4a8976cc6fde2cd91e1acd40a41ffe9e9bd8e27fe1f"
+      "size": 26551,
+      "sha256": "aa0495b6a1629d260b168eb19f5258826c6c0291158d52e531a613b91cd347fb",
+      "url": "c/aa0495b6a1629d260b168eb19f5258826c6c0291158d52e531a613b91cd347fb"
     }
   ],
-  "signature": "wG4Y7ffTxsht3ikRH/eevVSm23/8YFMwqBGA6lv1raZQ9rEjstep492JEEiZKDoZU4Q0+KCdR7ioSjPUlYkzCw=="
+  "signature": "wb6ZY/XHDrYEcwe1Q9YFrYhfv4xgw2zzDac7qcJoArUsoDGNoGGnrNkWzuUFg0gJffprlGL3YitJyFpjVwBtDA=="
 }
