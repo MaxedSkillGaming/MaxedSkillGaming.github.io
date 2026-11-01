@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://kissing-reload-timeline-shaped.trycloudflare.com",
-  "authUrl": "https://comprehensive-foundation-vatican-tri.trycloudflare.com",
+  "server": "wss://filling-broadcasting-motel-since.trycloudflare.com",
+  "authUrl": "https://feelings-memorial-motorcycles-collins.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "B4K8ZoUwasYU30eOmruoBobNkawSBCkB1NL9mM/dQkpaa0gncbyupbnhz1OZ6Qs9bIJ3KW5q8MJvIJ7txF8LCQ=="
+  "signature": "FczmKNzNDRirlT635sNTGNvdoqL6wo1/usHlc0QYLBaSxAxaH3nLQVSeZ/BM2v5lzZ8DJGrpXLD6qDpiwmHCAA=="
 }
