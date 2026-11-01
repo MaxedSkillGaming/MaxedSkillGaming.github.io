@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
   <title>Heroes of the Wealdmark - free online turn-based RPG in your browser</title>
   <meta name="description" content="Heroes of the Wealdmark is a free online RPG with turn-based tactical fights, gear and skill training. Create an account and play in your browser, no install." />
   <link rel="canonical" href="https://eternitysquaredtechnologies.github.io/wealdmark/" />
@@ -11,8 +12,11 @@
   <meta property="og:title" content="Heroes of the Wealdmark" />
   <meta property="og:description" content="A free online turn-based RPG. Create an account and play in your browser, no install." />
   <meta property="og:url" content="https://eternitysquaredtechnologies.github.io/wealdmark/" />
-  <meta property="og:image" content="https://eternitysquaredtechnologies.github.io/wealdmark/icon.png" />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content="https://eternitysquaredtechnologies.github.io/wealdmark/shots/plaza.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -20,6 +24,7 @@
     "name": "Heroes of the Wealdmark",
     "description": "A free online RPG with turn-based tactical fights, gear and skill training, played in the browser.",
     "url": "https://eternitysquaredtechnologies.github.io/wealdmark/",
+    "image": "https://eternitysquaredtechnologies.github.io/wealdmark/shots/plaza.jpg",
     "genre": ["RPG", "Turn-based tactics", "MMORPG"],
     "gamePlatform": "Web browser",
     "applicationCategory": "Game",
@@ -29,92 +34,199 @@
   }
   </script>
   <style>
-    :root { --bg: #14101c; --fg: #ece6f4; --muted: #a79bbd; --accent: #f0c860; --panel: #1f1830; --line: #34294d; }
+    :root {
+      --night: #120d1a;
+      --night-2: #1b1427;
+      --line: #3a2d50;
+      --parchment: #ece2c8;
+      --dim: #b2a68f;
+      --gold: #e8b84a;
+      --gold-deep: #7a5a14;
+      --moss: #7fb069;
+      --ember: #d4573b;
+      --display: "Pixelify Sans", ui-monospace, monospace;
+      --body: "Alegreya", Georgia, serif;
+    }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, sans-serif; }
-    a { color: var(--accent); }
-    .wrap { max-width: 56rem; margin: 0 auto; padding: 0 1rem; }
-    nav { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; flex-wrap: wrap; }
-    nav img { width: 32px; height: 32px; image-rendering: pixelated; }
-    nav strong { flex: 1; }
-    nav a { text-decoration: none; color: var(--muted); }
-    nav a:hover { color: var(--fg); }
-    .hero { text-align: center; padding: 3.5rem 0 3rem; }
-    .hero img { width: 112px; height: 112px; image-rendering: pixelated; }
-    h1 { margin: 1rem 0 .25rem; font-size: clamp(2rem, 6vw, 3rem); text-wrap: balance; }
-    .tag { color: var(--muted); margin: 0 0 2rem; font-size: 1.1rem; }
-    .buttons { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
-    .btn { display: inline-block; padding: .85rem 1.8rem; border-radius: .5rem; text-decoration: none; font-weight: 700; font-size: 1.1rem; border: 2px solid var(--accent); }
-    .btn.primary { background: var(--accent); color: #1a1408; }
-    .btn.second { color: var(--accent); }
-    .btn:hover, .btn:focus-visible { filter: brightness(1.15); }
-    .note { color: var(--muted); font-size: .9rem; margin-top: 1rem; }
-    h2 { font-size: 1.5rem; margin: 3rem 0 1rem; }
-    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
-    .card { background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: 1rem 1.1rem; }
-    .card h3 { margin: 0 0 .35rem; font-size: 1.05rem; }
-    .card p { margin: 0; color: var(--muted); }
-    ol { padding-left: 1.2rem; }
-    ol li { margin-bottom: .6rem; }
-    details { background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: .8rem 1.1rem; margin-bottom: .6rem; }
-    summary { cursor: pointer; font-weight: 600; }
-    details p { color: var(--muted); margin: .6rem 0 0; }
-    footer { color: var(--muted); font-size: .9rem; text-align: center; padding: 3rem 0 2.5rem; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; } }
+    body {
+      margin: 0;
+      background: var(--night);
+      color: var(--parchment);
+      font: 1.15rem/1.65 var(--body);
+    }
+    a { color: var(--gold); }
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .wrap { max-width: 68rem; margin: 0 auto; padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right)); }
+
+    /* top bar */
+    .bar { display: flex; align-items: center; gap: 1.25rem; padding-block: 1rem; flex-wrap: wrap; }
+    .bar .brand { display: flex; align-items: center; gap: .6rem; font: 700 1.1rem var(--display); color: var(--parchment); text-decoration: none; margin-right: auto; }
+    .bar .brand img { width: 32px; height: 32px; image-rendering: pixelated; }
+    .bar a.nav { color: var(--dim); text-decoration: none; }
+    .bar a.nav:hover { color: var(--parchment); }
+
+    /* hero */
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 3rem; align-items: center; padding-block: 3rem 4.5rem; }
+    h1 { font: 700 clamp(2.4rem, 5.5vw, 4rem)/1.02 var(--display); margin: 0 0 1rem; text-wrap: balance; letter-spacing: .01em; }
+    .lede { font-size: 1.4rem; line-height: 1.45; margin: 0 0 1.75rem; color: var(--parchment); max-width: 28rem; }
+    .lede em { color: var(--gold); font-style: italic; }
+    .buttons { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .btn { display: inline-block; font: 700 1.1rem var(--display); padding: .85rem 1.5rem; text-decoration: none; border: 3px solid var(--gold); color: var(--gold); background: transparent; box-shadow: 4px 4px 0 var(--gold-deep); transition: transform .08s, box-shadow .08s; }
+    .btn.primary { background: var(--gold); color: #1a1205; }
+    .btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--gold-deep); }
+    .btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--gold-deep); }
+    .status { margin-top: 1.5rem; color: var(--dim); font-size: 1rem; display: flex; align-items: center; gap: .55rem; }
+    .dot { width: .7rem; height: .7rem; background: var(--dim); display: inline-block; }
+    .status[data-state="up"] .dot { background: var(--moss); animation: pulse 2.4s ease-in-out infinite; }
+    .status[data-state="down"] .dot { background: var(--ember); }
+    @keyframes pulse { 50% { opacity: .35; } }
+
+    /* the screenshot sits in a game-window frame */
+    .frame { border: 3px solid var(--line); background: var(--night-2); box-shadow: 8px 8px 0 #000; }
+    .frame .title { display: flex; gap: .4rem; padding: .45rem .7rem; border-bottom: 3px solid var(--line); font: 500 .85rem var(--display); color: var(--dim); }
+    .frame .title i { width: .6rem; height: .6rem; background: var(--line); display: inline-block; }
+    .frame img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+
+    /* sections */
+    section { padding-block: 3rem; border-top: 3px solid var(--line); }
+    h2 { font: 700 clamp(1.6rem, 3.5vw, 2.2rem)/1.1 var(--display); margin: 0 0 1.5rem; text-wrap: balance; }
+    .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 3rem; }
+    .split > p { margin: 0; color: var(--dim); }
+
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: .7rem .9rem .7rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font: 700 1.05rem var(--display); color: var(--gold); white-space: nowrap; padding-right: 1.5rem; }
+    td { color: var(--parchment); }
+    .scroll { overflow-x: auto; }
+
+    ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
+    ol.steps li { counter-increment: s; display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; align-items: start; }
+    ol.steps li::before { content: counter(s); font: 700 1.6rem/1 var(--display); color: #1a1205; background: var(--gold); width: 3rem; height: 3rem; display: grid; place-items: center; box-shadow: 3px 3px 0 var(--gold-deep); }
+    ol.steps strong { color: var(--gold); font-weight: 700; }
+
+    details { border-bottom: 1px solid var(--line); padding-block: .9rem; }
+    summary { cursor: pointer; font: 700 1.1rem var(--display); }
+    details p { margin: .5rem 0 0; color: var(--dim); max-width: 42rem; }
+
+    .cta { text-align: center; }
+    .cta p { color: var(--dim); margin: 0 0 1.5rem; }
+    .cta .buttons { justify-content: center; }
+
+    footer { border-top: 3px solid var(--line); padding-block: 2rem 3rem; color: var(--dim); font-size: 1rem; }
+
+    @media (max-width: 52rem) {
+      .hero, .split { grid-template-columns: 1fr; gap: 2rem; }
+      .hero { padding-block: 1.5rem 3rem; }
+      .frame { box-shadow: 5px 5px 0 #000; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <nav>
-      <img src="icon.png" alt="" width="32" height="32" />
-      <strong>Heroes of the Wealdmark</strong>
-      <a href="#about">About</a>
-      <a href="#start">How to start</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-
-    <header class="hero">
-      <img src="icon.png" alt="Heroes of the Wealdmark icon" width="112" height="112" />
-      <h1>Heroes of the Wealdmark</h1>
-      <p class="tag">The Crown is stolen. The realm is waiting.</p>
-      <div class="buttons">
-        <a class="btn primary" href="play/">Play in your browser</a>
-        <a class="btn second" href="play/#register">Create account</a>
-      </div>
-      <p class="note">Free. No install. Works on desktop and phone browsers.</p>
+    <header class="bar">
+      <a class="brand" href="./"><img src="icon.png" alt="" width="32" height="32" />Heroes of the Wealdmark</a>
+      <a class="nav" href="#weapons">Weapons</a>
+      <a class="nav" href="#start">Get started</a>
+      <a class="nav" href="#faq">FAQ</a>
     </header>
 
     <main>
-      <section id="about">
-        <h2>What you do</h2>
-        <div class="grid">
-          <div class="card"><h3>Fight turn by turn</h3><p>Fights play out on a grid. Your weapon sets your style: melee, ranged or magic, each with its own action bar.</p></div>
-          <div class="card"><h3>Weapons that feel different</h3><p>Daggers bleed, maces crit, crossbows stun, bows loose extra arrows, and elemental staves each add a perk of their own.</p></div>
-          <div class="card"><h3>Train, craft, trade</h3><p>Gather, craft and find gear, fill your bag and bank, and shop with the people of the Reach.</p></div>
-          <div class="card"><h3>Share the fields</h3><p>Other players are out there with you. Chat, and watch the fields refill faster when the realm is busy.</p></div>
+      <div class="hero">
+        <div>
+          <h1>The Crown is stolen. The realm is waiting.</h1>
+          <p class="lede">A free online RPG you play in your browser. Fight turn by turn on a grid, train your skills, and take your gear out into the <em>Wealdmark</em>.</p>
+          <div class="buttons">
+            <a class="btn primary" href="play/">Play now</a>
+            <a class="btn" href="play/#register">Create account</a>
+          </div>
+          <p class="status" id="status" data-state="unknown" role="status"><span class="dot"></span><span id="status-text">Checking the realm...</span></p>
+        </div>
+        <div class="frame">
+          <div class="title"><i></i><i></i><i></i>&nbsp;Bellstone Plaza</div>
+          <img src="shots/plaza.jpg" width="800" height="475" alt="A hero standing in Bellstone Plaza, a cobbled market square with stalls, lamps and townsfolk, in pixel art." />
+        </div>
+      </div>
+
+      <section id="weapons">
+        <div class="split">
+          <div>
+            <h2>Every weapon plays differently</h2>
+            <p>Your weapon decides your fighting style and your action bar: melee, ranged or magic. Switch weapons and the bar switches with it. Each weapon also carries a perk of its own.</p>
+          </div>
+          <div class="scroll">
+            <table>
+              <tbody>
+                <tr><th>Sword</th><td>Hits 5% harder.</td></tr>
+                <tr><th>Dagger</th><td>Two actions a turn. Wounds bleed.</td></tr>
+                <tr><th>Mace</th><td>10% chance to crit.</td></tr>
+                <tr><th>Spear</th><td>Two-handed. Blocks 20% of attacks.</td></tr>
+                <tr><th>Bow</th><td>Longer reach, extra crit chance, sometimes two arrows.</td></tr>
+                <tr><th>Crossbow</th><td>Can stun an enemy for three rounds.</td></tr>
+                <tr><th>Pistol</th><td>One-handed. Wield two. May finish a wounded enemy outright.</td></tr>
+                <tr><th>Staves</th><td>Air dodges, fire burns hotter, water heals, earth shrugs off blows.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="split">
+          <div>
+            <h2>A world to work in</h2>
+          </div>
+          <p>Gather, craft and trade. Fill your bag and your bank. Take on quests from the people of the Reach, and meet other heroes in the fields, where monsters come back faster the busier the realm gets.</p>
         </div>
       </section>
 
       <section id="start">
-        <h2>How to start</h2>
-        <ol>
-          <li>Press <strong>Create account</strong>, pick a username and a password, and say you are 13 or older.</li>
-          <li>Save the <strong>recovery key</strong> the game shows you. It is the way back in if you forget your password.</li>
-          <li>Pick your hero's look, then walk out and hit the first thing that moves.</li>
+        <h2>Get started in a minute</h2>
+        <ol class="steps">
+          <li><div><strong>Create an account.</strong> Pick a username and a password, and confirm you are 13 or older.</div></li>
+          <li><div><strong>Save your recovery key.</strong> The game shows it once. It is the way back in if you forget your password.</div></li>
+          <li><div><strong>Choose your look and walk out.</strong> Click a tile to move, click a monster to fight it.</div></li>
         </ol>
-        <p class="buttons" style="justify-content:flex-start"><a class="btn primary" href="play/#register">Create account</a> <a class="btn second" href="play/">I already have one</a></p>
       </section>
 
       <section id="faq">
         <h2>Questions</h2>
         <details><summary>Does it cost anything?</summary><p>No. The game is free to play.</p></details>
-        <details><summary>Do I need to install anything?</summary><p>No. It runs in a modern browser on desktop, tablet or phone. Tick "Keep me signed in" on the login page and you will not need to type your password again for up to 30 days.</p></details>
-        <details><summary>I lost my password.</summary><p>Use "Forgot password?" on the login page with the recovery key you saved when you made the account.</p></details>
-        <details><summary>Is it online with other people?</summary><p>Yes. The server is small for now, so if it is full or offline, try again a little later.</p></details>
+        <details><summary>Do I need to install anything?</summary><p>No. It runs in a modern browser on desktop, tablet or phone. Tick "Keep me signed in" at login and you will not need your password again for up to 30 days.</p></details>
+        <details><summary>I lost my password.</summary><p>Use "Forgot password?" on the login page, with the recovery key you saved when you made the account.</p></details>
+        <details><summary>Who else is playing?</summary><p>Other heroes, on a small server. If the realm shows as full or offline above, try again a little later.</p></details>
+        <details><summary>Is it made with AI?</summary><p>Parts of it are. The story and item text were written with an AI model. The art and music are drawn and generated in code.</p></details>
+      </section>
+
+      <section class="cta">
+        <h2>The realm is waiting</h2>
+        <p>No download, no cost. Just a username.</p>
+        <div class="buttons">
+          <a class="btn primary" href="play/">Play now</a>
+          <a class="btn" href="play/#register">Create account</a>
+        </div>
       </section>
     </main>
 
-    <footer>Made by Eternity Squared Technologies. &copy; 2026</footer>
+    <footer>Heroes of the Wealdmark &copy; 2026 Eternity Squared Technologies.</footer>
   </div>
+
+  <script>
+    // Ask the game's login service whether it is up, so players know before they click.
+    (async () => {
+      const box = document.getElementById('status');
+      const text = document.getElementById('status-text');
+      const set = (state, msg) => { box.dataset.state = state; text.textContent = msg; };
+      try {
+        const cfg = await (await fetch('play/config.json', { cache: 'no-store' })).json();
+        const res = await fetch(new URL('/health', cfg.authUrl), { cache: 'no-store' });
+        if (!res.ok) throw new Error('down');
+        set('up', 'The realm is open');
+      } catch {
+        set('down', 'The realm is closed right now. Try again soon.');
+      }
+    })();
+  </script>
 </body>
 </html>
