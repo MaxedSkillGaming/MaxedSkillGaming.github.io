@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://preferred-massage-foreign-edmonton.trycloudflare.com",
-  "authUrl": "https://neighbor-coaching-cylinder-geek.trycloudflare.com",
+  "server": "wss://focusing-bean-partners-concentrate.trycloudflare.com",
+  "authUrl": "https://replies-programs-premium-tramadol.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 250386,
-      "sha256": "2540e970c242d111d3f9eef550a80bb920b21e269616180e38e2f79ac8a71c0b",
-      "url": "c/2540e970c242d111d3f9eef550a80bb920b21e269616180e38e2f79ac8a71c0b"
+      "size": 250426,
+      "sha256": "81a6d9601840af35f20cabd050b40d16ab772cf3858ffa0991c2c9e3c558b1d3",
+      "url": "c/81a6d9601840af35f20cabd050b40d16ab772cf3858ffa0991c2c9e3c558b1d3"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 15687,
-      "sha256": "4883ada9c84bb6bba183b9f88c9620b14ede75299848875201f090c253c4c44c",
-      "url": "c/4883ada9c84bb6bba183b9f88c9620b14ede75299848875201f090c253c4c44c"
+      "size": 15824,
+      "sha256": "83122610ea969d985edb9e5dda0eb30be708216a43b0a691cbc824c238af0ea9",
+      "url": "c/83122610ea969d985edb9e5dda0eb30be708216a43b0a691cbc824c238af0ea9"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 26665,
-      "sha256": "f8feb9c2e4128977bf61174e2f6978571f4f1014fbbba9c11e6c10b55064b0e9",
-      "url": "c/f8feb9c2e4128977bf61174e2f6978571f4f1014fbbba9c11e6c10b55064b0e9"
+      "size": 26725,
+      "sha256": "1b8018671b9f8ad08b5e00ed6f2004a199e0d9735721a9329b3664c88840fe51",
+      "url": "c/1b8018671b9f8ad08b5e00ed6f2004a199e0d9735721a9329b3664c88840fe51"
     }
   ],
-  "signature": "AWoLq9snAgsCLVtt2GMA6kELG6VifIYwCYnV6/iDTnQzdsJgF7ERPNRGrW0DoKthCRz93s0IdGpp+Qrg1y8MDQ=="
+  "signature": "qyU4VliS9XA3Ha16rslzgZyytM+ivJXYgDx15PXySceSJOraAzk9cX+WUR1dZ9Oxd4a+qyTstu7ICfRHHCCSBQ=="
 }
