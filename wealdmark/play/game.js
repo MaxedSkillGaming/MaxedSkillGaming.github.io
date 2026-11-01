@@ -14,7 +14,9 @@
   const LOG_LINES = 80;
   const MOVE_STEP_MS = 130;
   const MAX_LEVEL = 100;
-  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-trades'];
+  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-trades', 'panel-party', 'panel-dungeon'];
+  /** Iron bits each hero pays to enter a dungeon run. Matches the server's default. */
+  const DUNGEON_FEE = 25;
   const TOWN_PANELS = ['dialog', 'panel-shop', 'panel-storage', 'panel-station', 'panel-perks', 'panel-anchor'];
   const ROW_LEVELS = [1, 8, 16, 24, 32, 40];
   const TREE_NAMES = ['melee', 'range', 'magic', 'defense'];
@@ -189,6 +191,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     storage_full: 'Your storage is full.',
     no_space: 'There is no room for that.',
     missing_items: 'You are missing some of the required materials.',
+    no_party: 'You are not in a party.',
+    not_leader: 'Only the party leader can do that.',
+    party_full: 'The party is full.',
+    unknown_hero: 'No hero by that name is online.',
+    no_dungeon: 'There is no dungeon gate near you.',
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1922,6 +1929,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         return onState(msg, now);
       case 'stats':
         G.stats = msg;
+        if (!$('panel-dungeon').classList.contains('hidden')) renderDungeon();
         hint('walk');
         setTimeout(() => hint('monster'), 6000);
         setTimeout(() => hint('town'), 14000);
@@ -1969,6 +1977,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         return;
       case 'log':
         return addLog(msg.text, msg.cls);
+      case 'party':
+        G.party = msg.leader == null || !msg.members.length ? null : msg;
+        if (G.party) G.invite = null;
+        renderDungeon();
+        return renderParty();
+      case 'party.invite':
+        G.invite = msg.from;
+        toast(`${msg.from} invites you to a party. Open the Party window (P) to answer.`);
+        play('click');
+        return renderParty();
       case 'dialog':
         return onDialog(msg);
       case 'shop':
@@ -2078,6 +2096,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     G.fight = { id: msg.id, actors: new Map(), queue: [], until: now, pending: null, selected: null, options: null, end: null, round: 0, order: [], turn: null, outcome: null, hover: null, result: null };
     syncFromState(msg.state);
     G.fight.options = null;
+    G.fight.mates = msg.state.actors.filter((a) => a.side === 'hero' && a.id !== G.selfId).map((a) => a.name);
     G.dest = null;
     if (G.auto && bossFight()) {
       setAuto(false);
@@ -2340,7 +2359,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const xp = Object.values(end.xp).reduce((sum, v) => sum + (v > 0 ? v : 0), 0);
     if (xp > 0) addLog(`You gain ${xp} experience.`, 'round');
     for (const lu of end.levelUps) addLog(lu.skill === 'combat' ? `You reached combat level ${lu.level}. Press K to spend your skill points.` : `Your ${pretty(lu.skill)} level has increased to ${lu.level}.`, 'levelup');
-    if (end.loot.iron_bits > 0) addLog(`You find ${end.loot.iron_bits} iron bits.`, 'loot');
+    const mates = f.mates || [];
+    if (end.loot.iron_bits > 0) addLog(mates.length ? `You take ${end.loot.iron_bits} iron bits, your share by damage dealt alongside ${mates.join(', ')}.` : `You find ${end.loot.iron_bits} iron bits.`, 'loot');
+    else if (mates.length && end.outcome === 'victory') addLog('The loot was split by damage dealt, and your share came to no iron bits.', 'loot');
     for (const it of end.loot.items || []) addLog(`You find ${itemName(it)}.`, `loot ${it.rarity || ''}`.trim());
     if (end.penalty && end.penalty.iron_bits > 0) addLog(`You lose ${end.penalty.iron_bits} iron bits.`, 'bad');
     if (end.loot.lost) addLog('Your bag is full. The loot was left behind.', 'bad');
@@ -4497,6 +4518,99 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return '';
   }
 
+  function partyBtn(label, op, name) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'act';
+    b.textContent = label;
+    b.addEventListener('click', () => window.coe.send(name ? { t: 'party', op, name } : { t: 'party', op }));
+    return b;
+  }
+
+  function inviteFromBox() {
+    const box = $('party-name');
+    const name = box.value.trim();
+    if (!name) return;
+    window.coe.send({ t: 'party', op: 'invite', name });
+    box.value = '';
+  }
+
+  function renderParty() {
+    const body = $('party-body');
+    body.textContent = '';
+    if (G.invite && !G.party) {
+      const p = document.createElement('p');
+      p.textContent = `${G.invite} invites you to a party.`;
+      const row = document.createElement('div');
+      row.className = 'row';
+      const yes = partyBtn('Accept', 'accept');
+      const no = partyBtn('Decline', 'decline');
+      for (const b of [yes, no]) {
+        b.addEventListener('click', () => {
+          G.invite = null;
+          renderParty();
+        });
+      }
+      row.append(yes, no);
+      body.append(p, row);
+    }
+    const party = G.party;
+    if (!party) {
+      if (!G.invite) {
+        const p = document.createElement('p');
+        p.className = 'muted';
+        p.textContent = 'You are not in a party. Invite a hero by name to start one.';
+        body.append(p);
+      }
+      return;
+    }
+    const leading = party.leader === G.selfId;
+    for (const m of party.members) {
+      const row = document.createElement('div');
+      row.className = 'party-member';
+      const name = document.createElement('span');
+      name.textContent = `${m.name}${m.id === party.leader ? ' (leader)' : ''}  Lv ${m.level}`;
+      const bar = document.createElement('div');
+      bar.className = 'meter hp mini';
+      const fill = document.createElement('div');
+      fill.className = 'meter-fill';
+      fill.style.width = `${Math.max(0, Math.min(100, (m.hp / Math.max(1, m.maxHp)) * 100))}%`;
+      const txt = document.createElement('span');
+      txt.textContent = `${m.hp}/${m.maxHp}`;
+      bar.append(fill, txt);
+      row.append(name, bar);
+      if (leading && m.id !== G.selfId) row.append(partyBtn('Remove', 'kick', m.name));
+      body.append(row);
+    }
+    body.append(partyBtn('Leave party', 'leave'));
+  }
+
+  function renderDungeon() {
+    const body = $('dungeon-body');
+    body.textContent = '';
+    const party = G.party;
+    const p = document.createElement('p');
+    const bits = (G.stats && G.stats.wallet && G.stats.wallet.iron_bits) || 0;
+    p.textContent = party ? `Entering takes your party of ${party.members.length}. Each hero pays ${DUNGEON_FEE} iron bits.` : `Entering alone costs ${DUNGEON_FEE} iron bits.`;
+    const have = document.createElement('p');
+    have.className = bits < DUNGEON_FEE ? 'bad' : 'muted';
+    have.textContent = `You carry ${bits} iron bits.`;
+    const enter = document.createElement('button');
+    enter.type = 'button';
+    enter.className = 'act';
+    enter.textContent = `Enter (${DUNGEON_FEE} iron bits each)`;
+    enter.addEventListener('click', () => window.coe.send({ t: 'dungeon', op: 'enter' }));
+    const leave = document.createElement('button');
+    leave.type = 'button';
+    leave.className = 'act';
+    leave.textContent = 'Walk out';
+    leave.addEventListener('click', () => window.coe.send({ t: 'dungeon', op: 'leave' }));
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.append(enter, leave);
+    body.append(p, have, row);
+  }
+
   function renderJournal() {
     const box = $('journal-body');
     if (!box || !G.data) return;
@@ -5239,6 +5353,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       return renderJournal();
     }
     if (k === 'i') return togglePanel('panel-bag');
+    if (k === 'p') {
+      togglePanel('panel-party');
+      return renderParty();
+    }
+    if (k === 'o') {
+      togglePanel('panel-dungeon');
+      return renderDungeon();
+    }
     if (k === 'c') return togglePanel('panel-stats');
     if (k === 'e' && !G.fight) return togglePanel('panel-equip');
     const quick = QUICK.find((x) => x.key === k);
@@ -6069,6 +6191,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('btn-equip'), 'click', () => togglePanel('panel-equip'));
     on($('btn-stats'), 'click', () => togglePanel('panel-stats'));
     on($('btn-sound'), 'click', () => togglePanel('panel-sound'));
+    on($('btn-party'), 'click', () => {
+      togglePanel('panel-party');
+      renderParty();
+    });
+    on($('btn-dungeon'), 'click', () => {
+      togglePanel('panel-dungeon');
+      renderDungeon();
+    });
+    on($('party-invite'), 'click', inviteFromBox);
+    on($('party-name'), 'keydown', (ev) => {
+      ev.stopPropagation();
+      if (ev.key === 'Enter') inviteFromBox();
+    });
     on($('btn-journal'), 'click', () => {
       togglePanel('panel-journal');
       renderJournal();

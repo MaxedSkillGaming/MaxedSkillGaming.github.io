@@ -607,3 +607,9 @@ button.link:hover { opacity: 1; }
   .modal-box { min-width: 0; max-width: calc(100vw - 16px); }
   #dialog { left: 6px !important; right: 6px !important; width: auto !important; max-width: none; }
 }
+
+#party-body .party-member { display: grid; grid-template-columns: 1fr auto; gap: 4px; align-items: center; margin: 6px 0; }
+#party-body .meter.mini { position: relative; width: 90px; height: 14px; }
+#party-body .meter.mini span { position: absolute; inset: 0; text-align: center; font-size: 10px; line-height: 14px; }
+#party-name { width: 60%; }
+#panel-dungeon .bad { color: #e07070; }

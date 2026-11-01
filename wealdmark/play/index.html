@@ -150,6 +150,8 @@
       <button id="btn-equip" type="button">Gear (E)</button>
       <button id="btn-bag" type="button">Bag (I)</button>
       <button id="btn-journal" type="button">Journal (J)</button>
+      <button id="btn-party" type="button">Party (P)</button>
+      <button id="btn-dungeon" type="button">Dungeon (O)</button>
       <button id="btn-look" type="button">Look (L)</button>
       <button id="btn-town" type="button">Town (T)</button>
       <button id="btn-sound" type="button">Sound</button>
@@ -228,6 +230,19 @@
       <label>Music <input id="vol-music" type="range" min="0" max="1" step="0.05" /></label>
       <label class="check"><input id="mute" type="checkbox" /> Mute everything</label>
       <label class="check"><input id="hide-others" type="checkbox" /> Hide other players</label>
+    </div>
+
+    <div id="panel-party" class="side hidden">
+      <h2>Party</h2>
+      <div id="party-body"></div>
+      <div class="row"><input id="party-name" type="text" maxlength="32" placeholder="Hero name" autocomplete="off" /><button id="party-invite" class="act" type="button">Invite</button></div>
+      <p class="muted">A party holds up to four heroes. When one of you starts a fight, partners within eight tiles join it, and iron bits are shared by damage dealt.</p>
+    </div>
+
+    <div id="panel-dungeon" class="side hidden">
+      <h2>Dungeon</h2>
+      <div id="dungeon-body"></div>
+      <p class="muted">Stand near a dungeon gate. Each hero pays the fee once per run, and the run is a private copy of the dungeon. Walking out keeps what you found.</p>
     </div>
 
     <div id="panel-journal" class="side hidden">
