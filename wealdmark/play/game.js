@@ -1893,14 +1893,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function hint(key) {
     let seen = {};
     try {
-      seen = JSON.parse(localStorage.getItem('coe.hints') || '{}');
+      seen = JSON.parse(localStorage.getItem('wealdmark.hints') || '{}');
     } catch {
       /* storage can be unavailable; hints then show each session */
     }
     if (seen[key] || !HINTS[key]) return;
     seen[key] = 1;
     try {
-      localStorage.setItem('coe.hints', JSON.stringify(seen));
+      localStorage.setItem('wealdmark.hints', JSON.stringify(seen));
     } catch {
       /* ignore */
     }
@@ -1916,7 +1916,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
   }
 
-  const play = (name) => window.coeAudio && window.coeAudio.play(name);
+  const play = (name) => window.wealdmarkAudio && window.wealdmarkAudio.play(name);
   const myCombat = () => (G.stats ? G.stats.combatLevel : 1);
 
   // ---- server messages
@@ -2554,7 +2554,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!isMyTurn()) return;
     G.fight.options = null;
     renderFightUi();
-    window.coe.send({ t: 'fight', action });
+    window.wealdmark.send({ t: 'fight', action });
   }
 
   const basicOf = (options) => (options.abilities.find((a) => BASIC_ATTACKS.includes(a.id)) || options.abilities[0] || {}).id || null;
@@ -2870,7 +2870,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function barState() {
     const me = G.self();
-    const key = `coe.bar.${me ? me.name : ''}`;
+    const key = `wealdmark.bar.${me ? me.name : ''}`;
     if (G.bar && G.bar.key === key) return G.bar;
     let saved = null;
     try {
@@ -2954,7 +2954,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         return toast('In a fight you can only swap to the weapon in your swap slot.');
       }
       if (idx < 0) return toast(G.inv && G.inv.equipment && G.inv.equipment.weapon2 && G.inv.equipment.weapon2.id === entry.id ? 'That weapon is in your swap slot. Take it off in Gear (E) to hold it.' : 'That weapon is not in your bag.');
-      return window.coe.send({ t: 'equip', slot: idx });
+      return window.wealdmark.send({ t: 'equip', slot: idx });
     }
     const info = ABILITY_INFO[entry.id];
     if (!G.fight) return fromKey ? undefined : toast(info ? `${info[0]}: ${info[1]}` : 'Nothing to do outside a fight.');
@@ -2974,7 +2974,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (!isMyTurn() || G.fight.options.acted) return toast('Not your turn to act.');
       return sendFight({ t: 'eat', slot: idx });
     }
-    window.coe.send({ t: 'use', slot: idx });
+    window.wealdmark.send({ t: 'use', slot: idx });
   }
 
   function closeBarPicker() {
@@ -3331,7 +3331,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         b.title = tip.join('\n');
         b.onclick = () => {
           if (G.fight) return toast("You can't change skills in a fight.");
-          if (canSpend) window.coe.send({ t: 'spend', skill: sk.id });
+          if (canSpend) window.wealdmark.send({ t: 'spend', skill: sk.id });
           else if (sk.planned) toast('This skill is coming in a future update.');
           else if (rank >= 10) toast('This skill is already at its maximum rank.');
           else if (rowLocked) toast(`Opens at level ${ROW_LEVELS[row]}.`);
@@ -3345,7 +3345,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     respec.textContent = s.respecCost ? `Respec (${s.respecCost} iron bits)` : 'Respec (free)';
     respec.onclick = () => {
       if (G.fight) return toast("You can't change skills in a fight.");
-      window.coe.send({ t: 'respec' });
+      window.wealdmark.send({ t: 'respec' });
     };
   }
 
@@ -3851,14 +3851,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         continue;
       }
       const label = (SLOT_LABELS.find((l) => l[0] === slot) || [slot, slot])[1];
-      equip.appendChild(slotButton(inv.equipment[slot], () => (G.fight ? toast("You can't change gear in a fight.") : window.coe.send({ t: 'unequip', slot })), label, slot));
+      equip.appendChild(slotButton(inv.equipment[slot], () => (G.fight ? toast("You can't change gear in a fight.") : window.wealdmark.send({ t: 'unequip', slot })), label, slot));
     }
     const belt = $('toolbelt');
     if (belt) {
       belt.textContent = '';
       for (const [type, label] of [['axe', 'Axe'], ['pickaxe', 'Pickaxe'], ['rod', 'Rod'], ['snare', 'Snare']]) {
         const ref = inv.toolbelt ? inv.toolbelt[type] : null;
-        belt.appendChild(slotButton(ref, () => window.coe.send({ t: 'unbelt', tool: type }), label));
+        belt.appendChild(slotButton(ref, () => window.wealdmark.send({ t: 'unbelt', tool: type }), label));
       }
     }
     G.gearInfo = inv.gear || null;
@@ -3874,10 +3874,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
             if (G.fight) {
               if (isMyTurn() && !G.fight.options.acted) sendFight({ t: 'eat', slot: i });
               else toast('Not your turn to act.');
-            } else window.coe.send({ t: 'use', slot: i });
-          } else if (def.kind === 'tool') window.coe.send({ t: 'belt', slot: i });
+            } else window.wealdmark.send({ t: 'use', slot: i });
+          } else if (def.kind === 'tool') window.wealdmark.send({ t: 'belt', slot: i });
           else if (G.fight) toast("You can't change gear in a fight.");
-          else window.coe.send({ t: 'equip', slot: i, ...(ev.shiftKey && def.kind === 'weapon' ? { alt: true } : {}), ...(ev.ctrlKey && def.kind === 'weapon' && def.weaponClass === 'pistol' ? { off: true } : {}) });
+          else window.wealdmark.send({ t: 'equip', slot: i, ...(ev.shiftKey && def.kind === 'weapon' ? { alt: true } : {}), ...(ev.ctrlKey && def.kind === 'weapon' && def.weaponClass === 'pistol' ? { off: true } : {}) });
         }),
       );
     });
@@ -3886,7 +3886,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** Free teleport to Bellstone Plaza. The server refuses it in a fight. */
   function goToTown() {
     if (G.fight) return toast("You can't do that in a fight.");
-    window.coe.send({ t: 'teleport' });
+    window.wealdmark.send({ t: 'teleport' });
   }
 
   function buildLookPanel() {
@@ -3912,7 +3912,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const me = G && G.self();
         if (me) me.pet = pet.id || undefined;
         renderLook();
-        window.coe.send({ t: 'pet', id: pet.id || null });
+        window.wealdmark.send({ t: 'pet', id: pet.id || null });
       });
       pets.appendChild(b);
     }
@@ -3925,7 +3925,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     me.chosen = next;
     me.look = look(me.name, next);
     renderLook();
-    window.coe.send({ t: 'look', look: next });
+    window.wealdmark.send({ t: 'look', look: next });
   }
 
   function renderLook() {
@@ -4031,7 +4031,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   function setupSound() {
-    const s = window.coeAudio.settings;
+    const s = window.wealdmarkAudio.settings;
     $('vol-master').value = s.master;
     $('vol-sfx').value = s.sfx;
     $('vol-music').value = s.music;
@@ -4092,7 +4092,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const was = townOpen();
     for (const p of TOWN_PANELS) $(p).classList.add('hidden');
     G.town = null;
-    if (was && tell) window.coe.send({ t: 'close' });
+    if (was && tell) window.wealdmark.send({ t: 'close' });
   }
 
   function walletLine() {
@@ -4120,7 +4120,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       b.dataset.option = o.id;
       b.addEventListener('click', () => {
         play('click');
-        window.coe.send({ t: 'choose', option: o.id });
+        window.wealdmark.send({ t: 'choose', option: o.id });
       });
       opts.appendChild(b);
     });
@@ -4224,7 +4224,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         row.type = 'button';
         row.title = itemTip(ref);
         row.append(iconCanvas(def), el('span', 'name', `${itemName(ref)}${ref.qty > 1 ? ` x${ref.qty}` : ''}`), price(each, 'iron_bits'));
-        row.addEventListener('click', (ev) => window.coe.send({ t: 'sell', slot: i, qty: ev.shiftKey ? ref.qty : 1 }));
+        row.addEventListener('click', (ev) => window.wealdmark.send({ t: 'sell', slot: i, qty: ev.shiftKey ? ref.qty : 1 }));
         box.appendChild(row);
       });
     }
@@ -4271,7 +4271,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const b = el('button', 'act', label);
       b.type = 'button';
       b.disabled = !ok;
-      b.addEventListener('click', () => window.coe.send(msg));
+      b.addEventListener('click', () => window.wealdmark.send(msg));
       ex.appendChild(b);
     };
     exBtn('100 iron to 1 gold', w.iron_bits >= GOLD_RATE, { t: 'exchange', dir: 'up', amount: GOLD_RATE });
@@ -4289,12 +4289,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       up.type = 'button';
       up.disabled = w.iron_bits < cost;
       up.title = `Upgrade ${(G.storage.tier || 0) + 1} of 5. Iron bits only; change gold coins back first if you need to.`;
-      up.addEventListener('click', () => window.coe.send({ t: 'storage_upgrade' }));
+      up.addEventListener('click', () => window.wealdmark.send({ t: 'storage_upgrade' }));
       box.appendChild(up);
     } else if (typeof G.storage.tier === 'number') box.appendChild(el('p', 'muted', 'Every storage upgrade is bought.'));
     const grid = el('div', 'slot-grid');
     G.storage.items.forEach((ref, i) => {
-      grid.appendChild(slotButton(ref, (ev) => window.coe.send({ t: 'store', dir: 'out', slot: i, qty: ev.shiftKey ? 999 : 1 })));
+      grid.appendChild(slotButton(ref, (ev) => window.wealdmark.send({ t: 'store', dir: 'out', slot: i, qty: ev.shiftKey ? 999 : 1 })));
     });
     box.appendChild(grid);
 
@@ -4302,7 +4302,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const bag = el('div', 'slot-grid');
     if (G.inv) {
       G.inv.items.forEach((ref, i) => {
-        bag.appendChild(slotButton(ref, (ev) => window.coe.send({ t: 'store', dir: 'in', slot: i, qty: ev.shiftKey ? 999 : 1 })));
+        bag.appendChild(slotButton(ref, (ev) => window.wealdmark.send({ t: 'store', dir: 'in', slot: i, qty: ev.shiftKey ? 999 : 1 })));
       });
     }
     box.appendChild(bag);
@@ -4350,7 +4350,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const b = el('button', 'act', label);
         b.type = 'button';
         b.disabled = low || most < 1 || n < 1 || (n === 5 && most < 5);
-        b.addEventListener('click', () => window.coe.send({ t: 'craft', recipe: r.id, qty: Math.min(28, n) }));
+        b.addEventListener('click', () => window.wealdmark.send({ t: 'craft', recipe: r.id, qty: Math.min(28, n) }));
         btns.appendChild(b);
       }
       row.appendChild(btns);
@@ -4394,7 +4394,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         b.append(document.createTextNode('Buy '), price(perk.cost, 'favor_tokens'));
         b.disabled = w.favor_tokens < perk.cost || (perk.type === 'slots' && G.perks.extraSlots >= 60);
       }
-      b.addEventListener('click', () => window.coe.send({ t: 'perk', id: perk.id }));
+      b.addEventListener('click', () => window.wealdmark.send({ t: 'perk', id: perk.id }));
       row.appendChild(b);
       box.appendChild(row);
     }
@@ -4422,7 +4422,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         b.textContent = 'Place crystal';
         b.disabled = crystals < 1;
       }
-      b.addEventListener('click', () => window.coe.send({ t: 'anchor_attune', id: here.id }));
+      b.addEventListener('click', () => window.wealdmark.send({ t: 'anchor_attune', id: here.id }));
       row.appendChild(b);
       box.appendChild(row);
       if (!here.free && crystals < 1) box.appendChild(el('p', 'muted', 'Teleport Crystals are sold by Magister Edith Crane at the Academy of the Royal Art in Aldmoor.'));
@@ -4440,7 +4440,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         b.disabled = !here || !here.attuned || here.id === a.id;
         b.addEventListener('click', () => {
           G.anchorTravel = a.name;
-          window.coe.send({ t: 'anchor_travel', to: a.id });
+          window.wealdmark.send({ t: 'anchor_travel', to: a.id });
           closeTown(false);
         });
       } else {
@@ -4523,7 +4523,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     b.type = 'button';
     b.className = 'act';
     b.textContent = label;
-    b.addEventListener('click', () => window.coe.send(name ? { t: 'party', op, name } : { t: 'party', op }));
+    b.addEventListener('click', () => window.wealdmark.send(name ? { t: 'party', op, name } : { t: 'party', op }));
     return b;
   }
 
@@ -4531,7 +4531,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const box = $('party-name');
     const name = box.value.trim();
     if (!name) return;
-    window.coe.send({ t: 'party', op: 'invite', name });
+    window.wealdmark.send({ t: 'party', op: 'invite', name });
     box.value = '';
   }
 
@@ -4599,12 +4599,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     enter.type = 'button';
     enter.className = 'act';
     enter.textContent = `Enter (${DUNGEON_FEE} iron bits each)`;
-    enter.addEventListener('click', () => window.coe.send({ t: 'dungeon', op: 'enter' }));
+    enter.addEventListener('click', () => window.wealdmark.send({ t: 'dungeon', op: 'enter' }));
     const leave = document.createElement('button');
     leave.type = 'button';
     leave.className = 'act';
     leave.textContent = 'Walk out';
-    leave.addEventListener('click', () => window.coe.send({ t: 'dungeon', op: 'leave' }));
+    leave.addEventListener('click', () => window.wealdmark.send({ t: 'dungeon', op: 'leave' }));
     const row = document.createElement('div');
     row.className = 'row';
     row.append(enter, leave);
@@ -4737,7 +4737,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** Whether other players (and anything that follows them) are left out of the picture. Kept per device. */
   const hideOthers = { on: false };
   try {
-    hideOthers.on = localStorage.getItem('coe.hideOthers') === '1';
+    hideOthers.on = localStorage.getItem('wealdmark.hideOthers') === '1';
   } catch {
     // blocked storage: show everyone
   }
@@ -5091,7 +5091,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       updateTip();
       const me = G.self();
       const z = zoneAt(map, me.x, me.y);
-      if (window.coeAudio) window.coeAudio.music(G.fight ? 'fight' : z && z.kind === 'safe' ? 'town' : 'wilds');
+      if (window.wealdmarkAudio) window.wealdmarkAudio.music(G.fight ? 'fight' : z && z.kind === 'safe' ? 'town' : 'wilds');
       const others = [...G.entities.values()].filter((e) => e.kind === 'player' && e.id !== G.selfId).length;
       const place = z ? (z.name === map.name ? `${map.name} (${KIND_LABEL[z.kind]})` : `${map.name} - ${z.name} (${KIND_LABEL[z.kind]})`) : map.name;
       $('hud').textContent = `${place}\n` +
@@ -5132,7 +5132,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function loadZoom() {
     try {
-      const z = Number(localStorage.getItem('coe.zoom'));
+      const z = Number(localStorage.getItem('wealdmark.zoom'));
       return Number.isFinite(z) ? Math.max(-12, Math.min(3, z)) : 0;
     } catch {
       return 0;
@@ -5142,7 +5142,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function setZoom(z) {
     G.zoom = Math.max(-12, Math.min(3, z));
     try {
-      localStorage.setItem('coe.zoom', String(G.zoom));
+      localStorage.setItem('wealdmark.zoom', String(G.zoom));
     } catch {
       /* private mode: the zoom just is not remembered */
     }
@@ -5158,7 +5158,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (x < 0 || y < 0 || x >= G.map.width || y >= G.map.height) return;
     G.dest = { x, y };
     if (townOpen()) closeTown(false);
-    window.coe.send({ t: 'move', x, y });
+    window.wealdmark.send({ t: 'move', x, y });
   }
 
   /** Pinch to zoom, long-press to examine a tile, and the on-screen buttons that stand in for hotkeys. */
@@ -5220,7 +5220,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       closeNodeMenu();
       if (!$('buy-confirm').classList.contains('hidden')) return closeBuyConfirm();
       closePanels();
-      if (G.busy) window.coe.send({ t: 'stop' });
+      if (G.busy) window.wealdmark.send({ t: 'stop' });
       closeTown(true);
     });
   }
@@ -5277,7 +5277,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const verb = node.kind === 'station' ? 'use' : def && def.verb ? def.verb : 'gather';
     add(`${verb[0].toUpperCase()}${verb.slice(1)} ${node.name}`, () => {
       G.dest = null;
-      window.coe.send({ t: 'interact', target: node.id });
+      window.wealdmark.send({ t: 'interact', target: node.id });
     });
     add('Walk here', () => requestMove(Math.round(node.x), Math.round(node.y)));
     add('Examine', () => inspectTile({ x: Math.round(node.x), y: Math.round(node.y) }));
@@ -5299,13 +5299,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (thing && (thing.kind === 'node' || thing.kind === 'station')) return openNodeMenu(thing, ev);
     if (thing) {
       G.dest = null;
-      return window.coe.send({ t: 'interact', target: thing.id });
+      return window.wealdmark.send({ t: 'interact', target: thing.id });
     }
     const monster = [...G.entities.values()].find((e) => e.kind === 'monster' && Math.round(e.x) === t.x && Math.round(e.y) === t.y);
     if (monster) {
       if (monster.fight) return toast(ERRORS.busy);
       G.dest = null;
-      return window.coe.send({ t: 'attack', target: monster.id });
+      return window.wealdmark.send({ t: 'attack', target: monster.id });
     }
     requestMove(t.x, t.y);
   }
@@ -5333,7 +5333,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       closeNodeMenu();
       if (!$('buy-confirm').classList.contains('hidden')) return closeBuyConfirm();
       closePanels();
-      if (G.busy) window.coe.send({ t: 'stop' });
+      if (G.busy) window.wealdmark.send({ t: 'stop' });
       closeTown(true);
       return;
     }
@@ -5390,7 +5390,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const text = input.value.trim();
     input.value = '';
     input.blur();
-    if (text) window.coe.send({ t: 'chat', text });
+    if (text) window.wealdmark.send({ t: 'chat', text });
   }
 
   const listeners = [];
@@ -6074,14 +6074,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   async function start(welcome, map) {
     const img = new Image();
-    const url = await window.coe.readImage(map.tileset.image);
+    const url = await window.wealdmark.readImage(map.tileset.image);
     if (!url) throw new Error('missing_tileset');
     await new Promise((resolve, reject) => {
       img.onload = resolve;
       img.onerror = () => reject(new Error('bad_tileset'));
       img.src = url;
     });
-    const data = await window.coe.data();
+    const data = await window.wealdmark.data();
     let ground = null;
     try {
       ground = bakeGround(map, img);
@@ -6183,7 +6183,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('bc-yes'), 'click', () => {
       const pending = G.buyPending;
       closeBuyConfirm();
-      if (pending) window.coe.send({ t: 'buy', item: pending.item, qty: pending.qty });
+      if (pending) window.wealdmark.send({ t: 'buy', item: pending.item, qty: pending.qty });
     });
     setupWindows();
     on($('btn-skills'), 'click', () => togglePanel('panel-skills'));
@@ -6215,14 +6215,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       renderLook();
     });
     buildLookPanel();
-    on($('vol-master'), 'input', (e) => window.coeAudio.set('master', e.target.value));
-    on($('vol-sfx'), 'input', (e) => window.coeAudio.set('sfx', e.target.value));
-    on($('vol-music'), 'input', (e) => window.coeAudio.set('music', e.target.value));
-    on($('mute'), 'change', (e) => window.coeAudio.set('muted', e.target.checked));
+    on($('vol-master'), 'input', (e) => window.wealdmarkAudio.set('master', e.target.value));
+    on($('vol-sfx'), 'input', (e) => window.wealdmarkAudio.set('sfx', e.target.value));
+    on($('vol-music'), 'input', (e) => window.wealdmarkAudio.set('music', e.target.value));
+    on($('mute'), 'change', (e) => window.wealdmarkAudio.set('muted', e.target.checked));
     on($('hide-others'), 'change', (e) => {
       hideOthers.on = e.target.checked;
       try {
-        localStorage.setItem('coe.hideOthers', hideOthers.on ? '1' : '0');
+        localStorage.setItem('wealdmark.hideOthers', hideOthers.on ? '1' : '0');
       } catch {
         // blocked storage: the choice lasts this visit
       }
@@ -6231,19 +6231,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     for (const m of early.splice(0)) handle(m);
     if (welcome.intro) {
       playIntro(() => {
-        window.coe.send({ t: 'intro_done' });
+        window.wealdmark.send({ t: 'intro_done' });
         toast('Talk to Reeve Ivy Penn near the bellstone to learn the basics.');
       });
     }
     G.raf = requestAnimationFrame(frame);
-    G.ping = setInterval(() => window.coe.send({ t: 'ping', n: Math.floor(performance.now()) }), 15000);
+    G.ping = setInterval(() => window.wealdmark.send({ t: 'ping', n: Math.floor(performance.now()) }), 15000);
   }
 
   function stop() {
     if (!G) return;
     cancelAnimationFrame(G.raf);
     clearInterval(G.ping);
-    if (window.coeAudio) window.coeAudio.music(null);
+    if (window.wealdmarkAudio) window.wealdmarkAudio.music(null);
     for (const off of listeners.splice(0)) off();
     openOrder.length = 0;
     for (const p of [...PANELS, ...TOWN_PANELS, 'turns', 'fightbar', 'busy']) $(p).classList.add('hidden');
@@ -6285,5 +6285,5 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return { x: rect.left + G.off.x + x * px + px / 2, y: rect.top + G.off.y + y * px + px / 2 };
   }
 
-  window.coeGame = { start, stop, handle, debug, playIntro, tileCenter, isRunning: () => G !== null };
+  window.wealdmarkGame = { start, stop, handle, debug, playIntro, tileCenter, isRunning: () => G !== null };
 })();

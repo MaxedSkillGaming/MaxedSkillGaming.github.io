@@ -6,7 +6,7 @@
  * without touching the callers. Music is generated here too: chiptune loops per place (see docs/audio-plan.md).
  */
 (function () {
-  const KEY = 'coe.audio.v1';
+  const KEY = 'wealdmark.audio.v1';
   const defaults = { master: 0.7, music: 0.5, sfx: 0.8, muted: false };
 
   function load() {
@@ -300,7 +300,7 @@
     pump();
   }
 
-  window.coeAudio = {
+  window.wealdmarkAudio = {
     settings,
     play(name) {
       if (settings.muted || !sounds[name] || !ensure()) return;

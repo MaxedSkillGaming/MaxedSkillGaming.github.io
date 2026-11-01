@@ -1,5 +1,5 @@
 'use strict';
-// The browser's stand-in for preload.cjs. It gives the page the same window.coe the desktop shell gives, but talks to
+// The browser's stand-in for preload.cjs. It gives the page the same window.wealdmark the desktop shell gives, but talks to
 // the auth service and game server straight from the page. Only the web build loads this file.
 //
 // Tokens live in this closure. The one exception is the refresh token of a player who ticked "keep me signed in": it goes
@@ -23,7 +23,7 @@
   let keepalive = null;
   let remember = false;
 
-  const KEEP_KEY = 'coe.web.session';
+  const KEEP_KEY = 'wealdmark.web.session';
   const keep = (token) => {
     try {
       if (token) localStorage.setItem(KEEP_KEY, token);
@@ -160,7 +160,7 @@
     }
   }
 
-  window.coe = {
+  window.wealdmark = {
     async patch() {
       try {
         config = await getJson('config.json');

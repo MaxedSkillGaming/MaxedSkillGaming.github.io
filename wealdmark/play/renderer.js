@@ -52,7 +52,7 @@ const AUTH_ERRORS = {
 let mode = 'login';
 
 // Mirrors the server's sign-up rules (packages/shared/src/auth.ts). The server has the final say.
-const RESERVED = ['admin', 'administrator', 'moderator', 'mod', 'gm', 'staff', 'support', 'system', 'server', 'owner', 'eternity', 'official', 'root', 'null', 'undefined'];
+const RESERVED = ['admin', 'administrator', 'moderator', 'mod', 'gm', 'staff', 'support', 'system', 'server', 'owner', 'wealdmark', 'maxed', 'official', 'root', 'null', 'undefined'];
 const COMMON = ['password', 'password1', 'password12', 'password123', 'passw0rd123', '1234567890', '12345678910', 'qwertyuiop', 'qwerty12345', 'iloveyou123', 'letmein1234', 'welcome1234', 'admin12345', 'abc1234567', '0123456789', '9876543210'];
 
 function usernameProblem(name) {
@@ -121,7 +121,7 @@ async function runPatch() {
   $('patch-detail').textContent = '';
   $('bar-fill').style.width = '0%';
 
-  const stop = window.coe.onPatchProgress((p) => {
+  const stop = window.wealdmark.onPatchProgress((p) => {
     if (p.phase === 'downloading' || p.phase === 'done') {
       const pct = p.bytesTotal > 0 ? Math.round((p.bytesDone / p.bytesTotal) * 100) : 100;
       $('bar-fill').style.width = pct + '%';
@@ -129,7 +129,7 @@ async function runPatch() {
       $('patch-detail').textContent = p.current ? p.current : '';
     }
   });
-  const result = await window.coe.patch();
+  const result = await window.wealdmark.patch();
   stop();
 
   if (!result.ok) {
@@ -140,10 +140,10 @@ async function runPatch() {
 
   $('bar-fill').style.width = '100%';
   $('patch-status').textContent = 'Up to date.';
-  const info = await window.coe.info();
+  const info = await window.wealdmark.info();
   $('version').textContent = `launcher ${info.version} - content ${result.version}`;
 
-  const resumed = await window.coe.resume();
+  const resumed = await window.wealdmark.resume();
   if (resumed.ok) {
     enterHome(resumed.username);
   } else {
@@ -183,7 +183,7 @@ $('auth-form').addEventListener('submit', async (event) => {
       return;
     }
   }
-  const call = mode === 'login' ? window.coe.login : window.coe.register;
+  const call = mode === 'login' ? window.wealdmark.login : window.wealdmark.register;
   const result = await call($('username').value.trim(), $('password').value, $('remember').checked, $('age').checked, chosen ? chosen.value : '');
   $('submit').disabled = false;
   $('password').value = '';
@@ -193,7 +193,7 @@ $('auth-form').addEventListener('submit', async (event) => {
 });
 
 $('logout').addEventListener('click', async () => {
-  await window.coe.logout();
+  await window.wealdmark.logout();
   show('login');
   $('username').focus();
 });
@@ -201,17 +201,17 @@ $('logout').addEventListener('click', async () => {
 $('play').addEventListener('click', async () => {
   $('home-error').textContent = '';
   $('play').disabled = true;
-  const result = await window.coe.play();
+  const result = await window.wealdmark.play();
   $('play').disabled = false;
   if (!result.ok) {
     $('home-error').textContent = PLAY_ERRORS[result.error] || `Could not enter the world (${result.error}).`;
     return;
   }
   try {
-    await window.coeGame.start(result.welcome, result.map);
+    await window.wealdmarkGame.start(result.welcome, result.map);
     show('gameview');
   } catch {
-    window.coe.leave();
+    window.wealdmark.leave();
     $('home-error').textContent = 'Could not load the map.';
   }
 });
@@ -224,9 +224,9 @@ $('leave').addEventListener('click', () => askSignOut(true));
 $('so-no').addEventListener('click', () => askSignOut(false));
 $('so-yes').addEventListener('click', async () => {
   askSignOut(false);
-  window.coe.leave();
-  window.coeGame.stop();
-  await window.coe.logout();
+  window.wealdmark.leave();
+  window.wealdmarkGame.stop();
+  await window.wealdmark.logout();
   show('login');
   $('username').focus();
 });
@@ -234,10 +234,10 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !$('signout-confirm').classList.contains('hidden')) askSignOut(false);
 });
 
-window.coe.onGameMessage((msg) => window.coeGame.handle(msg));
-window.coe.onGameClosed((info) => {
-  if (!window.coeGame.isRunning()) return;
-  window.coeGame.stop();
+window.wealdmark.onGameMessage((msg) => window.wealdmarkGame.handle(msg));
+window.wealdmark.onGameClosed((info) => {
+  if (!window.wealdmarkGame.isRunning()) return;
+  window.wealdmarkGame.stop();
   show('home');
   $('home-error').textContent = CLOSE_REASONS[info.error] || 'You were disconnected from the world.';
 });
@@ -270,12 +270,12 @@ $('reset-form').addEventListener('submit', async (event) => {
   $('reset-submit').disabled = true;
   $('reset-message').className = 'error';
   $('reset-message').textContent = '';
-  if (typeof window.coe.resetPassword !== 'function') {
+  if (typeof window.wealdmark.resetPassword !== 'function') {
     $('reset-submit').disabled = false;
     $('reset-message').textContent = 'Install the latest version of the game to reset a password.';
     return;
   }
-  const result = await window.coe.resetPassword($('reset-username').value.trim(), $('reset-code').value.trim(), $('reset-password').value);
+  const result = await window.wealdmark.resetPassword($('reset-username').value.trim(), $('reset-code').value.trim(), $('reset-password').value);
   $('reset-submit').disabled = false;
   if (result.ok) {
     $('reset-password').value = '';
@@ -327,11 +327,11 @@ $('recovery-continue').addEventListener('click', () => {
 
 $('recovery-make').addEventListener('click', async () => {
   $('recovery-error').textContent = '';
-  if (typeof window.coe.newRecoveryKey !== 'function') {
+  if (typeof window.wealdmark.newRecoveryKey !== 'function') {
     $('recovery-error').textContent = 'Install the latest version of the game to make a recovery key.';
     return;
   }
-  const result = await window.coe.newRecoveryKey(currentUser, $('recovery-password').value);
+  const result = await window.wealdmark.newRecoveryKey(currentUser, $('recovery-password').value);
   $('recovery-password').value = '';
   if (result.ok) showRecovery(result.recoveryKey, () => show('home'));
   else $('recovery-error').textContent = authMessage(result);
@@ -339,7 +339,7 @@ $('recovery-make').addEventListener('click', async () => {
 
 $('google-link').addEventListener('click', async () => {
   $('recovery-error').textContent = '';
-  if (typeof window.coe.googleLink !== 'function') {
+  if (typeof window.wealdmark.googleLink !== 'function') {
     $('recovery-error').textContent = 'Install the latest version of the game to link Google.';
     return;
   }
@@ -348,14 +348,14 @@ $('google-link').addEventListener('click', async () => {
     return;
   }
   $('recovery-error').textContent = 'Finish signing in with Google in your browser...';
-  const result = await window.coe.googleLink(currentUser, $('recovery-password').value);
+  const result = await window.wealdmark.googleLink(currentUser, $('recovery-password').value);
   $('recovery-password').value = '';
   $('recovery-error').textContent = result.ok ? 'Google account linked.' : authMessage(result);
 });
 
 $('reset-google').addEventListener('click', async () => {
   $('reset-message').className = 'error';
-  if (typeof window.coe.googleReset !== 'function') {
+  if (typeof window.wealdmark.googleReset !== 'function') {
     $('reset-message').textContent = 'Install the latest version of the game to use Google.';
     return;
   }
@@ -364,7 +364,7 @@ $('reset-google').addEventListener('click', async () => {
     return;
   }
   $('reset-message').textContent = 'Finish signing in with Google in your browser...';
-  const result = await window.coe.googleReset($('reset-password').value);
+  const result = await window.wealdmark.googleReset($('reset-password').value);
   if (!result.ok) {
     $('reset-message').textContent = result.error === 'invalid_request' ? 'The new password must be at least 10 characters and not a common one.' : authMessage(result);
     return;
