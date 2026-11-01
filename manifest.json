@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://tourism-scholars-catalyst-diesel.trycloudflare.com",
-  "authUrl": "https://exclusively-wallet-payment-pos.trycloudflare.com",
+  "server": "wss://supply-asbestos-when-loved.trycloudflare.com",
+  "authUrl": "https://layout-essentials-accessible-relatively.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "a57rVB65dqtpcMnglMKj+jrZHJ98chrDeryS1cHXY+9wSSzilz53Co0Q/lqI/yPawyjVqGOnwj3GZloFKlPiAA=="
+  "signature": "uzxYF1cHfKcwORfbcuL1IasvK4fyIQs7zwJ8SYlfEKuoK8ocNvTVVYy+DGzzJHdWvVVS6U2E5Z4Pltk+VMBqBg=="
 }
