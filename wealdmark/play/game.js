@@ -1,6 +1,6 @@
 'use strict';
 
-/* Heroes of the Wealdmark. Copyright (c) 2026 Eternity Squared Technologies. All rights reserved. */
+/* Heroes of the Wealdmark. Copyright (c) 2026 Maxed Skill Gaming. All rights reserved. */
 
 /**
  * The world view: draws the map, players, and monsters on a canvas; plays turn-based fights
@@ -9,7 +9,7 @@
  */
 (function () {
   const TILE = 16;
-  const WATERMARK = 'Heroes of the Wealdmark © 2026 Eternity Squared Technologies';
+  const WATERMARK = 'Heroes of the Wealdmark © 2026 Maxed Skill Gaming';
   const BUBBLE_MS = 6000;
   const LOG_LINES = 80;
   const MOVE_STEP_MS = 130;
