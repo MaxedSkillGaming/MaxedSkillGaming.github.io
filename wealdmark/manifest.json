@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://filling-broadcasting-motel-since.trycloudflare.com",
-  "authUrl": "https://feelings-memorial-motorcycles-collins.trycloudflare.com",
+  "server": "wss://aerial-soldier-cambridge-evaluations.trycloudflare.com",
+  "authUrl": "https://gonna-same-movie-lion.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 250848,
-      "sha256": "08b8bbc93b7ec3a97f2eb15d37a8a752501f17f0a4aa8d5632f8255b6436d38f",
-      "url": "c/08b8bbc93b7ec3a97f2eb15d37a8a752501f17f0a4aa8d5632f8255b6436d38f"
+      "size": 256343,
+      "sha256": "f5567b1faaac051dd8612fd36871f20edcffebb9401e0d081e6f34b27a27dfd4",
+      "url": "c/f5567b1faaac051dd8612fd36871f20edcffebb9401e0d081e6f34b27a27dfd4"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 14772,
-      "sha256": "a5e9e96c5065cc1d85b5ee02eaf70c8850f49df81888882627e25f63a199c46b",
-      "url": "c/a5e9e96c5065cc1d85b5ee02eaf70c8850f49df81888882627e25f63a199c46b"
+      "size": 15668,
+      "sha256": "65ad940db8c19a6ca0b6299166831337b22d5c311a93e8631dc24d799fef3c1b",
+      "url": "c/65ad940db8c19a6ca0b6299166831337b22d5c311a93e8631dc24d799fef3c1b"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 26784,
-      "sha256": "7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087",
-      "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
+      "size": 27171,
+      "sha256": "b9fc12cfddfff077e64ce4a8976cc6fde2cd91e1acd40a41ffe9e9bd8e27fe1f",
+      "url": "c/b9fc12cfddfff077e64ce4a8976cc6fde2cd91e1acd40a41ffe9e9bd8e27fe1f"
     }
   ],
-  "signature": "FczmKNzNDRirlT635sNTGNvdoqL6wo1/usHlc0QYLBaSxAxaH3nLQVSeZ/BM2v5lzZ8DJGrpXLD6qDpiwmHCAA=="
+  "signature": "wG4Y7ffTxsht3ikRH/eevVSm23/8YFMwqBGA6lv1raZQ9rEjstep492JEEiZKDoZU4Q0+KCdR7ioSjPUlYkzCw=="
 }
