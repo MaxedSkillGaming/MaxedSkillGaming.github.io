@@ -2768,48 +2768,134 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const next = xpForLevel(s.combatLevel + 1);
     const max = s.combatLevel >= MAX_LEVEL;
     $('xp-fill').style.width = `${max ? 100 : Math.max(0, Math.min(100, ((xp - cur) / Math.max(1, next - cur)) * 100))}%`;
+    const bar = $('xp-fill').parentElement;
+    if (renderXpBar.last !== undefined && xp > renderXpBar.last) {
+      bar.classList.remove('gain');
+      void bar.offsetWidth;
+      bar.classList.add('gain');
+    }
+    renderXpBar.last = xp;
     $('xp-text').textContent = max ? `Level ${s.combatLevel}` : `Level ${s.combatLevel}  ${xp - cur}/${next - cur} XP`;
   }
 
   /** Corner map: the ground around the hero, with dots for people, monsters and townsfolk. */
   const MM = { span: 41, px: 3, key: null, base: null };
-  const RSIZES = [
-    { span: 25, track: 150 },
-    { span: 33, track: 170 },
-    { span: 41, track: 190 },
-    { span: 53, track: 240 },
-  ];
-  const rview = { size: 2, map: true, quests: true };
+  const rview = { map: true, quests: true };
 
-  /** Size and show/hide for the corner map and quest list. The choice is remembered. */
+  /** The UI scale for this window: 1 up to 1500x720, growing with the window to 1.75. */
+  function uiScale() {
+    return Number(getComputedStyle(document.documentElement).getPropertyValue('--ui')) || 1;
+  }
+  function updateUiScale() {
+    const ui = Math.max(1, Math.min(1.75, Math.min(window.innerWidth / 1500, window.innerHeight / 720)));
+    const fine = window.matchMedia('(pointer: fine)').matches;
+    document.documentElement.classList.toggle('wide-hud', window.innerWidth / ui >= 1360 && fine);
+    document.documentElement.classList.toggle('narrow-hud', window.innerWidth / ui < 1620);
+    const root = document.documentElement.style;
+    root.setProperty('--ui', ui.toFixed(3));
+    // vw and vh are not shrunk by the zoom, so give the layout the window size in its own (scaled) units.
+    root.setProperty('--vw', `${(window.innerWidth / ui).toFixed(1)}px`);
+    root.setProperty('--vh', `${(window.innerHeight / ui).toFixed(1)}px`);
+  }
+
+  /**
+   * Let the player drag a box by its handle. Positions are kept in the box's own (scaled) units.
+   * `done` runs when the drag ends.
+   */
+  function dragBox(box, handle, done) {
+    handle.addEventListener('pointerdown', (ev) => {
+      if (ev.button !== 0) return;
+      ev.preventDefault();
+      const z = uiScale();
+      const parent = box.offsetParent || document.body;
+      const pr = parent.getBoundingClientRect();
+      const r = box.getBoundingClientRect();
+      const startX = ev.clientX;
+      const startY = ev.clientY;
+      const left0 = (r.left - pr.left) / z;
+      const top0 = (r.top - pr.top) / z;
+      box.style.right = 'auto';
+      box.style.bottom = 'auto';
+      box.dataset.moved = '1';
+      const move = (e) => {
+        const maxL = Math.max(0, pr.width / z - 60);
+        const maxT = Math.max(0, pr.height / z - 30);
+        box.style.left = `${Math.min(Math.max(0, left0 + (e.clientX - startX) / z), maxL)}px`;
+        box.style.top = `${Math.min(Math.max(0, top0 + (e.clientY - startY) / z), maxT)}px`;
+      };
+      const up = () => {
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', up);
+        if (done) done();
+      };
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
+    });
+  }
+
+  /** A box the player can move and resize, remembered between visits. */
+  function floatBox(id, key) {
+    const box = $(id);
+    const store = `wealdmark.float.${key}`;
+    const save = () => {
+      if (box.classList.contains('off') || box.classList.contains('hidden') || !box.offsetWidth) return;
+      const z = uiScale();
+      const pr = (box.offsetParent || document.body).getBoundingClientRect();
+      const r = box.getBoundingClientRect();
+      try {
+        localStorage.setItem(store, JSON.stringify({ l: (r.left - pr.left) / z, t: (r.top - pr.top) / z, w: r.width / z, h: r.height / z }));
+      } catch {
+        /* blocked storage */
+      }
+    };
+    try {
+      const v = JSON.parse(localStorage.getItem(store));
+      if (v && [v.l, v.t, v.w, v.h].every(Number.isFinite)) {
+        box.style.right = 'auto';
+        box.style.left = `${Math.max(0, v.l)}px`;
+        box.style.top = `${Math.max(0, v.t)}px`;
+        box.style.width = `${Math.max(90, v.w)}px`;
+        box.style.height = `${Math.max(60, v.h)}px`;
+      }
+    } catch {
+      /* nothing saved */
+    }
+    dragBox(box, box.querySelector('.fgrip'), save);
+    if (typeof ResizeObserver === 'function') {
+      let t = null;
+      new ResizeObserver(() => {
+        clearTimeout(t);
+        t = setTimeout(save, 300);
+      }).observe(box);
+    }
+  }
+
+  /** The map and quest list: show or hide each, drag by the title, resize from the corner. */
   function setupCorner() {
+    updateUiScale();
+    window.addEventListener('resize', updateUiScale);
     try {
       Object.assign(rview, JSON.parse(localStorage.getItem('wealdmark.corner')) || {});
     } catch {
       /* no saved choice */
     }
     const apply = () => {
-      rview.size = Math.max(0, Math.min(RSIZES.length - 1, Number(rview.size) || 0));
-      const sz = RSIZES[rview.size];
-      MM.span = sz.span;
-      const cv = $('minimap');
-      cv.width = cv.height = sz.span * MM.px;
-      cv.style.width = cv.style.height = `${sz.span * MM.px}px`;
-      cv.style.display = rview.map ? '' : 'none';
-      $('tracker').style.width = `${sz.track}px`;
-      $('tracker').style.display = rview.quests ? '' : 'none';
+      $('mapbox').classList.toggle('off', !rview.map);
+      $('trackbox').classList.toggle('off', !rview.quests);
       $('r-map').classList.toggle('off', !rview.map);
       $('r-quests').classList.toggle('off', !rview.quests);
       try {
-        localStorage.setItem('wealdmark.corner', JSON.stringify(rview));
+        localStorage.setItem('wealdmark.corner', JSON.stringify({ map: rview.map, quests: rview.quests }));
       } catch {
         /* blocked storage */
       }
     };
-    on($('r-smaller'), 'click', () => (rview.size--, apply()));
-    on($('r-bigger'), 'click', () => (rview.size++, apply()));
     on($('r-map'), 'click', () => ((rview.map = !rview.map), apply()));
     on($('r-quests'), 'click', () => ((rview.quests = !rview.quests), apply()));
+    floatBox('mapbox', 'map');
+    floatBox('trackbox', 'quests');
     apply();
   }
   function renderMinimap(map) {
@@ -4050,12 +4136,22 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   const openOrder = [];
   let zTop = 20;
 
+  /** New windows open on the right, directly under the map and the quest list. */
   function placeWindow(el) {
     if (el.dataset.moved) return;
+    const z = uiScale();
+    const pr = (el.offsetParent || document.body).getBoundingClientRect();
+    let bottom = 56;
+    for (const id of ['mapbox', 'trackbox']) {
+      const b = $(id);
+      if (b && b.offsetWidth) bottom = Math.max(bottom, (b.getBoundingClientRect().bottom - pr.top) / z);
+    }
     const slot = Math.max(0, openOrder.indexOf(el.id));
+    const top = bottom + 6 + slot * 28;
     el.style.left = 'auto';
     el.style.right = `${10 + slot * 24}px`;
-    el.style.top = `${56 + slot * 28}px`;
+    el.style.top = `${top}px`;
+    el.style.maxHeight = `${Math.max(160, pr.height / z - top - 120)}px`;
   }
 
   function raise(el) {
@@ -4105,25 +4201,44 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       el.insertBefore(x, el.firstChild);
       if (!el.classList.contains('side')) continue;
       el.addEventListener('pointerdown', () => raise(el));
-      // Remember where the player put each window and how big they made it.
-      const wkey = `wealdmark.win.${p}`;
+      // The instructions sit behind a ? next to the close button instead of taking up room in the window.
+      const helps = [...el.querySelectorAll(':scope > p.muted:not([id])')];
+      if (helps.length) {
+        for (const hp of helps) hp.classList.add('help', 'hidden');
+        const q = document.createElement('button');
+        q.type = 'button';
+        q.className = 'xbtn qbtn';
+        q.textContent = '?';
+        q.title = 'Show or hide the instructions';
+        q.setAttribute('aria-label', 'Instructions');
+        q.addEventListener('pointerdown', (e) => e.stopPropagation());
+        q.addEventListener('click', () => {
+          for (const hp of helps) hp.classList.toggle('hidden');
+          play('click');
+        });
+        el.insertBefore(q, x.nextSibling);
+      }
+      // Remember where the player put each window and how big they made it (in the window's own scaled units).
+      const wkey = `wealdmark.win2.${p}`;
       const saveWin = () => {
-        if (el.classList.contains('hidden') || (el.offsetParent || document.body).clientWidth < 300 || window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) return;
+        if (el.classList.contains('hidden') || !el.offsetWidth || window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) return;
+        const z = uiScale();
+        const pr = (el.offsetParent || document.body).getBoundingClientRect();
+        const r = el.getBoundingClientRect();
         try {
-          localStorage.setItem(wkey, JSON.stringify({ l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }));
+          localStorage.setItem(wkey, JSON.stringify({ l: (r.left - pr.left) / z, t: (r.top - pr.top) / z, w: r.width / z, h: r.height / z }));
         } catch {
           /* blocked storage: the layout lasts until the page closes */
         }
       };
       try {
-        const s = JSON.parse(localStorage.getItem(wkey));
-        if (s && Number.isFinite(s.l) && Number.isFinite(s.t) && Number.isFinite(s.w) && Number.isFinite(s.h)) {
-          const box = el.offsetParent || document.body;
+        const sv = JSON.parse(localStorage.getItem(wkey));
+        if (sv && [sv.l, sv.t, sv.w, sv.h].every(Number.isFinite)) {
           el.style.right = 'auto';
-          el.style.left = `${Math.min(Math.max(0, s.l), Math.max(0, box.clientWidth - 80))}px`;
-          el.style.top = `${Math.min(Math.max(0, s.t), Math.max(0, box.clientHeight - 60))}px`;
-          el.style.width = `${Math.max(200, s.w)}px`;
-          el.style.height = `${Math.max(90, s.h)}px`;
+          el.style.left = `${Math.max(0, sv.l)}px`;
+          el.style.top = `${Math.max(0, sv.t)}px`;
+          el.style.width = `${Math.max(200, sv.w)}px`;
+          el.style.height = `${Math.max(90, sv.h)}px`;
           el.dataset.moved = '1';
         }
       } catch {
@@ -4139,29 +4254,72 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const bar = el.querySelector('h2');
       if (!bar) continue;
       bar.classList.add('grip');
-      bar.addEventListener('pointerdown', (ev) => {
-        if (ev.button !== 0) return;
-        ev.preventDefault();
-        const box = el.offsetParent || document.body;
-        const sx = ev.clientX - el.offsetLeft;
-        const sy = ev.clientY - el.offsetTop;
-        el.style.right = 'auto';
-        const move = (e) => {
-          el.dataset.moved = '1';
-          el.style.left = `${Math.min(Math.max(0, e.clientX - sx), Math.max(0, box.clientWidth - 60))}px`;
-          el.style.top = `${Math.min(Math.max(0, e.clientY - sy), Math.max(0, box.clientHeight - 40))}px`;
-        };
-        const up = () => {
-          document.removeEventListener('pointermove', move);
-          document.removeEventListener('pointerup', up);
-          document.removeEventListener('pointercancel', up);
-          saveWin();
-        };
-        document.addEventListener('pointermove', move);
-        document.addEventListener('pointerup', up);
-        document.addEventListener('pointercancel', up);
-      });
+      dragBox(el, bar, saveWin);
     }
+  }
+
+  /** Clear the chat after a yes, and resize it by dragging the corner at its top right. */
+  function setupChat() {
+    const nav = $('chatnav');
+    const idle = () => {
+      nav.textContent = '';
+      const b = el('button', '', 'Clear');
+      b.type = 'button';
+      b.title = 'Clear the chat';
+      b.addEventListener('click', ask);
+      nav.appendChild(b);
+    };
+    const ask = () => {
+      nav.textContent = '';
+      const yes = el('button', '', 'Yes, clear');
+      const no = el('button', '', 'No');
+      yes.type = no.type = 'button';
+      yes.addEventListener('click', () => {
+        $('chatlog').textContent = '';
+        idle();
+      });
+      no.addEventListener('click', idle);
+      nav.append(el('span', 'ask', 'Clear the whole chat?'), yes, no);
+    };
+    idle();
+
+    const chat = $('chat');
+    const store = 'wealdmark.chatsize';
+    try {
+      const v = JSON.parse(localStorage.getItem(store));
+      if (v && Number.isFinite(v.w) && Number.isFinite(v.h)) {
+        chat.style.width = `${Math.max(200, v.w)}px`;
+        chat.style.height = `${Math.max(110, v.h)}px`;
+      }
+    } catch {
+      /* nothing saved */
+    }
+    $('chat-grip').addEventListener('pointerdown', (ev) => {
+      if (ev.button !== 0) return;
+      ev.preventDefault();
+      const z = uiScale();
+      const w0 = chat.getBoundingClientRect().width / z;
+      const h0 = chat.getBoundingClientRect().height / z;
+      const x0 = ev.clientX;
+      const y0 = ev.clientY;
+      const move = (e) => {
+        chat.style.width = `${Math.max(200, Math.min(window.innerWidth / z - 40, w0 + (e.clientX - x0) / z))}px`;
+        chat.style.height = `${Math.max(110, Math.min(window.innerHeight / z - 100, h0 - (e.clientY - y0) / z))}px`;
+      };
+      const up = () => {
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', up);
+        try {
+          localStorage.setItem(store, JSON.stringify({ w: chat.getBoundingClientRect().width / z, h: chat.getBoundingClientRect().height / z }));
+        } catch {
+          /* blocked storage */
+        }
+      };
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
+    });
   }
 
   function setupSound() {
@@ -5243,7 +5401,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       renderGlobes(hp, maxHp, mp, maxMp);
       renderBar();
       renderTracker();
-      $('rhud').classList.toggle('hidden', Boolean(G.fight));
+      for (const id of ['rctl', 'mapbox', 'trackbox']) $(id).classList.toggle('hidden', Boolean(G.fight));
       if (!G.fight) {
         if ($('buffs').childElementCount) $('buffs').textContent = '';
         renderMinimap(map);
@@ -6301,8 +6459,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }, { passive: false });
     on(window, 'keydown', onKey);
     on($('chatform'), 'submit', onChat);
-    on($('chat-prev'), 'click', () => $('chatlog').scrollBy({ top: -Math.max(40, $('chatlog').clientHeight - 20), behavior: 'smooth' }));
-    on($('chat-next'), 'click', () => $('chatlog').scrollBy({ top: Math.max(40, $('chatlog').clientHeight - 20), behavior: 'smooth' }));
+    setupChat();
     setupCorner();
     on($('menu-btn'), 'click', (ev) => {
       ev.stopPropagation();

@@ -113,11 +113,6 @@
     <div id="vitals">
       <div class="meter hp"><div id="hp-fill" class="meter-fill"></div><span id="hp-text"></span></div>
       <div class="meter mp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div>
-      <div id="wallet">
-        <span class="coin iron" title="Iron bits"></span><span id="w-iron">0</span>
-        <span class="coin gold" title="Gold coins"></span><span id="w-gold">0</span>
-        <span class="coin favor" title="Favor tokens"></span><span id="w-favor">0</span>
-      </div>
     </div>
 
     <div id="buffs"></div>
@@ -144,14 +139,16 @@
     </div>
     <div id="bar-picker" class="hidden"></div>
 
-    <div id="rhud">
-      <div id="rctl">
-        <button id="r-smaller" type="button" title="Make the map and quests smaller">&minus;</button>
-        <button id="r-bigger" type="button" title="Make the map and quests bigger">+</button>
-        <button id="r-map" type="button" title="Show or hide the map">Map</button>
-        <button id="r-quests" type="button" title="Show or hide the quest list">Quests</button>
-      </div>
-      <canvas id="minimap" width="123" height="123"></canvas>
+    <div id="rctl">
+      <button id="r-map" type="button" title="Show or hide the map">Map</button>
+      <button id="r-quests" type="button" title="Show or hide the quest list">Quests</button>
+    </div>
+    <div id="mapbox" class="fbox">
+      <div class="fgrip" title="Drag to move. Drag the corner to resize.">Map</div>
+      <canvas id="minimap" width="123" height="123" aria-hidden="true"></canvas>
+    </div>
+    <div id="trackbox" class="fbox">
+      <div class="fgrip" title="Drag to move. Drag the corner to resize.">Quests</div>
       <div id="tracker" class="hidden"></div>
     </div>
 
@@ -203,6 +200,11 @@
 
     <div id="panel-bag" class="side hidden">
       <h2>Inventory</h2>
+      <div id="wallet" title="Your coins: iron bits, gold coins, favor tokens">
+        <span class="coin iron" title="Iron bits"></span><span id="w-iron">0</span>
+        <span class="coin gold" title="Gold coins"></span><span id="w-gold">0</span>
+        <span class="coin favor" title="Favor tokens"></span><span id="w-favor">0</span>
+      </div>
       <div id="bag-grid"></div>
       <p class="muted">Click food to eat it, or gear to wear it. Shift-click a weapon to put it in the swap slot. Hover for details.</p>
     </div>
@@ -337,7 +339,8 @@
     </div>
 
     <div id="chat">
-      <div id="chatnav"><button id="chat-prev" type="button" title="Older messages">Previous</button><button id="chat-next" type="button" title="Newer messages">Next</button></div>
+      <div id="chat-grip" title="Drag to resize the chat"></div>
+      <div id="chatnav"><button id="chat-clear" type="button" title="Clear the chat">Clear</button></div>
       <ul id="chatlog"></ul>
       <form id="chatform" autocomplete="off">
         <input id="chatinput" maxlength="120" placeholder="Press Enter to chat" aria-label="Chat message" />
