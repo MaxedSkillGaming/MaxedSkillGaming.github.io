@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://supply-asbestos-when-loved.trycloudflare.com",
-  "authUrl": "https://layout-essentials-accessible-relatively.trycloudflare.com",
+  "server": "wss://chart-bundle-computing-lanka.trycloudflare.com",
+  "authUrl": "https://celebs-promotional-controlled-arrange.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "uzxYF1cHfKcwORfbcuL1IasvK4fyIQs7zwJ8SYlfEKuoK8ocNvTVVYy+DGzzJHdWvVVS6U2E5Z4Pltk+VMBqBg=="
+  "signature": "dzSCPvC6TzpHutVUrtulgJiusqCM69aDFRXUcXyv4voMLHuAohPEs0btd+MUTZQYwyIMFp6h0c3sqq/wYuMECw=="
 }
