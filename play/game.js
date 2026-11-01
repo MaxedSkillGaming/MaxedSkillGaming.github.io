@@ -31,26 +31,26 @@
     dust_cloud: ['Dust Cloud', 'A choking cloud of rock dust. Halves your mana regeneration for two rounds.'],
     wing_buffet: ['Wing Buffet', 'Leathery wings in your face. Blinded: your attacks lose 30 points of hit chance for two rounds. Spells can miss while you are blinded.'],
     gore: ['Gore', 'A tusk blow. Stone boars charge and strike first.'],
-    multi_strike: ['Multi Strike', '60% damage to up to 4 enemies in the 3 by 3 block in front of you.'],
+    multi_strike: ['Multi Strike', '85% damage to up to 4 enemies in the 3 by 3 block in front of you.'],
     power_strike: ['Power Strike', '200% damage to an adjacent enemy.'],
-    rend: ['Rend', '80% damage now, then bleed for 60% over 3 rounds.'],
+    rend: ['Rend', '100% damage now, then bleed for 60% over 3 rounds.'],
     sunder_strike: ['Sunder Strike', '100% damage and 2 stacks of Sunder (5% less armor each, up to 5).'],
     war_cry: ['War Cry', '+15% damage dealt for 5 rounds.'],
-    whirlwind: ['Whirlwind', '80% damage to every enemy on the 8 tiles around you.'],
+    whirlwind: ['Whirlwind', '110% damage to every enemy on the 8 tiles around you.'],
     execute: ['Execute', '150% damage, or 300% against a target under 30% health.'],
     shot: ['Shot', '100% damage to one enemy within 6 tiles.'],
-    multi_shot: ['Multi Shot', '60% damage to up to 4 enemies within 6 tiles.'],
+    multi_shot: ['Multi Shot', '85% damage to up to 4 enemies within 6 tiles.'],
     aimed_shot: ['Aimed Shot', '200% damage within 6 tiles. Cannot miss.'],
-    poison_arrow: ['Poison Arrow', '60% damage now, then poison for 80% over 3 rounds. Poison ignores armor.'],
-    snare: ['Snare', '80% damage; the target moves 2 fewer tiles for 2 turns.'],
-    rain_of_arrows: ['Rain of Arrows', '70% damage to every enemy in a 3 by 3 area within 6 tiles.'],
+    poison_arrow: ['Poison Arrow', '90% damage now, then poison for 80% over 3 rounds. Poison ignores armor.'],
+    snare: ['Snare', '100% damage; the target moves 2 fewer tiles for 2 turns.'],
+    rain_of_arrows: ['Rain of Arrows', '105% damage to every enemy in a 3 by 3 area within 6 tiles.'],
     backstep: ['Backstep', 'Run up to 4 tiles away from the nearest enemy and dodge 20% more until your next turn.'],
     deadeye: ['Deadeye', 'Your next shot deals 350% damage and always crits.'],
     fireball: ['Fireball', '100% fire damage to one enemy within 5 tiles.'],
-    ice_storm: ['Ice Storm', '70% damage to every enemy in a 3 by 3 area within 5 tiles; they move 2 fewer tiles next turn.'],
+    ice_storm: ['Ice Storm', '95% damage to every enemy in a 3 by 3 area within 5 tiles; they move 2 fewer tiles next turn.'],
     heal: ['Heal', 'Restore 30% of your max health.'],
     mana_shield: ['Mana Shield', 'For 3 rounds, damage drains mana instead of health (1 mana per 2 damage).'],
-    chain_lightning: ['Chain Lightning', '100%, 80%, then 60% damage on up to 3 enemies, each within 4 tiles of the last.'],
+    chain_lightning: ['Chain Lightning', '130%, 105%, then 80% damage on up to 3 enemies, each within 4 tiles of the last.'],
     arcane_surge: ['Arcane Surge', 'For 3 rounds: +40% spell damage and triple mana regen. Then you are exhausted (-20% damage) for 3 rounds.'],
     shield_bash: ['Shield Bash', '80% damage; the target cannot move on its next turn (bosses: 50% chance).'],
     fortify: ['Fortify', '15% less damage taken for 10 rounds.'],
@@ -58,13 +58,15 @@
     parry: ['Parry', 'Negate the next melee hit against you and answer it with 100% damage.'],
     stoneskin: ['Stoneskin', 'Absorb damage worth 20% of your max health for 2 rounds.'],
     retaliate: ['Retaliate', 'For 2 rounds, reflect 30% of the damage you take.'],
+    extra_shot: ['Extra shot', 'A second arrow from a lucky bow, at the same target.'],
+    execute_shot: ['Execute shot', 'A pistol shot that finishes a wounded enemy.'],
     unbreakable: ['Unbreakable', 'For 2 rounds take 50% less damage, and you cannot drop below 1 health in the first.'],
   };
   const ABILITY_NAMES = Object.fromEntries(Object.entries(ABILITY_INFO).map(([k, v]) => [k, v[0]]));
   /** The attack every hero has for their weapon, used when nothing else is selected. */
   const BASIC_ATTACKS = ['punch', 'slash', 'shot', 'fireball'];
   const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8 };
-const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder', 'exhaust', 'dust_choked', 'blinded']);
+const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder', 'exhaust', 'dust_choked', 'blinded']);
   const TIER_LEVELS = [1, 10, 20, 30];
   /** Procedural 24px icons for abilities and statuses, drawn once and cached as data URLs. */
   const poly = (c, pts) => {
@@ -103,7 +105,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     stagger: ['down', '#e0b48c'], slow: ['down', '#9ad8e8'], bleed: ['drop', '#e05a5a'], poison: ['drop', '#7bd88f'], burn: ['flame', '#ff9a4a'], sunder: ['shield', '#e05a5a'],
     exhaust: ['down', '#e07070'], dust_choked: ['burst', '#c8b090'], blinded: ['eye', '#e07070'], war_cry: ['up', '#f0c860'], deadeye: ['eye', '#f0c860'],
     mana_shield: ['shield', '#6a9ef0'], arcane_surge: ['bolt', '#c08aff'], fortify: ['shield', '#7ab0f0'], retaliate: ['burst', '#ff9a4a'], parry: ['shield', '#f0c860'],
-    stoneskin: ['shield', '#a8a8b8'], unbreakable: ['shield', '#f0c860'],
+    stoneskin: ['shield', '#a8a8b8'], unbreakable: ['shield', '#f0c860'], stunned: ['bolt', '#f0e060'], stun_immune: ['shield', '#c8c0e0'],
   };
   const iconCache = new Map();
   function iconUrl([shape, color]) {
@@ -151,12 +153,23 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     ['boon', 'Boon'],
   ];
   const WEAPON_BLURB = {
-    blade: 'Deals 20% more damage. Effective against heavy armor.',
-    dagger: 'Two actions per turn and +15% critical chance. Enemy armor is 40% more effective against it.',
-    bow: 'Range 6 and +8 accuracy.',
+    blade: 'Deals 5% more damage.',
+    dagger: 'Two actions per turn. 25% chance to make the target bleed for 10% of weapon damage a round, for 5 rounds. Enemy armor is 40% more effective against it.',
+    mace: '10% chance to critically hit.',
+    spear: 'Two-handed: no shield. Hits harder than a one-handed weapon. 20% chance to block an attack.',
+    bow: 'Range 6, +8 accuracy, +5% critical chance and a 10% chance to shoot an extra arrow.',
+    crossbow: '15% chance to stun the target for 3 rounds, then it cannot be stunned for 3 rounds. Bosses cannot be stunned.',
+    pistol: 'One-handed. Ctrl-click a second pistol in your bag to hold one in each hand and shoot twice a turn. 2% chance to finish an enemy under 30% health (not bosses).',
     staff: 'Range 5. Enemy armor is only 60% as effective against spells.',
   };
-  const CLASS_SKILL = { blade: 'melee', dagger: 'melee', bow: 'range', staff: 'magic' };
+  const ELEMENT_BLURB = {
+    air: 'Air: 10% chance to dodge an attack.',
+    fire: 'Fire: spells deal 10% more damage.',
+    water: 'Water: 5% chance when hit to heal 15% of your health, at most once every 5 rounds.',
+    earth: 'Earth: take 10% less damage.',
+  };
+  const ELEMENT_COLOR = { air: '#c8e8ff', fire: '#ff7a3a', water: '#4a9aff', earth: '#a0804a' };
+  const CLASS_SKILL = { blade: 'melee', dagger: 'melee', mace: 'melee', spear: 'melee', bow: 'range', crossbow: 'range', pistol: 'range', staff: 'magic' };
   const ERRORS = {
     no_path: "You can't walk there.",
     in_fight: "You can't do that in a fight.",
@@ -165,6 +178,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     safe_zone: "You can't start a fight in town.",
     not_in_fight: 'You are not in a fight.',
     illegal_action: "You can't do that right now.",
+    hands: 'Your hands are full. A spear needs both hands (no shield), and a pistol goes in the off hand only beside another pistol.',
     no_item: "You can't use that.",
     level_too_low: 'Your level is too low to use that.',
     bad_skill: "You can't raise that skill yet.",
@@ -319,7 +333,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
    */
   function drawFigure(ctx, x, y, s, l, step, bob, held) {
     held = held || {};
-    const key = ['p4', l.g, l.skin, l.body, l.hair, l.hat, step, held.weapon || '', held.shield ? 1 : 0].join('|');
+    const key = ['p4', l.g, l.skin, l.body, l.hair, l.hat, step, held.weapon || '', held.element || '', held.shield ? 1 : 0, held.offPistol ? 1 : 0].join('|');
     const c = sprite(key, (r) => {
       const fem = l.g === 'f';
       const boot = '#4a2e1c';
@@ -412,11 +426,36 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         r(2, 6, 2, 10, '#8a5a2c');
         r(3, 16, 2, 1, '#8a5a2c');
         r(5, 6, 1, 10, '#ece8d6');
+      } else if (held.weapon === 'mace') {
+        r(4, 8, 2, 11, '#6a4020');
+        r(2, 3, 6, 5, '#9aa0b0');
+        r(2, 3, 6, 1, '#dfe6f2');
+        r(3, 8, 4, 1, '#5a5f70');
+      } else if (held.weapon === 'spear') {
+        r(4, 3, 2, 18, '#8a5a2c');
+        r(3, 0, 4, 4, '#dfe6f2');
+        r(4, 0, 2, 1, '#ffffff');
+        r(3, 4, 4, 1, '#c89a3c');
+      } else if (held.weapon === 'crossbow') {
+        r(2, 9, 8, 2, '#6a4020');
+        r(1, 6, 2, 4, '#8a5a2c');
+        r(9, 6, 2, 4, '#8a5a2c');
+        r(3, 5, 6, 1, '#ece8d6');
+        r(5, 8, 2, 4, '#4a3018');
+      } else if (held.weapon === 'pistol') {
+        r(3, 9, 6, 2, '#5a5f70');
+        r(7, 11, 2, 4, '#6a4020');
+        r(2, 8, 3, 1, '#8a90a0');
       } else if (held.weapon === 'staff') {
+        const orb = ELEMENT_COLOR[held.element] || '#5ac8ff';
         r(4, 5, 2, 16, '#8a5a2c');
-        r(2, 0, 6, 5, '#5ac8ff');
+        r(2, 0, 6, 5, orb);
         r(3, 1, 2, 1, '#ffffff');
-        r(5, 3, 2, 1, '#2a8ac8');
+        r(5, 3, 2, 1, '#00000044');
+      }
+      if (held.offPistol) {
+        r(17, 13, 6, 2, '#5a5f70');
+        r(17, 15, 2, 4, '#6a4020');
       }
       if (held.shield) {
         r(17, 13, 5, 7, '#8a5a2c');
@@ -1253,7 +1292,8 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     if (id !== G.selfId) return { weapon: 'blade' };
     const eq = (G.inv && G.inv.equipment) || {};
     const def = eq.weapon && G.data && G.data.items.get(eq.weapon.id);
-    return { weapon: def ? def.weaponClass || 'blade' : null, shield: Boolean(eq.offhand) };
+    const off = eq.offhand && G.data && G.data.items.get(eq.offhand.id);
+    return { weapon: def ? def.weaponClass || 'blade' : null, element: def && def.element ? def.element : '', shield: Boolean(off && off.kind === 'armor'), offPistol: Boolean(off && off.weaponClass === 'pistol') };
   }
 
   // ---- state
@@ -1631,8 +1671,8 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         break;
       }
       case 'miss':
-        floater(ev.target, ev.dodged ? 'Dodge' : 'Miss', '#c8c0e0');
-        addLog(`${who(ev.source)} ${ev.source === G.selfId ? 'miss' : 'misses'} ${ev.target === G.selfId ? 'you' : lowerName(who(ev.target))}${ev.dodged ? ' (dodged)' : ''}.`);
+        floater(ev.target, ev.blocked ? 'Block' : ev.dodged ? 'Dodge' : 'Miss', ev.blocked ? '#9ad8e8' : '#c8c0e0');
+        addLog(`${who(ev.source)} ${ev.source === G.selfId ? 'miss' : 'misses'} ${ev.target === G.selfId ? 'you' : lowerName(who(ev.target))}${ev.dodged ? ' (dodged)' : ev.blocked ? ' (blocked)' : ''}.`);
         play('miss');
         break;
       case 'heal': {
@@ -1657,6 +1697,8 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         const you = ev.actor === G.selfId;
         if (ev.status === 'phase_shield') addLog(`${who(ev.actor)} ${you ? 'raise' : 'raises'} a shield. Break it within ${ev.rounds} rounds or it heals.`, you ? 'mine' : 'bad');
         else if (ev.status === 'stagger') addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} staggered.`);
+        else if (ev.status === 'stunned') addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} stunned and cannot act for ${ev.rounds} rounds.`, you ? 'bad' : 'mine');
+        else if (ev.status === 'stun_immune') addLog(`${who(ev.actor)} ${you ? 'shake' : 'shakes'} off the stun and cannot be stunned for ${ev.rounds} rounds.`);
         else if (ev.status === 'enrage') addLog(`${who(ev.actor)} ${you ? 'fly' : 'flies'} into a rage: more damage, more speed.`, you ? 'bad' : 'mine');
         else if (DEBUFFS.has(ev.status)) addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} afflicted: ${pretty(ev.status)}.`, you ? 'bad' : 'mine');
         else addLog(`${who(ev.actor)} ${you ? 'gain' : 'gains'} ${pretty(ev.status)}.`);
@@ -2311,7 +2353,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
   }
 
   /** Which bar is showing: the one for the weapon in hand. Fists count as melee. */
-  const barStyle = () => ({ blade: 'melee', dagger: 'melee', bow: 'range', staff: 'magic' }[weaponClassOf(heldWeapon())] || 'melee');
+  const barStyle = () => CLASS_SKILL[weaponClassOf(heldWeapon())] || 'melee';
 
   /** A bar until the player changes it: that style's basic attack and abilities, then defense abilities. */
   function defaultBar(style) {
@@ -2774,12 +2816,14 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     if (!def) return ref.id;
     const lines = [itemName(ref)];
     if (def.kind === 'weapon') {
-      lines.push(`${pretty(def.weaponClass || 'blade')}, power ${def.weaponPower}${def.weaponClass === 'dagger' ? ', two actions a turn' : ''}`);
+      lines.push(`${def.element ? `${pretty(def.element)} ` : ''}${pretty(def.weaponClass || 'blade')}, power ${def.weaponPower}${def.weaponClass === 'dagger' ? ', two actions a turn' : ''}${def.twoHanded ? ', two-handed' : ''}`);
       if (WEAPON_BLURB[def.weaponClass]) lines.push(WEAPON_BLURB[def.weaponClass]);
+      if (def.element && ELEMENT_BLURB[def.element]) lines.push(ELEMENT_BLURB[def.element]);
     }
     if (def.kind === 'armor') {
       lines.push(`${pretty(def.slot || 'armor')}${def.armor ? `, armor ${def.armor}` : ''}`);
       if (def.flatReduction) lines.push(`Blocks ${def.flatReduction} damage from every hit`);
+      if (def.blockChance) lines.push(`${Math.round(def.blockChance * 100)}% chance to block a physical hit, then a 3 round pause. Total block is capped at 75%.`);
     }
     if (def.kind === 'food' || def.kind === 'potion') lines.push([def.heal ? `Restores ${def.heal} health` : '', def.mana ? `Restores ${def.mana} mana` : ''].filter(Boolean).join(', '));
     else if (def.kind === 'tool') lines.push(`${pretty(def.toolType)}, tier ${def.tier}. Kept in your bag; it is not worn.`);
@@ -2805,6 +2849,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
     const rows = [
       ['Armor', `${g.armor} (${pct(g.armor / (g.armor + 100))} less damage)`],
       ['Shield block', g.flatReduction ? `${g.flatReduction} off every hit` : 'none'],
+      ['Block chance', pct(g.block || 0)],
       ['Weapon', g.weapon.cls ? `${pretty(g.weapon.cls)}, max hit ${g.weapon.maxHit}${g.weapon.actions > 1 ? ` x${g.weapon.actions}` : ''}` : `Fists, max hit ${g.weapon.maxHit}`],
       ['Damage', `${g.damagePct >= 0 ? '+' : ''}${pct(g.damagePct)}`],
       ['Crit chance', pct(g.critChance)],
@@ -3063,11 +3108,41 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
         r(9, 13, 2, 2, w.d);
         r(11, 3, 1, 10, '#ece8d6');
         r(7, 7, 5, 2, '#a02828');
+      } else if (cls === 'mace') {
+        const m = METALS[t];
+        r(7, 6, 2, 9, '#6a4020');
+        r(4, 1, 8, 6, m.m);
+        r(4, 1, 8, 1, m.l);
+        r(4, 6, 8, 1, m.d);
+        r(7, 0, 2, 1, m.l);
+        r(6, 14, 4, 1, '#d8b04a');
+      } else if (cls === 'spear') {
+        const m = METALS[t];
+        r(7, 4, 2, 11, '#8a5a2c');
+        r(7, 4, 1, 11, '#b07a3c');
+        r(6, 0, 4, 5, m.m);
+        r(7, 0, 2, 1, m.l);
+        r(5, 4, 6, 1, '#d8b04a');
+      } else if (cls === 'crossbow') {
+        const w = WOODS[t];
+        r(2, 5, 12, 1, '#ece8d6');
+        r(1, 4, 2, 3, w.m);
+        r(13, 4, 2, 3, w.m);
+        r(6, 5, 4, 9, w.m);
+        r(7, 5, 1, 9, w.l);
+        r(7, 3, 2, 4, '#a02828');
+      } else if (cls === 'pistol') {
+        const m = METALS[t];
+        r(2, 5, 10, 3, m.m);
+        r(2, 5, 10, 1, m.l);
+        r(10, 4, 3, 2, m.d);
+        r(4, 8, 3, 6, '#6a4020');
+        r(3, 12, 5, 1, '#4a3018');
       } else {
         const w = WOODS[t];
         r(7, 5, 2, 10, w.m);
         r(7, 5, 1, 10, w.l);
-        r(5, 0, 6, 5, ORBS[t]);
+        r(5, 0, 6, 5, def.element ? ELEMENT_COLOR[def.element] : ORBS[t]);
         r(6, 0, 4, 1, '#ffffff');
         r(5, 3, 6, 2, '#ffffff88');
         r(6, 5, 4, 1, w.d);
@@ -3247,7 +3322,7 @@ const DEBUFFS = new Set(['stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder',
             } else window.coe.send({ t: 'use', slot: i });
           } else if (def.kind === 'tool') window.coe.send({ t: 'belt', slot: i });
           else if (G.fight) toast("You can't change gear in a fight.");
-          else window.coe.send({ t: 'equip', slot: i, ...(ev.shiftKey && def.kind === 'weapon' ? { alt: true } : {}) });
+          else window.coe.send({ t: 'equip', slot: i, ...(ev.shiftKey && def.kind === 'weapon' ? { alt: true } : {}), ...(ev.ctrlKey && def.kind === 'weapon' && def.weaponClass === 'pistol' ? { off: true } : {}) });
         }),
       );
     });
