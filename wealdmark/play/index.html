@@ -141,32 +141,36 @@
 
     <div id="rctl">
       <button id="r-map" type="button" title="Show or hide the map">Map</button>
-      <button id="r-quests" type="button" title="Show or hide the quest list">Quests</button>
+      <button id="r-world" type="button" title="The whole world: shops, workshops, gathering spots and jobs" aria-label="World map">&#127760;</button>
     </div>
     <div id="mapbox" class="fbox">
       <div class="fgrip" title="Drag to move. Drag the corner to resize.">Map</div>
       <canvas id="minimap" width="123" height="123" aria-hidden="true"></canvas>
     </div>
-    <div id="trackbox" class="fbox">
-      <div class="fgrip" title="Drag to move. Drag the corner to resize.">Quests</div>
-      <div id="tracker" class="hidden"></div>
-    </div>
 
     <div id="toolbar">
       <button id="menu-btn" type="button" aria-haspopup="true">Menu</button>
       <div id="menu-list" class="hidden">
-      <button id="btn-skills" type="button">Skills (K)</button>
-      <button id="btn-stats" type="button">Stats (C)</button>
-      <button id="btn-trades" type="button">Trades (V)</button>
-      <button id="btn-equip" type="button">Gear (E)</button>
+      <button id="btn-loot" class="hidden" type="button">Loot</button>
       <button id="btn-bag" type="button">Bag (I)</button>
       <button id="btn-journal" type="button">Journal (J)</button>
-      <button id="btn-party" type="button">Party (P)</button>
-      <button id="btn-dungeon" type="button">Dungeon (O)</button>
-      <button id="btn-look" type="button">Look (L)</button>
-      <button id="btn-town" type="button">Town (T)</button>
-      <button id="btn-sound" type="button">Sound</button>
-      <button id="leave" type="button">Log Out</button>
+      <div class="grp"><button class="grp-btn" type="button" aria-haspopup="true">Hero</button><div class="grp-pop">
+        <button id="btn-skills" type="button">Skills (K)</button>
+        <button id="btn-stats" type="button">Stats (C)</button>
+        <button id="btn-equip" type="button">Gear (E)</button>
+        <button id="btn-look" type="button">Look (L)</button>
+      </div></div>
+      <div class="grp"><button class="grp-btn" type="button" aria-haspopup="true">World</button><div class="grp-pop">
+        <button id="btn-trades" type="button">Trades (V)</button>
+        <button id="btn-party" type="button">Party (P)</button>
+        <button id="btn-merc" type="button">Hire (H)</button>
+        <button id="btn-dungeon" type="button">Dungeon (O)</button>
+        <button id="btn-town" type="button">Town (T)</button>
+      </div></div>
+      <div class="grp"><button class="grp-btn" type="button" aria-haspopup="true">More</button><div class="grp-pop">
+        <button id="btn-sound" type="button">Sound</button>
+        <button id="leave" type="button">Log Out</button>
+      </div></div>
       </div>
     </div>
 
@@ -255,15 +259,35 @@
       <p class="muted">A party holds up to four heroes. When one of you starts a fight, partners within eight tiles join it, and iron bits are shared by damage dealt.</p>
     </div>
 
+    <div id="panel-merc" class="side wide hidden">
+      <h2>Mercenaries</h2>
+      <div id="merc-body"></div>
+      <p class="muted">Hire one in a town for gold coins. It fights beside you for five fights and counts as half a hero when monsters scale. If it is knocked out, it leaves. You earn XP only from your own damage.</p>
+    </div>
+
     <div id="panel-dungeon" class="side hidden">
       <h2>Dungeon</h2>
       <div id="dungeon-body"></div>
       <p class="muted">Stand near a dungeon gate. Each hero pays the fee once per run, and the run is a private copy of the dungeon. Walking out keeps what you found.</p>
     </div>
 
+    <div id="panel-loot" class="side hidden">
+      <h2 id="loot-title">Loot</h2>
+      <div id="loot-body"></div>
+      <button id="loot-all" class="act" type="button">Take all</button>
+      <p id="loot-note" class="muted"></p>
+    </div>
+
     <div id="panel-journal" class="side hidden">
       <h2>Journal</h2>
       <div id="journal-body"></div>
+    </div>
+
+    <div id="panel-world" class="side wide hidden">
+      <h2>World</h2>
+      <p class="muted">Click a legend entry to hide or show it. The gold dot is you.</p>
+      <div id="world-legend"></div>
+      <div id="world-scroll"><canvas id="worldmap" aria-label="Map of the whole world"></canvas></div>
     </div>
 
     <div id="panel-shop" class="side wide hidden">

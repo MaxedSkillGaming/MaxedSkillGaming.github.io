@@ -14,7 +14,7 @@
   const LOG_LINES = 80;
   const MOVE_STEP_MS = 130;
   const MAX_LEVEL = 100;
-  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-trades', 'panel-party', 'panel-dungeon'];
+  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-party', 'panel-merc', 'panel-dungeon'];
   /** Iron bits each hero pays to enter a dungeon run. Matches the server's default. */
   const DUNGEON_FEE = 25;
   const TOWN_PANELS = ['dialog', 'panel-shop', 'panel-storage', 'panel-station', 'panel-perks', 'panel-anchor'];
@@ -502,6 +502,32 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         r(10, 8, 1, 2, '#ffffff');
         r(13, 8, 1, 2, '#ffffff');
         r(11, 8, 2, 1, '#3a2c22');
+      } else if (mon === 'sellsword' || mon === 'archer' || mon === 'mage') {
+        const tunic = mon === 'sellsword' ? '#a83a3a' : mon === 'archer' ? '#3a8a4a' : '#4a5ac8';
+        const light = mon === 'sellsword' ? '#d86a6a' : mon === 'archer' ? '#6ac87a' : '#8a9aff';
+        r(5, 13 - (step === 1 ? 1 : 0), 2, 2, '#3a2a1a');
+        r(9, 13 - (step === 2 ? 1 : 0), 2, 2, '#3a2a1a');
+        r(4, 6, 8, 7, tunic);
+        r(4, 6, 3, 3, light);
+        r(4, 11, 8, 1, '#2a1a10');
+        r(5, 2, 6, 5, '#e8b88a');
+        if (mon === 'mage') {
+          r(4, 1, 8, 2, tunic);
+          r(6, -1, 4, 3, tunic);
+          r(12, 3, 1, 10, '#8a5a2c');
+          r(11, 2, 3, 2, '#ffe66a');
+        } else if (mon === 'archer') {
+          r(4, 1, 8, 3, '#2a5a30');
+          r(12, 3, 1, 10, '#8a5a2c');
+          r(13, 4, 1, 8, '#ece8d6');
+        } else {
+          r(4, 1, 8, 3, '#8a8a94');
+          r(5, 1, 6, 1, '#c8c8d4');
+          r(12, 2, 1, 9, '#c8c8d4');
+          r(11, 10, 3, 1, '#d8b04a');
+        }
+        r(6, 4, 1, 1, '#2a1a10');
+        r(9, 4, 1, 1, '#2a1a10');
       } else if (mon === 'familiar') {
         r(4, 13 - (step === 1 ? 1 : 0), 3, 2, '#4a2e7a');
         r(9, 13 - (step === 2 ? 1 : 0), 3, 2, '#4a2e7a');
@@ -1975,6 +2001,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (G.fight) G.fight.end = msg;
         if (msg.outcome === 'defeat') hint('defeat');
         return;
+      case 'loot':
+        return onLoot(msg);
+      case 'merc':
+        G.merc = msg;
+        return renderMerc();
       case 'log':
         return addLog(msg.text, msg.cls);
       case 'party':
@@ -2364,12 +2395,112 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     else if (mates.length && end.outcome === 'victory') addLog('The loot was split by damage dealt, and your share came to no iron bits.', 'loot');
     for (const it of end.loot.items || []) addLog(`You find ${itemName(it)}.`, `loot ${it.rarity || ''}`.trim());
     if (end.penalty && end.penalty.iron_bits > 0) addLog(`You lose ${end.penalty.iron_bits} iron bits.`, 'bad');
-    if (end.loot.lost) addLog('Your bag is full. The loot was left behind.', 'bad');
     if (end.outcome === 'defeat') addLog('You wake at the bellstone, weary but whole.', 'round');
     if (end.outcome === 'fled') addLog('You escaped from the fight.', 'round');
     play(end.outcome === 'victory' ? 'victory' : end.outcome === 'defeat' ? 'defeat' : 'flee');
     if (end.levelUps.length) setTimeout(() => play('level'), 700);
     if (end.loot.iron_bits > 0 || (end.loot.items && end.loot.items.length)) setTimeout(() => play('coin'), 400);
+    if (lootCount(G.loot.fight)) showLoot('fight');
+  }
+
+  // ---- mercenaries
+
+  function renderMerc() {
+    const box = $('merc-body');
+    if (!box || !G.merc) return;
+    box.textContent = '';
+    const m = G.merc.merc;
+    if (m) {
+      const offer = G.merc.offers.find((o) => o.kind === m.kind);
+      box.appendChild(el('p', '', `${offer ? offer.name : pretty(m.kind)} under contract: ${m.fights} ${m.fights === 1 ? 'fight' : 'fights'} left.`));
+      const b = el('button', 'act', 'Let go');
+      b.type = 'button';
+      b.addEventListener('click', () => window.wealdmark.send({ t: 'merc', op: 'dismiss' }));
+      box.appendChild(b);
+      return;
+    }
+    box.appendChild(walletLine());
+    for (const o of G.merc.offers) {
+      const row = el('div', 'lootrow');
+      row.append(el('span', 'name', `${o.name}: ${o.blurb}`));
+      const b = el('button', 'act', `Hire, ${o.cost} gold`);
+      b.type = 'button';
+      b.addEventListener('click', () => window.wealdmark.send({ t: 'merc', op: 'hire', kind: o.kind }));
+      row.appendChild(b);
+      box.appendChild(row);
+    }
+  }
+
+  // ---- loot window: drops wait here until the hero takes them
+
+  const lootCount = (pile) => (pile ? pile.items.length + (pile.iron_bits > 0 ? 1 : 0) : 0);
+
+  function onLoot(msg) {
+    const had = lootCount(G.loot[msg.pool]);
+    G.loot[msg.pool] = msg;
+    const n = lootCount(msg);
+    const want = G.lootWanted != null;
+    if (n) {
+      // New drops open the window once the fight animation is over; an answer to the Loot button opens it at once.
+      if ((n > had || want) && !G.fight) showLoot(msg.pool);
+      else if (G.lootView === msg.pool) renderLoot();
+    } else if (G.lootView === msg.pool) {
+      const other = G.loot[msg.pool === 'fight' ? 'box' : 'fight'];
+      if (lootCount(other)) showLoot(other.pool);
+      else hideLoot();
+    }
+    if (want) G.lootWanted = null;
+    const waiting = lootCount(G.loot.fight) > 0;
+    $('btn-loot').classList.toggle('hidden', !waiting);
+    $('menu-btn').classList.toggle('alert', waiting);
+  }
+
+  function hideLoot() {
+    const panel = $('panel-loot');
+    if (!panel.classList.contains('hidden')) togglePanel('panel-loot');
+    G.lootView = null;
+  }
+
+  function showLoot(pool) {
+    G.lootView = pool;
+    if ($('panel-loot').classList.contains('hidden')) togglePanel('panel-loot');
+    renderLoot();
+  }
+
+  function renderLoot() {
+    const pool = G.lootView;
+    const pile = pool && G.loot[pool];
+    if (!pile) return;
+    $('loot-title').textContent = pool === 'box' ? `Lost and found, ${pile.town || 'town'}` : 'Loot';
+    $('loot-note').textContent = pool === 'box' ? 'You were disconnected before taking these. Nothing is lost.' : 'Close this window to take them later. The Loot button in the menu brings it back.';
+    const body = $('loot-body');
+    body.textContent = '';
+    const take = (index) => window.wealdmark.send({ t: 'loot', op: 'take', pool, index });
+    const row = (icon, name, cls, index) => {
+      const r = el('div', 'lootrow');
+      r.append(icon, el('span', 'name' + (cls ? ` ${cls}` : ''), name));
+      const b = el('button', 'act', 'Take');
+      b.type = 'button';
+      b.addEventListener('click', () => take(index));
+      r.appendChild(b);
+      return r;
+    };
+    if (pile.iron_bits > 0) {
+      const coin = el('span', 'lootbits', 'ib');
+      body.appendChild(row(coin, `${pile.iron_bits} iron bits`, '', -1));
+    }
+    pile.items.forEach((ref, i) => {
+      const slot = slotButton(ref, () => take(i));
+      body.appendChild(row(slot, `${itemName(ref)}${ref.qty > 1 ? ` x${ref.qty}` : ''}`, ref.rarity || '', i));
+    });
+    if (!lootCount(pile)) body.appendChild(el('p', 'muted', 'Nothing left.'));
+    $('loot-all').disabled = !lootCount(pile);
+  }
+
+  function openLootWindow() {
+    const pool = lootCount(G.loot.fight) ? 'fight' : lootCount(G.loot.box) ? 'box' : null;
+    G.lootWanted = pool || 'box';
+    window.wealdmark.send({ t: 'loot', op: 'open' });
   }
 
   // ---- fight controls
@@ -2679,17 +2810,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const chip = document.createElement('span');
       chip.className = 'chip ' + a.side + (id === f.turnActor ? ' active' : '');
       const nm = document.createElement('div');
-      nm.textContent = id === G.selfId ? `You (level ${a.level})` : `${a.name} (level ${a.level})`;
+      nm.textContent = id === G.selfId ? 'You' : a.name;
       chip.appendChild(nm);
-      if (a.side === 'enemy') {
-        const note = foeNote(a.level);
-        if (note) {
-          const sub = document.createElement('div');
-          sub.className = 'chip-sub';
-          sub.textContent = note;
-          chip.appendChild(sub);
-        }
-      }
       if (a.statuses.length) {
         const row = document.createElement('div');
         row.className = 'chip-status';
@@ -2778,9 +2900,52 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     $('xp-text').textContent = max ? `Level ${s.combatLevel}` : `Level ${s.combatLevel}  ${xp - cur}/${next - cur} XP`;
   }
 
+  /** Show an element's title text at once instead of after the browser's long delay. */
+  function setupTips() {
+    const tip = document.createElement('div');
+    tip.id = 'ui-tip';
+    tip.className = 'hidden';
+    document.body.appendChild(tip);
+    let cur = null;
+    const place = (ev) => {
+      const w = tip.offsetWidth;
+      const h = tip.offsetHeight;
+      const x = Math.min(ev.clientX + 14, window.innerWidth - w - 6);
+      const y = ev.clientY + 18 + h > window.innerHeight ? ev.clientY - h - 10 : ev.clientY + 18;
+      tip.style.left = `${Math.max(4, x)}px`;
+      tip.style.top = `${Math.max(4, y)}px`;
+    };
+    const hide = () => { cur = null; tip.classList.add('hidden'); };
+    on(document, 'pointerover', (ev) => {
+      const el = ev.target.closest && ev.target.closest('[title], [data-tip]');
+      if (!el || !el.closest('#gameview')) { hide(); return; }
+      if (el.hasAttribute('title')) {
+        el.dataset.tip = el.getAttribute('title');
+        el.removeAttribute('title');
+      }
+      if (!el.dataset.tip) { hide(); return; }
+      cur = el;
+      tip.textContent = el.dataset.tip;
+      tip.style.zoom = String(uiScale());
+      tip.classList.remove('hidden');
+      place(ev);
+    });
+    on(document, 'pointermove', (ev) => {
+      if (!cur) return;
+      if (cur.hasAttribute('title')) {
+        cur.dataset.tip = cur.getAttribute('title');
+        cur.removeAttribute('title');
+        tip.textContent = cur.dataset.tip;
+      }
+      place(ev);
+    });
+    on(document, 'pointerout', (ev) => { if (cur && !cur.contains(ev.relatedTarget)) hide(); });
+    on(document, 'pointerdown', hide);
+  }
+
   /** Corner map: the ground around the hero, with dots for people, monsters and townsfolk. */
   const MM = { span: 41, px: 3, key: null, base: null };
-  const rview = { map: true, quests: true };
+  const rview = { map: true };
 
   /** The UI scale for this window: 1 up to 1500x720, growing with the window to 1.75. */
   function uiScale() {
@@ -2883,19 +3048,20 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
     const apply = () => {
       $('mapbox').classList.toggle('off', !rview.map);
-      $('trackbox').classList.toggle('off', !rview.quests);
       $('r-map').classList.toggle('off', !rview.map);
-      $('r-quests').classList.toggle('off', !rview.quests);
       try {
-        localStorage.setItem('wealdmark.corner', JSON.stringify({ map: rview.map, quests: rview.quests }));
+        localStorage.setItem('wealdmark.corner', JSON.stringify({ map: rview.map }));
       } catch {
         /* blocked storage */
       }
     };
     on($('r-map'), 'click', () => ((rview.map = !rview.map), apply()));
-    on($('r-quests'), 'click', () => ((rview.quests = !rview.quests), apply()));
+    on($('r-world'), 'click', () => {
+      togglePanel('panel-world');
+      G.worldKey = null;
+      renderWorld(true);
+    });
     floatBox('mapbox', 'map');
-    floatBox('trackbox', 'quests');
     apply();
   }
   function renderMinimap(map) {
@@ -2941,36 +3107,208 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       c.fillStyle = col;
       c.fillRect(x * MM.px, y * MM.px, MM.px, MM.px);
     }
+    // Jobs on offer or ready to hand in, for anyone inside the view.
+    c.textAlign = 'center';
+    c.font = 'bold 10px "Courier New", monospace';
+    for (const n of map.npcs || []) {
+      const mark = questMark(n.npc);
+      if (!mark) continue;
+      const x = n.x - ox;
+      const y = n.y - oy;
+      if (x < 0 || y < 0 || x >= MM.span || y >= MM.span) continue;
+      c.fillStyle = '#000';
+      c.fillRect(x * MM.px - 3, y * MM.px - 8, 10, 11);
+      c.fillStyle = mark === '?' ? '#7bd88f' : '#ffd84a';
+      c.fillText(mark, x * MM.px + 2, y * MM.px + 1);
+    }
   }
 
-  /** Up to three active jobs pinned on screen. */
+  /** What the world map can show, in legend order. Each has a colour, a one-letter badge, and a test. */
+  const WORLD_KINDS = [
+    { id: 'quest', label: 'Jobs', color: '#ffd84a', badge: '!' },
+    { id: 'shop', label: 'Stores', color: '#e6b34a', badge: '$' },
+    { id: 'smith', label: 'Smithing', color: '#e07a3a', badge: 'S' },
+    { id: 'cook', label: 'Cooking', color: '#d85a5a', badge: 'C' },
+    { id: 'craft', label: 'Crafting', color: '#b072e6', badge: 'W' },
+    { id: 'inn', label: 'Inns and storage', color: '#6ab0ff', badge: 'I' },
+    { id: 'bell', label: 'Bellstones', color: '#9fe8c8', badge: 'B' },
+    { id: 'tree', label: 'Woodcutting', color: '#5aa04a', badge: 'T' },
+    { id: 'rock', label: 'Mining', color: '#a8a8b8', badge: 'M' },
+    { id: 'fish', label: 'Fishing', color: '#4a9fe0', badge: 'F' },
+    { id: 'warren', label: 'Hunting', color: '#b8885a', badge: 'H' },
+  ];
+  const worldHidden = new Set();
+
+  function worldPoints() {
+    const map = G.map;
+    const pts = [];
+    const npcs = G.data.npcs;
+    for (const n of map.npcs || []) {
+      const def = npcs.get(n.npc);
+      if (!def) continue;
+      const svc = new Set((def.services || []).map((s) => s.kind));
+      if (questMark(n.npc)) pts.push({ k: 'quest', x: n.x, y: n.y, name: def.name, mark: questMark(n.npc) });
+      if (svc.has('shop')) pts.push({ k: 'shop', x: n.x, y: n.y, name: def.name });
+      if (svc.has('inn') || svc.has('storage')) pts.push({ k: 'inn', x: n.x, y: n.y, name: def.name });
+    }
+    for (const s of map.stations || []) {
+      const def = G.data.stations.get(s.station);
+      if (!def) continue;
+      if (def.kind === 'bell') pts.push({ k: 'bell', x: s.x, y: s.y, name: def.name });
+      else if (def.kind === 'craft') pts.push({ k: def.skill === 'smithing' ? 'smith' : def.skill === 'cooking' ? 'cook' : 'craft', x: s.x, y: s.y, name: def.name });
+    }
+    const art = { tree: 'tree', rock: 'rock', fish: 'fish', warren: 'warren' };
+    for (const n of map.nodes || []) {
+      const def = G.data.nodes.get(n.node);
+      const k = def && art[def.art];
+      if (k) pts.push({ k, x: n.x, y: n.y, name: def.name });
+    }
+    return pts;
+  }
+
+  /** The whole map on one canvas, with places of interest and the hero. Redrawn when something it shows changes. */
+  function renderWorld(force) {
+    const panel = $('panel-world');
+    if (!panel || panel.classList.contains('hidden') || !G || !G.map || !G.data) return;
+    const me = G.self();
+    const marks = JSON.stringify([(G.map.npcs || []).map((n) => questMark(n.npc) || ''), [...worldHidden], me ? [Math.round(me.x / 2), Math.round(me.y / 2)] : 0]);
+    if (!force && marks === G.worldKey) return;
+    G.worldKey = marks;
+    const map = G.map;
+    const px = 3;
+    const cv = $('worldmap');
+    if (cv.width !== map.width * px) {
+      cv.width = map.width * px;
+      cv.height = map.height * px;
+      G.worldBase = null;
+    }
+    if (!G.worldBase) {
+      const b = document.createElement('canvas');
+      b.width = cv.width;
+      b.height = cv.height;
+      const c = b.getContext('2d');
+      c.fillStyle = '#0c0912';
+      c.fillRect(0, 0, b.width, b.height);
+      for (let y = 0; y < map.height; y++) {
+        for (let x = 0; x < map.width; x++) {
+          const gid = map.layers.ground[y * map.width + x];
+          c.fillStyle = gid === 4 ? '#2c5a8a' : map.blocked[y][x] === '1' ? '#2a2236' : '#4d7a52';
+          c.fillRect(x * px, y * px, px, px);
+        }
+      }
+      for (const z of map.zones) {
+        c.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.22)' : 'rgba(224,90,90,0.10)';
+        c.fillRect(z.x * px, z.y * px, z.w * px, z.h * px);
+      }
+      c.textAlign = 'center';
+      c.font = 'bold 11px "Courier New", monospace';
+      for (const z of map.zones) {
+        if (z.kind !== 'safe') continue;
+        const tx = (z.x + z.w / 2) * px;
+        const ty = z.y * px - 3;
+        c.lineWidth = 3;
+        c.strokeStyle = '#000';
+        c.strokeText(z.name, tx, ty);
+        c.fillStyle = '#f0d890';
+        c.fillText(z.name, tx, ty);
+      }
+      G.worldBase = b;
+    }
+    const ctx = cv.getContext('2d');
+    ctx.drawImage(G.worldBase, 0, 0);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 8px "Courier New", monospace';
+    const kinds = new Map(WORLD_KINDS.map((k) => [k.id, k]));
+    for (const p of worldPoints()) {
+      if (worldHidden.has(p.k)) continue;
+      const k = kinds.get(p.k);
+      const cx = p.x * px + px / 2;
+      const cy = p.y * px + px / 2;
+      const natural = p.k === 'tree' || p.k === 'rock' || p.k === 'fish' || p.k === 'warren';
+      if (natural) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(cx - 3, cy - 3, 6, 6);
+        ctx.fillStyle = k.color;
+        ctx.fillRect(cx - 2, cy - 2, 4, 4);
+      } else {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(cx - 5, cy - 5, 10, 10);
+        ctx.fillStyle = k.color;
+        ctx.fillRect(cx - 4, cy - 4, 8, 8);
+        ctx.fillStyle = '#17112a';
+        ctx.fillText(p.k === 'quest' ? p.mark : k.badge, cx, cy + 3);
+      }
+    }
+    if (me) {
+      const cx = Math.round(me.x) * px + px / 2;
+      const cy = Math.round(me.y) * px + px / 2;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#e6b34a';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      if (force) {
+        const sc = $('world-scroll');
+        sc.scrollTop = Math.max(0, cy - sc.clientHeight / 2);
+      }
+    }
+    const legend = $('world-legend');
+    if (!legend.childElementCount) {
+      for (const k of WORLD_KINDS) {
+        const b = el('button', 'wl');
+        b.type = 'button';
+        const sw = el('span', 'wsw', k.badge);
+        sw.style.background = k.color;
+        b.append(sw, document.createTextNode(k.label));
+        b.addEventListener('click', () => {
+          if (worldHidden.has(k.id)) worldHidden.delete(k.id);
+          else worldHidden.add(k.id);
+          b.classList.toggle('off', worldHidden.has(k.id));
+          renderWorld(true);
+        });
+        legend.appendChild(b);
+      }
+    }
+  }
+
+  /** Keep the journal's progress lines current as the bag and kills change. */
   let trackerKey = '';
   function renderTracker() {
-    const box = $('tracker');
     if (!G.data || !G.quests) return;
     const states = questStates();
-    const rows = [];
-    for (const q of G.data.quests.values()) {
+    const key = JSON.stringify([...G.data.quests.values()].map((q) => {
       const st = states.get(q.id);
-      if (!st || st.done || !q.steps[st.step]) continue;
-      const step = q.steps[st.step];
-      const prog = progressText(step.need, st);
-      const ready = needMet(step.need, st);
-      const giver = G.data.npcs.get(step.npc);
-      rows.push([q.name, ready && giver ? `Report to ${giver.name}` : step.todo, prog, ready]);
-      if (rows.length === 3) break;
-    }
-    const key = JSON.stringify(rows);
+      if (!st || st.done || !q.steps[st.step]) return [q.id, st ? 'done' : 0];
+      return [q.id, st.step, progressText(q.steps[st.step].need, st), needMet(q.steps[st.step].need, st)];
+    }));
     if (key === trackerKey) return;
     trackerKey = key;
-    box.textContent = '';
-    box.classList.toggle('hidden', !rows.length);
-    for (const [name, todo, prog, ready] of rows) {
-      const row = el('div', 'tq');
-      row.append(el('b', '', name), el('div', '', todo));
-      if (prog) row.append(el('div', ready ? 'ok' : 'short', prog));
-      box.appendChild(row);
+    renderJournal();
+  }
+
+  /** Quests the player has switched off in the journal; every other active quest counts as tracked. */
+  function untrackedQuests() {
+    const me = G.self();
+    try {
+      return new Set(JSON.parse(localStorage.getItem(`wealdmark.untracked.${me ? me.name : ''}`)) || []);
+    } catch {
+      return new Set();
     }
+  }
+  function setTracked(id, on) {
+    const me = G.self();
+    const set = untrackedQuests();
+    if (on) set.delete(id);
+    else set.add(id);
+    try {
+      localStorage.setItem(`wealdmark.untracked.${me ? me.name : ''}`, JSON.stringify([...set]));
+    } catch {
+      /* blocked storage: the choice lasts until the page closes */
+    }
+    renderJournal();
   }
 
   // ---- bottom bar: globes, action bar, quick slots
@@ -3081,7 +3419,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       return window.wealdmark.send({ t: 'equip', slot: idx });
     }
     const info = ABILITY_INFO[entry.id];
-    if (!G.fight) return fromKey ? undefined : toast(info ? `${info[0]}: ${info[1]}` : 'Nothing to do outside a fight.');
+    if (!G.fight) return fromKey ? undefined : openBarPicker('bar', i);
     if (!isMyTurn()) return toast('Not your turn to act.');
     const opt = G.fight.options.abilities.find((a) => a.id === entry.id);
     if (!opt) return toast(`${info ? info[0] : 'That ability'} needs a different weapon or shield.`);
@@ -3139,10 +3477,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         b.bars[style] = slots.slice();
         b.bars[style][which] = entry;
       });
-      for (const id of unlockedAbilities().filter((x) => ABILITY_STYLE[x] === style || ABILITY_STYLE[x] === 'defense')) {
+      for (const id of unlockedAbilities()) {
         const img = new Image();
         img.src = abilityIcon(id);
-        row(ABILITY_NAMES[id] || pretty(id), img, () => put({ k: 'ability', id }));
+        row(ABILITY_NAMES[id] || pretty(id), img, () => {
+          const need = ABILITY_STYLE[id];
+          if ((need === 'melee' || need === 'range' || need === 'magic') && need !== style) {
+            toast('You can not use that ability with your current weapon.');
+            return;
+          }
+          put({ k: 'ability', id });
+        });
       }
       const seen = new Set();
       const weapons = [];
@@ -3213,7 +3558,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
             if (G.fight.selected === entry.id) b.classList.add('selected');
           }
         }
-        lines.push('Right-click to change.');
+        lines.push(G.fight ? 'Right-click to change.' : 'Click or right-click to change this slot.');
         b.title = lines.join('\n');
       }
       if (!on) b.classList.add('off');
@@ -3808,7 +4153,228 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return false;
   }
 
+  /** Items whose icon would otherwise match a sibling: named gear, curios, and the lesser potions. */
+  const UNIQUE_ICONS = {
+    pine_nuts: (r) => {
+      for (const [x, y] of [[3, 8], [8, 5], [8, 10]]) {
+        r(x, y, 4, 5, '#8a5a2c');
+        r(x, y, 2, 3, '#b8803c');
+        r(x + 1, y + 4, 2, 1, '#4a2a14');
+      }
+    },
+    crew_note: (r) => {
+      r(3, 2, 10, 12, '#e8dcb0');
+      r(3, 2, 10, 1, '#fff4cc');
+      for (let i = 0; i < 4; i++) r(5, 4 + i * 2, 6 - (i % 2) * 2, 1, '#8a7a5a');
+      r(9, 10, 3, 3, '#b03a2a');
+      r(10, 11, 1, 1, '#e87a5a');
+    },
+    wolf_pelt: (r) => {
+      r(3, 3, 10, 10, '#7a7a84');
+      r(2, 5, 1, 4, '#7a7a84');
+      r(13, 6, 1, 4, '#7a7a84');
+      r(4, 13, 3, 2, '#7a7a84');
+      r(9, 13, 3, 2, '#7a7a84');
+      r(4, 4, 4, 3, '#a8a8b4');
+      r(8, 8, 4, 3, '#56565e');
+      r(5, 9, 2, 2, '#56565e');
+    },
+    grave_dust: (r) => {
+      r(6, 5, 4, 2, '#cfc8b4');
+      r(4, 7, 8, 2, '#b8b0a0');
+      r(2, 9, 12, 3, '#9a927f');
+      r(2, 12, 12, 1, '#6e6858');
+      r(6, 3, 1, 1, '#e8e2cc');
+      r(9, 2, 1, 1, '#e8e2cc');
+      r(11, 4, 1, 1, '#cfc8b4');
+    },
+    drowned_coin: (r) => {
+      r(5, 3, 6, 10, '#c8b050');
+      r(3, 5, 10, 6, '#c8b050');
+      r(5, 4, 3, 2, '#f0dc78');
+      r(5, 9, 4, 3, '#3a8a6a');
+      r(9, 6, 3, 2, '#3a8a6a');
+      r(7, 6, 2, 4, '#8a7a30');
+    },
+    eel_skin: (r) => {
+      for (let i = 0; i < 11; i++) {
+        r(2 + i, 11 - i, 3, 2, i % 2 ? '#2f5a52' : '#3f7a6c');
+        r(2 + i, 10 - i, 3, 1, '#7ab8a4');
+      }
+      r(12, 1, 2, 2, '#1a2a28');
+    },
+    teleport_crystal: (r) => {
+      r(7, 1, 2, 2, '#c8b8ff');
+      r(5, 3, 6, 3, '#8a6aff');
+      r(4, 6, 8, 3, '#6a4ae0');
+      r(5, 9, 6, 3, '#5a3ac0');
+      r(7, 12, 2, 2, '#3a2a90');
+      r(6, 4, 2, 4, '#d8ccff');
+      r(2, 7, 1, 1, '#c8b8ff');
+      r(13, 5, 1, 1, '#c8b8ff');
+    },
+    foremans_pick: (r) => {
+      r(7, 3, 2, 12, '#a0642c');
+      r(7, 3, 1, 12, '#c8803c');
+      r(2, 2, 12, 2, '#e8b020');
+      r(2, 2, 12, 1, '#ffd84a');
+      r(1, 3, 2, 3, '#e8b020');
+      r(13, 3, 2, 3, '#e8b020');
+      r(6, 5, 4, 1, '#3a3a44');
+    },
+    pickmans_bone_mask: (r) => {
+      r(4, 2, 8, 9, '#e8e4d0');
+      r(3, 4, 1, 5, '#e8e4d0');
+      r(12, 4, 1, 5, '#cfc8b0');
+      r(5, 5, 2, 3, '#2a2420');
+      r(9, 5, 2, 3, '#2a2420');
+      r(7, 8, 2, 1, '#2a2420');
+      r(5, 11, 6, 3, '#e8e4d0');
+      for (const x of [6, 8, 10]) r(x, 11, 1, 3, '#2a2420');
+      r(5, 2, 3, 1, '#fffbe8');
+    },
+    tidal_aegis: (r) => {
+      r(3, 2, 10, 9, '#3a78b8');
+      r(4, 11, 8, 2, '#3a78b8');
+      r(6, 13, 4, 1, '#3a78b8');
+      r(3, 2, 10, 1, '#9fd0f0');
+      r(3, 2, 1, 9, '#9fd0f0');
+      r(12, 3, 1, 8, '#245888');
+      for (const [x, y] of [[4, 5], [7, 5], [10, 5], [5, 8], [8, 8]]) {
+        r(x, y, 2, 1, '#cfeaff');
+        r(x + 1, y + 1, 1, 1, '#cfeaff');
+      }
+    },
+  };
+
+  /** A ring: a band, a stone, and a mark of its own. */
+  function ringIcon(band, bandLight, stone, mark) {
+    return (r) => {
+      r(4, 6, 8, 8, band);
+      r(5, 7, 6, 6, '#00000000');
+      r(5, 7, 6, 6, '#241a30');
+      r(4, 6, 8, 1, bandLight);
+      r(4, 6, 1, 8, bandLight);
+      r(5, 7, 6, 6, 'rgba(0,0,0,0)');
+      r(5, 8, 6, 4, '#241a30');
+      if (stone) {
+        r(6, 3, 4, 4, stone);
+        r(6, 3, 2, 2, '#ffffffaa');
+      }
+      if (mark === 'tally') for (const x of [5, 7, 9]) r(x, 12, 1, 2, bandLight);
+      if (mark === 'nut') {
+        r(6, 3, 4, 4, '#8a5a2c');
+        r(6, 3, 2, 2, '#b8803c');
+      }
+      if (mark === 'gold') r(4, 13, 8, 1, '#d8b04a');
+    };
+  }
+
+  /** A belt or sash laid flat, with a buckle or a knot. */
+  function beltIcon(strap, light, buckle, detail) {
+    return (r) => {
+      r(1, 6, 14, 4, strap);
+      r(1, 6, 14, 1, light);
+      r(1, 9, 14, 1, '#00000055');
+      r(6, 5, 4, 6, buckle);
+      r(7, 6, 2, 4, '#241a30');
+      if (detail === 'studs') for (const x of [2, 4, 11, 13]) r(x, 7, 1, 2, '#d8d8e4');
+      if (detail === 'knot') {
+        r(10, 9, 3, 5, strap);
+        r(11, 11, 2, 4, light);
+      }
+      if (detail === 'tools') {
+        r(2, 10, 2, 3, '#8a8a94');
+        r(12, 10, 2, 3, '#8a8a94');
+      }
+      if (detail === 'bone') for (const x of [2, 4, 11, 13]) r(x, 7, 1, 2, '#f4f0dc');
+      if (detail === 'wave') for (const x of [2, 4, 11, 13]) r(x, 8, 2, 1, '#cfeaff');
+    };
+  }
+
+  /** A boon: a charm on a cord. */
+  function boonIcon(gem, light, shape) {
+    return (r) => {
+      r(7, 0, 2, 5, '#6a4020');
+      r(6, 4, 4, 1, '#d8b04a');
+      if (shape === 'flame') {
+        r(6, 5, 4, 8, gem);
+        r(5, 8, 6, 4, gem);
+        r(7, 5, 2, 3, light);
+        r(7, 9, 2, 3, '#ffe08a');
+      } else if (shape === 'drop') {
+        r(7, 5, 2, 2, gem);
+        r(6, 7, 4, 2, gem);
+        r(5, 9, 6, 4, gem);
+        r(6, 13, 4, 1, gem);
+        r(6, 8, 2, 3, light);
+      } else if (shape === 'swirl') {
+        r(4, 6, 8, 7, gem);
+        r(6, 8, 4, 3, '#241a30');
+        r(7, 9, 2, 1, light);
+        r(4, 6, 8, 1, light);
+      } else if (shape === 'cairn') {
+        r(5, 10, 6, 3, '#8a8a94');
+        r(6, 7, 4, 3, '#a8a8b4');
+        r(7, 5, 2, 2, '#c8c8d4');
+        r(5, 10, 6, 1, '#b8b8c4');
+      } else {
+        r(7, 5, 2, 8, gem);
+        r(5, 7, 2, 4, gem);
+        r(9, 7, 2, 4, light);
+        r(7, 5, 2, 2, light);
+      }
+    };
+  }
+
+  Object.assign(UNIQUE_ICONS, {
+    silver_loop: ringIcon('#c8ccd8', '#f0f2fa', null, ''),
+    nutshell_ring: ringIcon('#8a5a2c', '#b8803c', null, 'nut'),
+    tally_ring: ringIcon('#6a6a74', '#a8a8b4', null, 'tally'),
+    moonglass_ring: ringIcon('#d8d8e8', '#ffffff', '#9fd0ff', ''),
+    pickman_ring: ringIcon('#7a5a40', '#b08a60', '#f08a2a', ''),
+    elrenor_ring: ringIcon('#d8b04a', '#fff0a0', '#4ae080', 'gold'),
+    studded_belt: beltIcon('#6a4020', '#8a5a2c', '#c8c8d4', 'studs'),
+    mind_goblin_sash: beltIcon('#3a8a4a', '#6ac87a', '#d8b04a', 'knot'),
+    foremans_belt: beltIcon('#c88a20', '#f0b84a', '#8a8a94', 'tools'),
+    guard_belt: beltIcon('#4a4a58', '#7a7a8a', '#d8b04a', ''),
+    bone_sash: beltIcon('#cfc8b0', '#f4f0dc', '#8a8470', 'bone'),
+    tide_sash: beltIcon('#2f8a9a', '#6ac8d8', '#d8b04a', 'wave'),
+    ember_boon: boonIcon('#e8602a', '#ffa05a', 'flame'),
+    goblin_wit_boon: boonIcon('#5ab84a', '#a0f08a', 'swirl'),
+    sump_boon: boonIcon('#7a6a3a', '#b8a060', 'drop'),
+    tide_boon: boonIcon('#3a78d8', '#8ab4f0', 'drop'),
+    cairn_boon: boonIcon('#8a8a94', '#c8c8d4', 'cairn'),
+    mere_boon: boonIcon('#2f8a6a', '#6ac8a4', 'reed'),
+  });
+
+  /** The lesser potions are smaller bottles; the full ones carry a gold cap. */
+  function potionIcon(def) {
+    const mana = Boolean(def.mana);
+    const small = /^minor_/.test(def.id);
+    const liquid = mana ? '#4a7fd8' : '#d84a4a';
+    const light = mana ? '#8ab4f0' : '#f08a8a';
+    return (r) => {
+      if (small) {
+        r(7, 4, 2, 2, '#8a6a44');
+        r(6, 6, 4, 1, '#cfd6e4');
+        r(5, 7, 6, 6, '#cfd6e4');
+        r(6, 8, 4, 4, liquid);
+        r(6, 8, 1, 3, light);
+      } else {
+        r(6, 1, 4, 2, '#d8b04a');
+        r(7, 3, 2, 2, '#cfd6e4');
+        r(3, 5, 10, 9, '#cfd6e4');
+        r(4, 6, 8, 7, liquid);
+        r(4, 6, 2, 5, light);
+        r(10, 9, 2, 3, '#00000033');
+      }
+    };
+  }
+
   function paintItem(r, def) {
+    const unique = UNIQUE_ICONS[def.id] || (def.kind === 'potion' ? potionIcon(def) : null);
+    if (unique) return unique(r);
     const t = Math.max(0, Math.min(3, (def.tier || 1) - 1));
     if (paintWorkItem(r, def)) return;
     if (def.kind === 'potion') {
@@ -4142,16 +4708,23 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const z = uiScale();
     const pr = (el.offsetParent || document.body).getBoundingClientRect();
     let bottom = 56;
-    for (const id of ['mapbox', 'trackbox']) {
+    for (const id of ['mapbox']) {
       const b = $(id);
       if (b && b.offsetWidth) bottom = Math.max(bottom, (b.getBoundingClientRect().bottom - pr.top) / z);
+    }
+    if (el.id === 'panel-trades') {
+      // Opens in the middle of the screen, like the crafting box.
+      el.style.right = 'auto';
+      el.style.left = `${Math.max(0, (pr.width / z - el.offsetWidth) / 2)}px`;
+      el.style.top = `${Math.max(8, (pr.height / z - el.offsetHeight) / 2)}px`;
+      return;
     }
     const slot = Math.max(0, openOrder.indexOf(el.id));
     const top = bottom + 6 + slot * 28;
     el.style.left = 'auto';
     el.style.right = `${10 + slot * 24}px`;
     el.style.top = `${top}px`;
-    el.style.maxHeight = `${Math.max(160, pr.height / z - top - 120)}px`;
+    el.style.maxHeight = `${Math.max(160, pr.height / z - top - 8)}px`;
   }
 
   function raise(el) {
@@ -4620,13 +5193,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const box = $('station-body');
     box.textContent = '';
     for (const line of st.text) box.appendChild(el('p', 'muted', line));
-    const list = [...G.data.recipes.values()].filter((r) => r.station === st.id);
+    // Only what you can make right now.
+    const most = (r) => Math.min(20, ...r.inputs.map((i) => Math.floor(bagCount(i.item) / i.qty)));
+    const list = [...G.data.recipes.values()].filter((r) => r.station === st.id && skillLevel(r.skill) >= r.level && most(r) >= 1 && G.data.items.get(r.output.item));
     for (const r of list) {
       const out = G.data.items.get(r.output.item);
-      if (!out) continue;
-      const low = skillLevel(r.skill) < r.level;
-      const most = Math.min(28, ...r.inputs.map((i) => Math.floor(bagCount(i.item) / i.qty)));
-      const row = el('div', 'recipe' + (low ? ' locked' : ''));
+      const low = false;
+      const max = most(r);
+      const row = el('div', 'recipe');
       const head = el('div', 'recipe-head');
       head.append(iconCanvas(out), el('span', 'name', `${out.name}${r.output.qty > 1 ? ` x${r.output.qty}` : ''}`), el('span', 'muted', `${SKILL_LABEL[r.skill]} ${r.level}`));
       row.appendChild(head);
@@ -4638,17 +5212,18 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       }
       row.appendChild(need);
       const btns = el('div', 'recipe-btns');
-      for (const [label, n] of [['Make 1', 1], ['Make 5', 5], ['Make all', most]]) {
+      for (const [label, n] of [['Make 1', 1], ['Make 5', 5], [max > 5 ? `Make ${max}` : 'Make all', max]]) {
+        if (n === 5 && max < 5) continue;
+        if (label !== 'Make 1' && n === 1) continue;
         const b = el('button', 'act', label);
         b.type = 'button';
-        b.disabled = low || most < 1 || n < 1 || (n === 5 && most < 5);
-        b.addEventListener('click', () => window.wealdmark.send({ t: 'craft', recipe: r.id, qty: Math.min(28, n) }));
+        b.addEventListener('click', () => window.wealdmark.send({ t: 'craft', recipe: r.id, qty: Math.min(20, n) }));
         btns.appendChild(b);
       }
       row.appendChild(btns);
       box.appendChild(row);
     }
-    if (!list.length) box.appendChild(el('p', 'muted', 'Nothing can be made here yet.'));
+    if (!list.length) box.appendChild(el('p', 'muted', 'You have nothing to make here. Bring the materials, or train the skill.'));
   }
 
   // the Crown Steward
@@ -4757,12 +5332,30 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   // busy bar
 
   function onBusy(msg) {
+    const was = G.busy;
     G.busy = msg.of > 0 ? msg : null;
     const bar = $('busy');
     bar.classList.toggle('hidden', !G.busy);
-    if (!G.busy) return;
-    $('busy-text').textContent = msg.what;
-    $('busy-fill').style.width = `${Math.min(100, Math.round(((msg.done + 1) / msg.of) * 100))}%`;
+    const atStation = G.town && G.town.kind === 'station';
+    if (!G.busy) {
+      // A batch is over: the one-time box is not coming back, so let the station go.
+      if (was && was.total && atStation) closeTown(true);
+      return;
+    }
+    if (msg.total && atStation) $('panel-station').classList.add('hidden');
+    const fill = $('busy-fill');
+    if (msg.total) {
+      // Each item fills the bar from empty to full over its 1.8 seconds.
+      const left = ((msg.total - msg.made) * msg.of - msg.done) * G.tickMs / 1000;
+      $('busy-text').textContent = `${msg.what}  ${msg.made} / ${msg.total} done  ${Math.ceil(left)}s left`;
+      if (msg.done === 0) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        void fill.offsetWidth;
+        fill.style.transition = '';
+      }
+    } else $('busy-text').textContent = msg.what;
+    fill.style.width = `${Math.min(100, Math.round(((msg.done + 1) / msg.of) * 100))}%`;
   }
 
   // jobs
@@ -4908,20 +5501,37 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!box || !G.data) return;
     box.textContent = '';
     const states = questStates();
+    const off = untrackedQuests();
     const active = [...G.data.quests.values()].filter((q) => states.get(q.id) && !states.get(q.id).done);
     const done = [...G.data.quests.values()].filter((q) => states.get(q.id) && states.get(q.id).done);
     if (!active.length && !done.length) box.appendChild(el('p', 'muted', 'No jobs yet. People with a gold ! over their head have work for you.'));
-    for (const q of active) {
+    const card = (q) => {
       const st = states.get(q.id);
       const step = q.steps[st.step];
-      const card = el('div', 'quest');
-      card.appendChild(el('h3', '', q.name));
+      const tracked = !off.has(q.id);
+      const c = el('div', 'quest' + (tracked ? ' tracked' : ''));
+      const head = el('div', 'qhead');
+      head.appendChild(el('h3', '', q.name));
+      const t = el('button', 'qtrack' + (tracked ? ' on' : ''), tracked ? 'Tracking' : 'Track');
+      t.type = 'button';
+      t.title = tracked ? 'Stop tracking this job' : 'Track this job';
+      t.addEventListener('click', () => setTracked(q.id, !tracked));
+      head.appendChild(t);
+      c.appendChild(head);
       const giver = G.data.npcs.get(step.npc);
-      card.appendChild(el('p', '', step.todo));
+      const ready = needMet(step.need, st);
+      c.appendChild(el('p', '', ready && giver ? `Report to ${giver.name}.` : step.todo));
       const prog = progressText(step.need, st);
-      if (prog) card.appendChild(el('p', needMet(step.need, st) ? 'ok' : 'short', prog));
-      if (giver) card.appendChild(el('p', 'muted', `Report to ${giver.name}.`));
-      box.appendChild(card);
+      if (prog) c.appendChild(el('p', ready ? 'ok' : 'short', prog));
+      if (giver && !ready) c.appendChild(el('p', 'muted', `Report to ${giver.name}.`));
+      return c;
+    };
+    const tracked = active.filter((q) => !off.has(q.id));
+    const other = active.filter((q) => off.has(q.id));
+    for (const q of tracked) box.appendChild(card(q));
+    if (other.length) {
+      box.appendChild(el('h3', 'muted', 'Not tracked'));
+      for (const q of other) box.appendChild(card(q));
     }
     if (done.length) {
       box.appendChild(el('h3', 'muted', 'Finished'));
@@ -5302,7 +5912,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           y -= 5 * s / 2 + 2;
         }
       }
-      const label = labelFor(r);
+      let label = labelFor(r);
+      if (r.fightActor && r.fightActor.side === 'enemy') {
+        const hit = myHitChance(r.fightActor.level);
+        if (hit !== null) label += ` ${pctText(hit)}`;
+      }
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#000';
       ctx.fillStyle = labelColor(r);
@@ -5387,7 +6001,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const others = [...G.entities.values()].filter((e) => e.kind === 'player' && e.id !== G.selfId).length;
       const place = z ? (z.name === map.name ? `${map.name} (${KIND_LABEL[z.kind]})` : `${map.name} - ${z.name} (${KIND_LABEL[z.kind]})`) : map.name;
       $('hud').textContent = `${place}\n` +
-        `Position: ${me.x}, ${me.y}\nPlayers nearby: ${others}`;
+        `Position: ${me.x}, ${me.y}   Nearby: ${others}`;
       const hh = G.fight && hero();
       const hp = hh ? hh.hp : G.stats ? G.stats.hp : 0;
       const maxHp = hh ? hh.maxHp : G.stats ? G.stats.maxHp : 1;
@@ -5401,10 +6015,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       renderGlobes(hp, maxHp, mp, maxMp);
       renderBar();
       renderTracker();
-      for (const id of ['rctl', 'mapbox', 'trackbox']) $(id).classList.toggle('hidden', Boolean(G.fight));
+      for (const id of ['rctl', 'mapbox']) $(id).classList.toggle('hidden', Boolean(G.fight));
       if (!G.fight) {
         if ($('buffs').childElementCount) $('buffs').textContent = '';
         renderMinimap(map);
+        renderWorld(false);
       }
     }
     ctx.save();
@@ -5569,8 +6184,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     m.classList.remove('hidden');
     const w = m.offsetWidth;
     const h = m.offsetHeight;
-    m.style.left = `${Math.max(4, Math.min(ev.clientX + 6, window.innerWidth - w - 4))}px`;
-    m.style.top = `${Math.max(4, Math.min(ev.clientY + 6, window.innerHeight - h - 4))}px`;
+    const z = uiScale();
+    m.style.left = `${Math.max(4, Math.min(ev.clientX / z + 6, window.innerWidth / z - w - 4))}px`;
+    m.style.top = `${Math.max(4, Math.min(ev.clientY / z + 6, window.innerHeight / z - h - 4))}px`;
   }
 
   function onClick(ev) {
@@ -6351,8 +6967,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     });
     tip.classList.remove('hidden');
     const box = G.canvas.getBoundingClientRect();
-    const left = Math.min(G.mouse.x - box.left + 16, box.width - tip.offsetWidth - 6);
-    const top = Math.min(G.mouse.y - box.top + 16, box.height - tip.offsetHeight - 6);
+    const z = uiScale();
+    const left = Math.min((G.mouse.x - box.left) / z + 16, box.width / z - tip.offsetWidth - 6);
+    const top = Math.min((G.mouse.y - box.top) / z + 16, box.height / z - tip.offsetHeight - 6);
     tip.style.left = `${Math.max(4, left)}px`;
     tip.style.top = `${Math.max(4, top)}px`;
   }
@@ -6402,6 +7019,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       buildings,
       tip,
       mouse: null,
+      loot: { fight: null, box: null },
       tickMs: welcome.tickMs,
       selfId: welcome.you.id,
       entities: new Map(),
@@ -6461,12 +7079,26 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('chatform'), 'submit', onChat);
     setupChat();
     setupCorner();
+    setupTips();
     on($('menu-btn'), 'click', (ev) => {
       ev.stopPropagation();
       $('menu-list').classList.toggle('hidden');
     });
     // Picking an entry, or clicking anywhere else, folds the menu back up.
     on($('menu-list'), 'click', () => $('menu-list').classList.add('hidden'));
+    for (const gb of document.querySelectorAll('.grp-btn')) {
+      on(gb, 'click', (ev) => {
+        ev.stopPropagation();
+        const grp = gb.parentElement;
+        const was = grp.classList.contains('open');
+        for (const o of document.querySelectorAll('.grp.open')) o.classList.remove('open');
+        if (!was) grp.classList.add('open');
+      });
+    }
+    on($('menu-list'), 'click', () => { for (const o of document.querySelectorAll('.grp.open')) o.classList.remove('open'); });
+    on(document, 'pointerdown', (ev) => {
+      if (!ev.target.closest('.grp')) for (const o of document.querySelectorAll('.grp.open')) o.classList.remove('open');
+    });
     on(document, 'pointerdown', (ev) => {
       if (!ev.target.closest('#toolbar')) $('menu-list').classList.add('hidden');
     });
@@ -6498,6 +7130,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       ev.stopPropagation();
       if (ev.key === 'Enter') inviteFromBox();
     });
+    on($('busy'), 'click', () => window.wealdmark.send({ t: 'stop' }));
+    on($('btn-merc'), 'click', () => {
+      togglePanel('panel-merc');
+      renderMerc();
+    });
+    on($('btn-loot'), 'click', () => {
+      if ($('panel-loot').classList.contains('hidden')) openLootWindow();
+      else hideLoot();
+    });
+    on($('loot-all'), 'click', () => window.wealdmark.send({ t: 'loot', op: 'all', pool: G.lootView || 'fight' }));
     on($('btn-journal'), 'click', () => {
       togglePanel('panel-journal');
       renderJournal();
