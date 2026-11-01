@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://situations-quotations-dryer-funky.trycloudflare.com",
-  "authUrl": "https://acres-tracks-disciplines-surrounding.trycloudflare.com",
+  "server": "wss://say-seating-par-outlet.trycloudflare.com",
+  "authUrl": "https://cambridge-steering-extras-pot.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 230323,
-      "sha256": "c25655dab00cedcc02919a7e3a7dc150693f033e59f232f75bf01e9db30e2846",
-      "url": "c/c25655dab00cedcc02919a7e3a7dc150693f033e59f232f75bf01e9db30e2846"
+      "size": 231070,
+      "sha256": "79b414aa44b7b41f14028afe4ffdb33116767ee492d009ac5dadfbfb7973b198",
+      "url": "c/79b414aa44b7b41f14028afe4ffdb33116767ee492d009ac5dadfbfb7973b198"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 14826,
-      "sha256": "d40909bd278d491eb9b90f8ea24c5b59c9f3317db1c9bb87848f2ade96f8dcb2",
-      "url": "c/d40909bd278d491eb9b90f8ea24c5b59c9f3317db1c9bb87848f2ade96f8dcb2"
+      "size": 14924,
+      "sha256": "51ab38cbdb8fff73507c37d2ab8f9c19e605730a241515fa2a219a4a1aed23e3",
+      "url": "c/51ab38cbdb8fff73507c37d2ab8f9c19e605730a241515fa2a219a4a1aed23e3"
     },
     {
       "path": "ui/renderer.js",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "SxGUbnk0yV8VPt4lCpNM37bHn8QSCKOf252HQZcCjhxWiwChVAkwmz5bwgnHXiYDiM2TcagamWD92Mu7/grxBQ=="
+  "signature": "ukUqFsWYgkB/ci15y75YN0ozcuioRXSY3BS3Z/R7hAZcVnzsZdMn/qn9tOKOtGL8O1yU7DWqfPYUA6tyuAiEDA=="
 }
