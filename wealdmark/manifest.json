@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://commitment-pieces-immediate-announced.trycloudflare.com",
-  "authUrl": "https://rolling-mysterious-deutsche-lakes.trycloudflare.com",
+  "server": "wss://annotation-ancient-ottawa-becomes.trycloudflare.com",
+  "authUrl": "https://role-notify-neon-stephen.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 256583,
-      "sha256": "381471ca23d647463547e3fa7cfa82f26b3746b9408dd2cd64cb2f76e6122cc1",
-      "url": "c/381471ca23d647463547e3fa7cfa82f26b3746b9408dd2cd64cb2f76e6122cc1"
+      "size": 262569,
+      "sha256": "c54e42ba14bdcb2c85b9d5240a009af974e62c7f994beecd0056765bbab8fb3b",
+      "url": "c/c54e42ba14bdcb2c85b9d5240a009af974e62c7f994beecd0056765bbab8fb3b"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 16357,
-      "sha256": "534a887de303bb46b46fbbfffcb5e9f1530901b451ecf846692333f07db25a59",
-      "url": "c/534a887de303bb46b46fbbfffcb5e9f1530901b451ecf846692333f07db25a59"
+      "size": 16452,
+      "sha256": "080e6e087dbc070f5bd0a6adc9da89f9416a68450f4d9a09c61c9fc76cf8b387",
+      "url": "c/080e6e087dbc070f5bd0a6adc9da89f9416a68450f4d9a09c61c9fc76cf8b387"
     },
     {
       "path": "ui/renderer.js",
@@ -109,10 +109,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 29225,
-      "sha256": "d4f065be88a65192f53295abf1687620f884cc79f23998306b233a785853da76",
-      "url": "c/d4f065be88a65192f53295abf1687620f884cc79f23998306b233a785853da76"
+      "size": 32499,
+      "sha256": "43ed04baf1d775d759b41221139c7aeb49b91e10772084b2425cdde0077acc5e",
+      "url": "c/43ed04baf1d775d759b41221139c7aeb49b91e10772084b2425cdde0077acc5e"
     }
   ],
-  "signature": "3DsmAb8v1dQ0oaY4KTvOfvQi2WsWeVut9kbDL4Wk8P4n2pZ8lQFbe75aQuaA2eRjMXE8JClzWsxPQWVKn6EUAQ=="
+  "signature": "bvwiJGqS94OXL1wgOQ7rhKWouDB3moNvWCWhh6lAfdyRhrDZu62NINsP6r5TtYIBWVVdLuR9S/Muos9SYuR4AA=="
 }
