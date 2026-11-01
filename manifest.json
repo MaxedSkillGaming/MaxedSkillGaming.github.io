@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://republican-while-normal-pixel.trycloudflare.com",
-  "authUrl": "https://cheque-gazette-phys-carmen.trycloudflare.com",
+  "server": "wss://tourism-scholars-catalyst-diesel.trycloudflare.com",
+  "authUrl": "https://exclusively-wallet-payment-pos.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -19,9 +19,9 @@
     },
     {
       "path": "data/items.json",
-      "size": 19795,
-      "sha256": "78c53a9068f464485cde188677f01e655319dcc283053c20052e7e6c6c8d8003",
-      "url": "c/78c53a9068f464485cde188677f01e655319dcc283053c20052e7e6c6c8d8003"
+      "size": 26317,
+      "sha256": "cf98caf85b6d0f0f96f90853d5e4b5bf85e1368ee18692270b6c7c5616089f81",
+      "url": "c/cf98caf85b6d0f0f96f90853d5e4b5bf85e1368ee18692270b6c7c5616089f81"
     },
     {
       "path": "data/monsters.json",
@@ -55,9 +55,9 @@
     },
     {
       "path": "data/shops.json",
-      "size": 13070,
-      "sha256": "81874f4d247b368a595252ba8ae892d9e635a438ce6636eb32a2012c4817d50a",
-      "url": "c/81874f4d247b368a595252ba8ae892d9e635a438ce6636eb32a2012c4817d50a"
+      "size": 15686,
+      "sha256": "c4b53e83d11a654c248b187848540a6a537c6a99dd4110048eb3a84c55a093e3",
+      "url": "c/c4b53e83d11a654c248b187848540a6a537c6a99dd4110048eb3a84c55a093e3"
     },
     {
       "path": "data/stations.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 225952,
-      "sha256": "6666811fe76d3f125fb7ea102a6c647d4945c8d8fe8d686053e7ed3dec7574c0",
-      "url": "c/6666811fe76d3f125fb7ea102a6c647d4945c8d8fe8d686053e7ed3dec7574c0"
+      "size": 230323,
+      "sha256": "c25655dab00cedcc02919a7e3a7dc150693f033e59f232f75bf01e9db30e2846",
+      "url": "c/c25655dab00cedcc02919a7e3a7dc150693f033e59f232f75bf01e9db30e2846"
     },
     {
       "path": "ui/icon.png",
@@ -114,5 +114,5 @@
       "url": "c/7d5bc298a36903f5a367c1020643ff029c9944e1a4c611d0ef0aa38a779fa087"
     }
   ],
-  "signature": "zkar6TlJ9nMGWz1Se+TbrjwTeadUmdvBKYzFvGTVcz/Tc598k7u+fc1xSguy58bJLEzmJ9XR/d21H9x1bRQ8Aw=="
+  "signature": "a57rVB65dqtpcMnglMKj+jrZHJ98chrDeryS1cHXY+9wSSzilz53Co0Q/lqI/yPawyjVqGOnwj3GZloFKlPiAA=="
 }
