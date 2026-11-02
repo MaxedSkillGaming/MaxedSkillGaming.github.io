@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://albums-pal-creature-patterns.trycloudflare.com",
-  "authUrl": "https://once-cologne-coordinate-lessons.trycloudflare.com",
+  "server": "wss://frank-bookmarks-chemical-cnet.trycloudflare.com",
+  "authUrl": "https://folding-ser-houston-discount.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "D2vFfWSRZrJYGDz0klm0wlstTuwWkDYCdUznK+nez39yUZ/FafwS1SO/jwGN8sH+T+5R9o+//QTZ5G75dBfIBQ=="
+  "signature": "Zp8bsUj6ioAKxfDElFD8X5OK/ykc3Wnjq3gTM9km9gIgkvVK4ioALqMfQy6H7/uHq803azomp9gHg8r/RSnIBQ=="
 }
