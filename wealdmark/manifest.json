@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://memorabilia-photographic-ave-purchasing.trycloudflare.com",
-  "authUrl": "https://clearly-anytime-tables-arrive.trycloudflare.com",
+  "server": "wss://looked-holes-relationship-cardiff.trycloudflare.com",
+  "authUrl": "https://ranger-plumbing-early-duke.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "GQm4XaZpTCrcl4pKqLaJzkR+/cd+2JqFs0z7s1elrXCXpiDztKyxPjPtYZieVRQHlT8seX+0co2TPNMRnTaABw=="
+  "signature": "s3NfaM3hBhGUuhiBuAIR/K3mcnY5N7vUi5aPhWYGBfm+y/aFLRu9X1M2gNnImGbQRaxxgOaoL2NJQPDXNx1tAQ=="
 }
