@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://solo-lawn-slides-taught.trycloudflare.com",
-  "authUrl": "https://replacing-completing-cardiovascular-hit.trycloudflare.com",
+  "server": "wss://exhaust-looks-missions-accurate.trycloudflare.com",
+  "authUrl": "https://metric-informational-deployment-gym.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "2S7V8nh0+1QEQUOh6oxXOV9oTEGxn8OfXYVxJrrE+a7awLBARH5cTVmdX0I+ZRQ21SfRVRBYSWH5JK53sSGeDg=="
+  "signature": "zgOeOKjQXAaBVq6GuoN/phOX9W4lkIx2w3GBqWi1Tdct0N0CuNSEFW4GAM5ZjLmngUbPJETgNr92e13A09EkBQ=="
 }
