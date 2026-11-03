@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://arrange-expensive-attachment-sellers.trycloudflare.com",
-  "authUrl": "https://ben-combined-fate-assumption.trycloudflare.com",
+  "server": "wss://solo-lawn-slides-taught.trycloudflare.com",
+  "authUrl": "https://replacing-completing-cardiovascular-hit.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "i7iZs3XvqNh5CW2xnnun8D7NaT/gCl3XczOoGl24q1RTpLfxtTVKAaudzFKjZ7oPgDGCiAr0hI9heW2rhUbQAw=="
+  "signature": "2S7V8nh0+1QEQUOh6oxXOV9oTEGxn8OfXYVxJrrE+a7awLBARH5cTVmdX0I+ZRQ21SfRVRBYSWH5JK53sSGeDg=="
 }
