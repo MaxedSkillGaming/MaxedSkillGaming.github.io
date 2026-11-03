@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://exhaust-looks-missions-accurate.trycloudflare.com",
-  "authUrl": "https://metric-informational-deployment-gym.trycloudflare.com",
+  "server": "wss://memorabilia-photographic-ave-purchasing.trycloudflare.com",
+  "authUrl": "https://clearly-anytime-tables-arrive.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "zgOeOKjQXAaBVq6GuoN/phOX9W4lkIx2w3GBqWi1Tdct0N0CuNSEFW4GAM5ZjLmngUbPJETgNr92e13A09EkBQ=="
+  "signature": "GQm4XaZpTCrcl4pKqLaJzkR+/cd+2JqFs0z7s1elrXCXpiDztKyxPjPtYZieVRQHlT8seX+0co2TPNMRnTaABw=="
 }
