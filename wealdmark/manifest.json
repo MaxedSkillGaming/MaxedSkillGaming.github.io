@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://frank-bookmarks-chemical-cnet.trycloudflare.com",
-  "authUrl": "https://folding-ser-houston-discount.trycloudflare.com",
+  "server": "wss://arrange-expensive-attachment-sellers.trycloudflare.com",
+  "authUrl": "https://ben-combined-fate-assumption.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -114,5 +114,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "Zp8bsUj6ioAKxfDElFD8X5OK/ykc3Wnjq3gTM9km9gIgkvVK4ioALqMfQy6H7/uHq803azomp9gHg8r/RSnIBQ=="
+  "signature": "i7iZs3XvqNh5CW2xnnun8D7NaT/gCl3XczOoGl24q1RTpLfxtTVKAaudzFKjZ7oPgDGCiAr0hI9heW2rhUbQAw=="
 }
