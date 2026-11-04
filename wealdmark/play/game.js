@@ -73,7 +73,7 @@
   const ABILITY_NAMES = Object.fromEntries(Object.entries(ABILITY_INFO).map(([k, v]) => [k, v[0]]));
   /** The attack every hero has for their weapon, used when nothing else is selected. */
   const BASIC_ATTACKS = ['punch', 'slash', 'shot', 'fireball'];
-  const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8 };
+  const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8, kiln_warden_brask: 1.6, sparkmother_veyra: 1.6, emberjaw: 1.8, cragmaw_the_unburned: 1.4, hollow_pyre_priest: 1.4 };
 const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder', 'exhaust', 'dust_choked', 'blinded']);
   const TIER_LEVELS = [1, 10, 20, 30];
   /** Procedural 24px icons for abilities and statuses, drawn once and cached as data URLs. */
@@ -456,6 +456,626 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }, 28);
     blit(ctx, c, x, y, s, bob);
   }
+
+  /** Cinder Reach monsters (levels 20 to 40), painted on the same 16x16 grid as the rest. `r(x, y, w, h, color)`. */
+  function emberBeast(r, step, p) {
+    const fl = step === 1 ? 1 : 0;
+    const fr = step === 2 ? 1 : 0;
+    r(3, 12 - fl, 2, 3, p.legD);
+    r(5, 12 - fr, 2, 3, p.legL);
+    r(9, 12 - fr, 2, 3, p.legD);
+    r(11, 12 - fl, 2, 3, p.legL);
+    r(0, 6, 2, 2, p.tail);
+    r(1, 7, 3, 2, p.tailL);
+    r(2, 6, 10, 7, p.body);
+    r(2, 12, 10, 1, p.belly);
+    r(3, 5, 8, 2, p.back);
+    r(5, 8, 5, 2, p.flank);
+    r(11, 5, 4, 6, p.head);
+    r(14, 8, 2, 3, p.muzzle);
+    r(15, 9, 1, 1, p.nose);
+    r(12, 4, 1, 2, p.ear);
+    r(14, 4, 1, 2, p.ear);
+    r(12, 6, 1, 1, p.eye);
+    r(13, 11, 1, 2, p.tooth);
+    r(15, 11, 1, 1, p.tooth);
+    if (p.extra) p.extra(r, fl, fr);
+  }
+
+  function emberWraith(r, step, p) {
+    const w = step === 1 ? 1 : 0;
+    const v = step === 2 ? 1 : 0;
+    r(3, 10, 10, 4, p.robeD);
+    r(2, 12 + w, 2, 2, p.robeD);
+    r(6, 13 - v, 2, 2, p.robeD);
+    r(10, 12 + v, 2, 2, p.robeD);
+    r(13, 13 - w, 2, 1, p.robeD);
+    r(3, 5, 10, 6, p.robe);
+    r(3, 5, 4, 3, p.robeL);
+    r(11, 7, 2, 4, p.robeD);
+    r(4, 1, 8, 5, p.hood);
+    r(4, 1, 8, 1, p.robeL);
+    r(5, 3, 6, 3, p.void);
+    r(6, 4, 1, 1, p.eye);
+    r(9, 4, 1, 1, p.eye);
+    r(1, 7, 2, 4, p.robe);
+    r(13, 7, 2, 4, p.robeD);
+    r(0, 10, 2, 1, p.hand);
+    r(14, 10, 2, 1, p.hand);
+    if (p.extra) p.extra(r, w, v);
+  }
+
+  function emberLizard(r, step, p) {
+    const fl = step === 1 ? 1 : 0;
+    const fr = step === 2 ? 1 : 0;
+    r(2, 12 - fl, 2, 3, p.legD);
+    r(5, 12 - fr, 2, 3, p.legL);
+    r(9, 12 - fr, 2, 3, p.legD);
+    r(11, 12 - fl, 2, 3, p.legL);
+    r(0, 9, 3, 2, p.tail);
+    r(0, 8, 1, 1, p.tail);
+    r(2, 8, 10, 5, p.body);
+    r(2, 8, 10, 1, p.back);
+    r(2, 12, 10, 1, p.belly);
+    r(11, 7, 5, 4, p.head);
+    r(11, 7, 5, 1, p.back);
+    r(15, 9, 1, 2, p.belly);
+    r(13, 8, 1, 1, p.eye);
+    r(14, 11, 1, 1, p.tooth);
+    if (p.extra) p.extra(r, fl, fr);
+  }
+
+  const EMBER_ART = {
+    ember_hound: (r, step) => emberBeast(r, step, {
+      legD: '#3a2418', legL: '#4a3020', tail: '#c0561e', tailL: '#e87a2a', body: '#6a3a22', belly: '#4a2a1a', back: '#8a4a2a',
+      flank: '#52301c', head: '#744028', muzzle: '#4a2a1a', nose: '#140a06', ear: '#3a2014', eye: '#ffd23a', tooth: '#f4ecd0',
+      extra: (rr, fl) => {
+        rr(3, 4, 1, 2, '#ff8a2a');
+        rr(5, 3 - fl, 1, 3, '#ffb02a');
+        rr(7, 4, 1, 2, '#ff8a2a');
+        rr(9, 3 + fl, 1, 3, '#ffb02a');
+        rr(0, 4 - fl, 2, 3, '#ffb02a');
+        rr(1, 5, 1, 1, '#ffe27a');
+      },
+    }),
+    ember_wolf: (r, step) => emberBeast(r, step, {
+      legD: '#2c2622', legL: '#3c342e', tail: '#4a403a', tailL: '#5a4e46', body: '#5a4e46', belly: '#3a322c', back: '#76685e',
+      flank: '#443a34', head: '#62564c', muzzle: '#3a322c', nose: '#0a0806', ear: '#2c2622', eye: '#ff7a2a', tooth: '#f4ecd0',
+      extra: (rr, fl, fr) => {
+        rr(0, 5 - fl, 2, 3, '#ff7a2a');
+        rr(0, 4 - fl, 1, 1, '#ffd23a');
+        rr(1, 7, 2, 1, '#ffb02a');
+        rr(3, 14, 2, 1, '#ff7a2a');
+        rr(11, 14, 2, 1, '#ff7a2a');
+        rr(4, 4, 2, 1, '#ff9a3a');
+        rr(8, 4, 2, 1, '#ff9a3a');
+        rr(6, 9, 1, 1, '#ff7a2a');
+      },
+    }),
+    char_stalker: (r, step) => emberBeast(r, step, {
+      legD: '#14100e', legL: '#1e1814', tail: '#241c18', tailL: '#2e2420', body: '#2a211c', belly: '#14100e', back: '#3a2e26',
+      flank: '#1e1814', head: '#30261f', muzzle: '#1a1410', nose: '#050403', ear: '#14100e', eye: '#ff4a1a', tooth: '#d8c8a8',
+      extra: (rr, fl) => {
+        rr(3, 3, 1, 3, '#4a3a30');
+        rr(5, 2 - fl, 1, 4, '#4a3a30');
+        rr(7, 3, 1, 3, '#4a3a30');
+        rr(9, 2 + fl, 1, 4, '#4a3a30');
+        rr(4, 8, 3, 1, '#ff5a1a');
+        rr(7, 10, 3, 1, '#ff8a2a');
+        rr(5, 11, 1, 1, '#ff5a1a');
+        rr(13, 6, 1, 1, '#ff4a1a');
+      },
+    }),
+
+    ash_crawler: (r, step) => {
+      const l = step === 1 ? 1 : 0;
+      const m = step === 2 ? 1 : 0;
+      r(0, 9 + l, 3, 1, '#3a3632');
+      r(1, 11 - l, 3, 1, '#3a3632');
+      r(13, 9 + m, 3, 1, '#3a3632');
+      r(12, 11 - m, 3, 1, '#3a3632');
+      r(1, 13, 2, 2, '#3a3632');
+      r(13, 13, 2, 2, '#3a3632');
+      r(5, 13, 1, 2, '#3a3632');
+      r(10, 13, 1, 2, '#3a3632');
+      r(3, 6, 10, 7, '#6a6660');
+      r(3, 6, 10, 2, '#8c8780');
+      r(3, 12, 10, 1, '#46423e');
+      r(5, 7, 1, 5, '#46423e');
+      r(8, 7, 1, 5, '#46423e');
+      r(11, 7, 1, 5, '#46423e');
+      r(6, 9, 2, 1, '#ff7a2a');
+      r(9, 10, 2, 1, '#ffb02a');
+      r(4, 10, 1, 1, '#ff7a2a');
+      r(10, 4, 5, 4, '#7c7770');
+      r(10, 4, 5, 1, '#9c978f');
+      r(12, 5, 1, 1, '#ff5a2a');
+      r(14, 5, 1, 1, '#ff5a2a');
+      r(13, 7, 3, 2, '#46423e');
+      r(14, 8, 1, 1, '#e8dcc0');
+    },
+    cinder_imp: (r, step) => {
+      r(4, 13 - (step === 1 ? 1 : 0), 3, 2, '#3a1410');
+      r(9, 13 - (step === 2 ? 1 : 0), 3, 2, '#3a1410');
+      r(12, 10, 3, 1, '#a82a1a');
+      r(14, 7, 1, 4, '#a82a1a');
+      r(13, 5, 3, 2, '#ff8a2a');
+      r(14, 4, 1, 1, '#ffd23a');
+      r(3, 6, 10, 8, '#b43a22');
+      r(3, 6, 4, 4, '#d85a38');
+      r(10, 8, 3, 6, '#8a2a18');
+      r(1, 7, 2, 4, '#a82a1a');
+      r(13, 7, 2, 3, '#8a2a18');
+      r(4, 8, 8, 1, '#e86a42');
+      r(4, 1, 8, 6, '#c8452a');
+      r(4, 1, 8, 2, '#e86a42');
+      r(10, 3, 2, 4, '#a8321e');
+      r(2, 0, 2, 3, '#2a1410');
+      r(12, 0, 2, 3, '#1a0c08');
+      r(5, 3, 2, 2, '#1a0808');
+      r(9, 3, 2, 2, '#1a0808');
+      r(5, 3, 1, 1, '#ffe27a');
+      r(9, 3, 1, 1, '#ffe27a');
+      r(6, 6, 4, 1, '#2a1410');
+      r(7, 6, 1, 1, '#ffffff');
+      r(9, 6, 1, 1, '#ffffff');
+    },
+    scorch_vulture: (r, step) => {
+      const up = step === 1;
+      r(6, 7, 5, 6, '#4a3a30');
+      r(6, 7, 5, 1, '#665244');
+      r(7, 12, 1, 3, '#8a6a4a');
+      r(9, 12, 1, 3, '#8a6a4a');
+      r(6, 13, 2, 1, '#8a6a4a');
+      r(9, 13, 2, 1, '#8a6a4a');
+      r(5, 5, 6, 3, '#d8c4a8');
+      r(10, 2, 3, 5, '#c8785a');
+      r(10, 2, 3, 1, '#e09a7a');
+      r(11, 4, 1, 1, '#ffd23a');
+      r(12, 5, 3, 2, '#d8b04a');
+      r(14, 6, 1, 2, '#a8803a');
+      r(7, 13, 2, 2, '#ff7a2a');
+      if (up) {
+        r(0, 2, 6, 6, '#3a2c24');
+        r(0, 2, 2, 3, '#ff7a2a');
+        r(2, 6, 4, 2, '#5a4636');
+        r(11, 1, 5, 5, '#2c221c');
+        r(14, 1, 2, 3, '#ff7a2a');
+      } else {
+        r(0, 7, 6, 4, '#3a2c24');
+        r(0, 9, 2, 3, '#ff7a2a');
+        r(2, 10, 4, 2, '#5a4636');
+        r(11, 8, 5, 4, '#2c221c');
+        r(14, 10, 2, 3, '#ff7a2a');
+      }
+    },
+    slag_beetle: (r, step) => {
+      const l = step === 1 ? 1 : 0;
+      const m = step === 2 ? 1 : 0;
+      r(1, 10 + l, 3, 1, '#2a2622');
+      r(1, 13 - l, 3, 1, '#2a2622');
+      r(12, 10 + m, 3, 1, '#2a2622');
+      r(12, 13 - m, 3, 1, '#2a2622');
+      r(4, 13, 2, 2, '#2a2622');
+      r(10, 13, 2, 2, '#2a2622');
+      r(2, 5, 12, 8, '#4a443e');
+      r(2, 5, 12, 2, '#6a625a');
+      r(2, 12, 12, 1, '#2e2a26');
+      r(7, 5, 1, 8, '#2a2622');
+      r(4, 7, 2, 1, '#ff7a2a');
+      r(4, 10, 3, 1, '#ffb02a');
+      r(9, 8, 2, 1, '#ffb02a');
+      r(10, 10, 3, 1, '#ff7a2a');
+      r(3, 2, 10, 4, '#5a544c');
+      r(3, 2, 10, 1, '#7a7268');
+      r(5, 3, 1, 1, '#ff5a2a');
+      r(10, 3, 1, 1, '#ff5a2a');
+      r(4, 0, 1, 3, '#d8caa8');
+      r(11, 0, 1, 3, '#d8caa8');
+    },
+    obsidian_golem: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(3, 12 - fl, 4, 3, '#1a1622');
+      r(9, 12 - fr, 4, 3, '#14101a');
+      r(2, 5, 12, 8, '#2c2638');
+      r(2, 5, 12, 2, '#4a4060');
+      r(3, 7, 2, 4, '#3a3250');
+      r(2, 12, 12, 1, '#18141e');
+      r(0, 6, 3, 6, '#241e30');
+      r(13, 6, 3, 6, '#241e30');
+      r(0, 6, 3, 1, '#4a4060');
+      r(4, 1, 8, 5, '#363048');
+      r(4, 1, 8, 1, '#5a5078');
+      r(5, 3, 2, 2, '#ff7a2a');
+      r(9, 3, 2, 2, '#ff7a2a');
+      r(5, 3, 1, 1, '#ffe27a');
+      r(9, 3, 1, 1, '#ffe27a');
+      r(6, 8, 1, 3, '#ff5a1a');
+      r(9, 7, 1, 2, '#ff7a2a');
+      r(8, 10, 2, 1, '#ff5a1a');
+      r(11, 9, 1, 2, '#ff7a2a');
+      r(5, 0, 1, 2, '#4a4060');
+      r(10, 0, 1, 2, '#4a4060');
+    },
+    magma_snake: (r, step) => {
+      const s = step === 1 ? 1 : 0;
+      const t = step === 2 ? 1 : 0;
+      r(0, 12 + s, 4, 2, '#8a2a14');
+      r(2, 10, 4, 3, '#b0381a');
+      r(2, 10, 4, 1, '#d8602a');
+      r(5, 7 + t, 5, 3, '#b0381a');
+      r(5, 7 + t, 5, 1, '#d8602a');
+      r(3, 12, 8, 2, '#8a2a14');
+      r(3, 12, 8, 1, '#c8481e');
+      r(9, 9, 4, 4, '#b0381a');
+      r(9, 9, 4, 1, '#d8602a');
+      r(10, 4, 5, 5, '#c8481e');
+      r(10, 4, 5, 1, '#f08a3a');
+      r(11, 5, 1, 1, '#ffe27a');
+      r(13, 5, 1, 1, '#ffe27a');
+      r(12, 7, 1, 1, '#f4ecd0');
+      r(14, 7, 1, 1, '#f4ecd0');
+      r(15, 8, 1, 2, '#ff3a2a');
+      r(6, 8 + t, 1, 1, '#ffd23a');
+      r(4, 11, 1, 1, '#ffd23a');
+      r(10, 10, 1, 1, '#ffd23a');
+    },
+    pyre_cultist: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(4, 13 - fl, 3, 2, '#2a1414');
+      r(9, 13 - fr, 3, 2, '#2a1414');
+      r(3, 6, 10, 8, '#7a2a22');
+      r(3, 6, 4, 3, '#a8402e');
+      r(3, 12, 10, 1, '#4a1814');
+      r(7, 7, 2, 6, '#d8a83a');
+      r(1, 7, 2, 5, '#7a2a22');
+      r(13, 7, 2, 5, '#5a1e18');
+      r(1, 11, 2, 2, '#8a5a3a');
+      r(4, 1, 8, 6, '#5a1e18');
+      r(4, 1, 8, 1, '#8a3a2a');
+      r(5, 3, 6, 3, '#14080a');
+      r(6, 4, 1, 1, '#ff9a3a');
+      r(9, 4, 1, 1, '#ff9a3a');
+      r(14, 5, 1, 7, '#6a4426');
+      r(13, 2 + fl, 3, 3, '#ff7a2a');
+      r(14, 1 + fl, 1, 2, '#ffd23a');
+    },
+    quarry_wraith: (r, step) => emberWraith(r, step, {
+      robeD: '#3a3438', robe: '#5a5258', robeL: '#7a727a', hood: '#4a4248', void: '#0a080c', eye: '#ff9a3a', hand: '#a8a0a0',
+      extra: (rr) => {
+        rr(2, 6, 1, 1, '#ff7a2a');
+        rr(12, 11, 1, 1, '#ff7a2a');
+        rr(5, 9, 1, 1, '#ffb02a');
+      },
+    }),
+    ash_wraith: (r, step) => emberWraith(r, step, {
+      robeD: '#8a8680', robe: '#b0aca4', robeL: '#d8d4cc', hood: '#9a968e', void: '#1a1618', eye: '#ff5a2a', hand: '#e8e4dc',
+      extra: (rr, w) => {
+        rr(0, 4 + w, 1, 2, '#ff8a2a');
+        rr(15, 5 - w, 1, 2, '#ff8a2a');
+        rr(7, 0, 2, 1, '#d8d4cc');
+        rr(5, 10, 2, 1, '#8a8680');
+        rr(9, 11, 2, 1, '#8a8680');
+      },
+    }),
+    lava_lizard: (r, step) => emberLizard(r, step, {
+      legD: '#5a2412', legL: '#7a3418', tail: '#8a3a18', body: '#a84a20', back: '#d86a2a', belly: '#6a2a14',
+      head: '#b85424', eye: '#ffe27a', tooth: '#f4ecd0',
+      extra: (rr) => {
+        rr(4, 9, 1, 1, '#ffb02a');
+        rr(7, 10, 2, 1, '#ffb02a');
+        rr(10, 9, 1, 1, '#ffb02a');
+        rr(3, 7, 1, 1, '#ff8a2a');
+        rr(6, 7, 1, 1, '#ff8a2a');
+        rr(9, 7, 1, 1, '#ff8a2a');
+      },
+    }),
+    salamander: (r, step) => emberLizard(r, step, {
+      legD: '#3a1a10', legL: '#52241a', tail: '#d8561e', body: '#e8702a', back: '#ffa03a', belly: '#9a3a18',
+      head: '#f08030', eye: '#14080a', tooth: '#fff2c8',
+      extra: (rr, fl, fr) => {
+        rr(0, 6 - fl, 2, 3, '#ffd23a');
+        rr(0, 5 - fl, 1, 1, '#ffe98a');
+        rr(3, 6, 1, 2, '#ffd23a');
+        rr(6, 5 - fr, 1, 3, '#ffd23a');
+        rr(9, 6, 1, 2, '#ffd23a');
+        rr(4, 10, 2, 1, '#3a1a10');
+        rr(8, 10, 2, 1, '#3a1a10');
+        rr(5, 9, 1, 1, '#3a1a10');
+        rr(9, 9, 1, 1, '#3a1a10');
+        rr(15, 11, 1, 1, '#ff5a1a');
+      },
+    }),
+    flame_wisp: (r, step) => {
+      const a = step === 1 ? 1 : 0;
+      const b = step === 2 ? 1 : 0;
+      r(7, 0 - a, 2, 3, '#ff8a2a');
+      r(7, 0 - a, 1, 1, '#ffd23a');
+      r(4, 2 + b, 2, 3, '#ff8a2a');
+      r(10, 2 + a, 2, 3, '#ff8a2a');
+      r(3, 5, 10, 8, '#ff7a2a');
+      r(4, 4, 8, 2, '#ff9a3a');
+      r(5, 6, 6, 6, '#ffb02a');
+      r(6, 7, 4, 4, '#ffd23a');
+      r(3, 12, 10, 1, '#d85a1a');
+      r(5, 13, 6, 1, '#b8461a');
+      r(5, 8, 2, 2, '#3a1408');
+      r(9, 8, 2, 2, '#3a1408');
+      r(5, 8, 1, 1, '#ffffff');
+      r(9, 8, 1, 1, '#ffffff');
+      r(7, 11, 2, 1, '#8a2a10');
+      r(7, 14, 2, 1, '#8a2a10');
+    },
+    forge_wight: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(4, 13 - fl, 3, 2, '#3a3238');
+      r(9, 13 - fr, 3, 2, '#3a3238');
+      r(3, 6, 10, 8, '#52484e');
+      r(3, 6, 4, 3, '#7a6e76');
+      r(3, 12, 10, 1, '#201a1e');
+      r(7, 8, 2, 5, '#ff7a2a');
+      r(7, 9, 2, 1, '#ffd23a');
+      r(1, 6, 3, 3, '#7a6e76');
+      r(12, 6, 3, 3, '#5a4e56');
+      r(1, 9, 2, 3, '#a89088');
+      r(13, 9, 2, 3, '#a89088');
+      r(5, 1, 6, 6, '#6a5e66');
+      r(5, 1, 6, 1, '#968a92');
+      r(5, 5, 6, 2, '#2a2228');
+      r(6, 4, 2, 1, '#ff7a2a');
+      r(9, 4, 2, 1, '#ff7a2a');
+      r(7, 0, 2, 2, '#968a92');
+      r(14, 2, 1, 9, '#6a4426');
+      r(12, 1, 4, 3, '#8a8088');
+      r(12, 1, 4, 1, '#b8aeb4');
+    },
+    thrall_of_fire: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(4, 13 - fl, 3, 2, '#2a1c18');
+      r(9, 13 - fr, 3, 2, '#2a1c18');
+      r(4, 6, 8, 8, '#3a2a24');
+      r(4, 6, 3, 3, '#5a4036');
+      r(4, 12, 8, 1, '#1e1410');
+      r(5, 8, 6, 1, '#ff7a2a');
+      r(6, 10, 4, 1, '#ff5a1a');
+      r(2, 7, 2, 5, '#5a4036');
+      r(12, 7, 2, 5, '#3a2a24');
+      r(1, 11, 3, 1, '#8a8a92');
+      r(12, 11, 3, 1, '#8a8a92');
+      r(5, 2, 6, 5, '#4a362c');
+      r(5, 2, 6, 1, '#6a4c40');
+      r(6, 4, 1, 1, '#ffd23a');
+      r(9, 4, 1, 1, '#ffd23a');
+      r(7, 6, 2, 1, '#14080a');
+      r(5, 0 - fl, 2, 3, '#ff7a2a');
+      r(7, -1 + fl, 2, 4, '#ffb02a');
+      r(9, 0 - fr, 2, 3, '#ff7a2a');
+      r(7, 0, 2, 1, '#ffe27a');
+    },
+    magma_elemental: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(3, 12 - fl, 4, 3, '#4a1a10');
+      r(9, 12 - fr, 4, 3, '#3a140c');
+      r(1, 4, 14, 9, '#3a2824');
+      r(1, 4, 14, 2, '#5a4036');
+      r(2, 6, 12, 6, '#d8481a');
+      r(3, 6, 4, 2, '#ff7a2a');
+      r(9, 8, 4, 3, '#ff7a2a');
+      r(5, 9, 4, 2, '#ffb02a');
+      r(6, 10, 2, 1, '#ffe27a');
+      r(0, 6, 3, 6, '#3a2824');
+      r(13, 6, 3, 6, '#3a2824');
+      r(0, 11, 3, 1, '#ff5a1a');
+      r(13, 11, 3, 1, '#ff5a1a');
+      r(4, 0, 8, 5, '#4a3430');
+      r(4, 0, 8, 1, '#6a4c44');
+      r(5, 2, 2, 2, '#ffe27a');
+      r(9, 2, 2, 2, '#ffe27a');
+      r(6, 4, 4, 1, '#ff5a1a');
+      r(2, 12, 12, 1, '#2a1a16');
+    },
+    phoenix_hatchling: (r, step) => {
+      const up = step === 1;
+      r(5, 6, 7, 7, '#e8561e');
+      r(5, 6, 7, 2, '#ff8a2a');
+      r(6, 9, 5, 3, '#ffb02a');
+      r(7, 10, 3, 1, '#ffe27a');
+      r(4, 12, 1, 3, '#d8a03a');
+      r(10, 12, 1, 3, '#d8a03a');
+      r(3, 13, 3, 1, '#d8a03a');
+      r(9, 13, 3, 1, '#d8a03a');
+      r(6, 1, 7, 6, '#ff7a2a');
+      r(6, 1, 7, 1, '#ffb02a');
+      r(7, 0, 1, 2, '#ffd23a');
+      r(9, -1, 1, 3, '#ffd23a');
+      r(11, 0, 1, 2, '#ffd23a');
+      r(8, 3, 2, 2, '#14080a');
+      r(8, 3, 1, 1, '#ffffff');
+      r(12, 4, 3, 2, '#ffd23a');
+      r(14, 5, 1, 1, '#d8a03a');
+      r(1, 8, 4, 2, '#d8481a');
+      r(0, 9, 2, 3, '#ff7a2a');
+      if (up) {
+        r(10, 3, 5, 3, '#c8401a');
+        r(13, 2, 3, 2, '#ff8a2a');
+      } else {
+        r(10, 7, 5, 3, '#c8401a');
+        r(13, 8, 3, 2, '#ff8a2a');
+      }
+    },
+    drake_of_the_peak: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(3, 12 - fl, 3, 3, '#3a2a30');
+      r(5, 12 - fr, 2, 3, '#2a1c22');
+      r(9, 12 - fr, 3, 3, '#3a2a30');
+      r(11, 12 - fl, 2, 3, '#2a1c22');
+      r(0, 8, 3, 2, '#5a3a40');
+      r(0, 7, 1, 1, '#ff7a2a');
+      r(1, 9, 3, 2, '#6a4650');
+      r(2, 6, 10, 7, '#7a4a54');
+      r(2, 6, 10, 2, '#9a6470');
+      r(2, 12, 10, 1, '#c8a47a');
+      r(4, 8, 6, 4, '#a8788a');
+      r(3, 2 - fl, 4, 5, '#4a2e3a');
+      r(4, 1 - fl, 3, 2, '#6a4250');
+      r(8, 3 + fr, 4, 3, '#4a2e3a');
+      r(9, 3 + fr, 2, 1, '#6a4250');
+      r(11, 4, 4, 6, '#8a5460');
+      r(14, 7, 2, 3, '#6a4250');
+      r(15, 8, 1, 1, '#14080a');
+      r(11, 2, 1, 3, '#e8d8b4');
+      r(13, 2, 1, 3, '#d0c098');
+      r(12, 5, 1, 1, '#ffd23a');
+      r(13, 10, 1, 2, '#f4f0e0');
+      r(15, 10, 1, 1, '#f4f0e0');
+      r(15, 6, 1, 1, '#ff7a2a');
+    },
+
+    kiln_warden_brask: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(3, 12 - fl, 4, 3, '#2a2428');
+      r(9, 12 - fr, 4, 3, '#201a1e');
+      r(3, 6, 10, 7, '#52484e');
+      r(3, 6, 10, 2, '#7a6e76');
+      r(3, 12, 10, 1, '#2a2228');
+      r(7, 8, 2, 4, '#ff7a2a');
+      r(6, 7, 4, 1, '#8a8088');
+      r(1, 6, 3, 3, '#7a6e76');
+      r(12, 6, 3, 3, '#5a4e56');
+      r(1, 9, 2, 3, '#b08060');
+      r(13, 9, 2, 3, '#b08060');
+      r(5, 1, 6, 6, '#6a5e66');
+      r(5, 1, 6, 1, '#968a92');
+      r(5, 4, 6, 3, '#2a2228');
+      r(6, 5, 2, 1, '#ff7a2a');
+      r(9, 5, 2, 1, '#ff7a2a');
+      r(3, 0, 2, 3, '#968a92');
+      r(11, 0, 2, 3, '#7a6e76');
+      r(0, 1, 1, 12, '#6a4426');
+      r(14, 3, 2, 5, '#6a4426');
+      r(13, 1, 3, 3, '#8a8088');
+      r(13, 1, 3, 1, '#c0b8be');
+      r(14, 4, 1, 1, '#ff7a2a');
+    },
+    sparkmother_veyra: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(4, 13 - fl, 3, 2, '#3a1a14');
+      r(9, 13 - fr, 3, 2, '#3a1a14');
+      r(3, 6, 10, 8, '#a8321e');
+      r(3, 6, 4, 3, '#d8583a');
+      r(3, 12, 10, 1, '#6a1a10');
+      r(7, 7, 2, 6, '#ffd23a');
+      r(1, 7, 2, 5, '#a8321e');
+      r(13, 7, 2, 5, '#7a2218');
+      r(1, 11, 2, 2, '#e8b890');
+      r(13, 11, 2, 2, '#e8b890');
+      r(5, 2, 6, 5, '#e8b890');
+      r(4, 1, 8, 2, '#2a1008');
+      r(3, 3, 2, 8, '#2a1008');
+      r(11, 3, 2, 8, '#1a0a06');
+      r(6, 4, 1, 1, '#ff7a2a');
+      r(9, 4, 1, 1, '#ff7a2a');
+      r(7, 6, 2, 1, '#8a2a20');
+      r(4, -1 - fl, 1, 3, '#ffd23a');
+      r(6, -2 + fl, 1, 4, '#ffe98a');
+      r(8, -1 - fr, 1, 3, '#ffd23a');
+      r(10, -2 + fr, 1, 4, '#ffe98a');
+      r(12, -1, 1, 3, '#ffd23a');
+      r(0, 4, 1, 1, '#ffe98a');
+      r(15, 5, 1, 1, '#ffe98a');
+      r(0, 8, 1, 1, '#ffd23a');
+      r(15, 9, 1, 1, '#ffd23a');
+    },
+    emberjaw: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(3, 12 - fl, 3, 3, '#2a1a1a');
+      r(9, 12 - fr, 3, 3, '#2a1a1a');
+      r(0, 8, 4, 2, '#6a2a1a');
+      r(0, 7, 1, 1, '#ff7a2a');
+      r(1, 9, 4, 3, '#7a321e');
+      r(2, 5, 10, 8, '#8a3a22');
+      r(2, 5, 10, 2, '#b45a34');
+      r(2, 12, 10, 1, '#d8a46a');
+      r(4, 8, 6, 4, '#e8c08a');
+      r(3, 2, 1, 3, '#2a1410');
+      r(6, 1, 1, 4, '#2a1410');
+      r(9, 2, 1, 3, '#2a1410');
+      r(4, 7, 2, 1, '#ff7a2a');
+      r(8, 6, 2, 1, '#ff7a2a');
+      r(11, 3, 4, 7, '#7a321e');
+      r(11, 3, 4, 1, '#b45a34');
+      r(13, 0, 2, 4, '#e8d8b4');
+      r(11, 1, 1, 3, '#d0c098');
+      r(12, 5, 1, 1, '#ffd23a');
+      r(11, 9, 5, 3, '#4a1a10');
+      r(11, 9, 1, 2, '#f4f0e0');
+      r(13, 9, 1, 2, '#f4f0e0');
+      r(15, 9, 1, 2, '#f4f0e0');
+      r(12, 11, 3, 1, '#ff5a1a');
+      r(9, 5, 1, 1, '#ffb02a');
+    },
+    cragmaw_the_unburned: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(2, 12 - fl, 3, 3, '#2a2220');
+      r(5, 12 - fr, 3, 3, '#201a18');
+      r(9, 12 - fr, 3, 3, '#2a2220');
+      r(12, 12 - fl, 3, 3, '#201a18');
+      r(0, 7, 2, 2, '#4a3a34');
+      r(1, 5, 11, 8, '#5a4a42');
+      r(1, 5, 11, 2, '#7a6458');
+      r(1, 12, 11, 1, '#32282a');
+      r(3, 3, 2, 3, '#7a6458');
+      r(6, 2, 2, 4, '#8a7468');
+      r(9, 3, 2, 3, '#7a6458');
+      r(3, 8, 3, 1, '#ff7a2a');
+      r(7, 10, 3, 1, '#ffb02a');
+      r(10, 7, 1, 2, '#ff7a2a');
+      r(11, 4, 5, 8, '#6a564c');
+      r(11, 4, 5, 1, '#8a7468');
+      r(12, 6, 1, 1, '#ff5a2a');
+      r(15, 8, 1, 2, '#14100e');
+      r(12, 11, 1, 3, '#f4ecd0');
+      r(14, 11, 1, 3, '#e8dcc0');
+      r(10, 3, 1, 2, '#3a2c28');
+    },
+    hollow_pyre_priest: (r, step) => {
+      const fl = step === 1 ? 1 : 0;
+      const fr = step === 2 ? 1 : 0;
+      r(4, 13 - fl, 3, 2, '#1e1414');
+      r(9, 13 - fr, 3, 2, '#1e1414');
+      r(3, 6, 10, 8, '#3a1e1c');
+      r(3, 6, 4, 3, '#5a2e28');
+      r(3, 12, 10, 1, '#1a0e0c');
+      r(7, 7, 2, 6, '#c8a83a');
+      r(1, 7, 2, 5, '#3a1e1c');
+      r(13, 7, 2, 5, '#2a1412');
+      r(1, 11, 2, 2, '#d8d0b8');
+      r(13, 11, 2, 2, '#d8d0b8');
+      r(4, 1, 8, 6, '#2a1412');
+      r(4, 1, 8, 1, '#5a2e28');
+      r(5, 3, 6, 4, '#d8d0b8');
+      r(5, 3, 6, 1, '#f0ead8');
+      r(6, 4, 2, 2, '#0a0606');
+      r(9, 4, 2, 2, '#0a0606');
+      r(6, 4, 1, 1, '#ff7a2a');
+      r(9, 4, 1, 1, '#ff7a2a');
+      r(7, 6, 3, 1, '#0a0606');
+      r(0, 1, 1, 13, '#6a4426');
+      r(-1, -1 - fl, 3, 3, '#ff7a2a');
+      r(0, -2 - fl, 1, 2, '#ffd23a');
+      r(5, 0, 6, 1, '#c8a83a');
+    },
+  };
 
   /** Monsters in the same 16x16 tile, rounder and shaded like the people. */
   function drawMonster(ctx, mon, x, y, s, step, bob) {
@@ -1143,6 +1763,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           r(12, 2, 4, 3, '#6a6a76');
           r(12, 2, 4, 1, '#9a9aa6');
         }
+      } else if (EMBER_ART[mon]) {
+        EMBER_ART[mon](r, step);
       } else {
         r(3, 3, 10, 10, '#c04040');
         r(3, 3, 10, 2, '#d85a5a');
@@ -2137,6 +2759,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (me) me.pet = msg.id || undefined;
         return renderLook();
       }
+      case 'unlocks':
+        G.locks = { pets: msg.pets, mercs: msg.mercs };
+        renderLook();
+        if (G.merc) renderMerc();
+        return;
       case 'inventory':
         G.inv = msg;
         if (msg.items && msg.items.some((i) => i && i.rarity)) hint('bag');
@@ -2670,8 +3297,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     for (const o of G.merc.offers) {
       const row = el('div', 'lootrow');
       row.append(el('span', 'name', `${o.name}: ${o.blurb}`));
-      const b = el('button', 'act', `Hire, ${o.cost} gold`);
+      const lockedBy = G.locks && G.locks.mercs[o.kind];
+      const b = el('button', 'act', lockedBy ? 'Locked' : `Hire, ${o.cost} gold`);
       b.type = 'button';
+      if (lockedBy) {
+        b.disabled = true;
+        b.title = `Finish the quest "${lockedBy}" to unlock.`;
+        row.append(el('span', 'muted', `Quest: ${lockedBy}`));
+      }
       b.addEventListener('click', () => window.wealdmark.send({ t: 'merc', op: 'hire', kind: o.kind }));
       row.appendChild(b);
       box.appendChild(row);
@@ -4398,7 +5031,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   ];
   const GEMS = ['#e04a4a', '#4a8aff', '#4ae080', '#c85aff'];
 
-  const LOG_COLORS = { pine: '#a0743c', birch: '#e4dcc8', oak: '#8a5a2c', willow: '#b8a070' };
+  const LOG_COLORS = { pine: '#a0743c', birch: '#e4dcc8', oak: '#8a5a2c', willow: '#b8a070', cinderwood: '#4a3a34' };
   const ORE_COLORS = { copper: '#c8803c', tin: '#b8c0d0', iron: '#8a6a58', moonsilver: '#bfe4ff', coal: '#38343c' };
   const BAR_METAL = { bronze: 0, iron: 1, steel: 2, moonsilver: 3 };
   const HIDE_COLORS = { soft_leather: '#b88a5a', hard_leather: '#8a5a34', stagskin: '#a07a4a', shadowhide: '#4a3a5a' };
@@ -4747,10 +5380,296 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     mere_boon: boonIcon('#2f8a6a', '#6ac8a4', 'reed'),
   });
 
+  /** Cinder Reach drops, food and boss gear. */
+  Object.assign(UNIQUE_ICONS, {
+    hound_fang: (r) => {
+      r(6, 2, 5, 3, '#f0ead4');
+      r(6, 5, 4, 3, '#f0ead4');
+      r(7, 8, 3, 3, '#e4dcc0');
+      r(8, 11, 2, 2, '#d8cfae');
+      r(6, 2, 1, 6, '#fffaf0');
+      r(10, 4, 1, 5, '#b8ac88');
+      r(6, 2, 5, 1, '#8a4a2a');
+    },
+    ash_chitin: (r) => {
+      r(3, 4, 10, 8, '#5a5660');
+      r(4, 3, 8, 1, '#5a5660');
+      r(4, 12, 8, 1, '#4a4650');
+      r(3, 4, 10, 1, '#8a8690');
+      r(3, 4, 1, 8, '#7a7680');
+      r(5, 7, 6, 1, '#f08a2a');
+      r(7, 5, 1, 6, '#f08a2a');
+      r(11, 6, 1, 5, '#3a363e');
+    },
+    ember_shard: (r) => {
+      r(7, 1, 2, 3, '#ffb04a');
+      r(6, 4, 4, 5, '#f07a2a');
+      r(5, 7, 6, 4, '#e8602a');
+      r(6, 11, 4, 3, '#b8401a');
+      r(6, 4, 1, 6, '#ffd890');
+      r(10, 8, 1, 4, '#8a2a12');
+    },
+    charred_hide: (r) => {
+      r(3, 3, 10, 10, '#3a2e2a');
+      r(2, 5, 1, 4, '#3a2e2a');
+      r(13, 6, 1, 4, '#3a2e2a');
+      r(4, 13, 3, 2, '#3a2e2a');
+      r(9, 13, 3, 2, '#3a2e2a');
+      r(4, 4, 4, 2, '#5a4a40');
+      r(8, 8, 4, 3, '#241c1a');
+      r(3, 11, 2, 2, '#e8602a');
+      r(11, 3, 2, 2, '#e8602a');
+    },
+    scorched_feather: (r) => {
+      r(7, 1, 2, 3, '#4a4048');
+      r(6, 4, 4, 7, '#3a3238');
+      r(5, 6, 6, 4, '#4a4048');
+      r(7, 11, 1, 4, '#8a7a6a');
+      r(6, 4, 1, 5, '#6a5e66');
+      r(9, 1, 1, 3, '#f08a2a');
+      r(10, 5, 1, 2, '#f08a2a');
+    },
+    slag_plate: (r) => {
+      r(2, 3, 12, 10, '#4a464e');
+      r(2, 3, 12, 1, '#7a767e');
+      r(2, 3, 1, 10, '#6a666e');
+      r(13, 4, 1, 9, '#2a262e');
+      r(3, 12, 11, 1, '#2a262e');
+      r(5, 5, 1, 4, '#f08a2a');
+      r(5, 8, 4, 1, '#f08a2a');
+      r(9, 8, 1, 3, '#ffb04a');
+      r(4, 11, 2, 1, '#e8602a');
+    },
+    obsidian_shard: (r) => {
+      r(7, 1, 3, 3, '#2a2433');
+      r(6, 4, 5, 4, '#1f1a28');
+      r(5, 8, 6, 4, '#2a2433');
+      r(6, 12, 3, 2, '#1f1a28');
+      r(7, 2, 1, 7, '#6a5e88');
+      r(8, 3, 1, 2, '#9a8ec0');
+      r(10, 8, 1, 3, '#140f1c');
+    },
+    snake_scale: (r) => {
+      r(6, 2, 5, 2, '#8a3a2a');
+      r(4, 4, 8, 6, '#a8452e');
+      r(5, 10, 6, 2, '#8a3a2a');
+      r(7, 12, 2, 2, '#6a2a1e');
+      r(4, 4, 8, 1, '#d8704a');
+      r(6, 6, 4, 1, '#d8704a');
+      r(11, 6, 1, 4, '#6a2a1e');
+    },
+    cultist_ash: (r) => {
+      r(6, 5, 4, 2, '#8a8690');
+      r(4, 7, 8, 2, '#6e6a74');
+      r(2, 9, 12, 3, '#5a565e');
+      r(2, 12, 12, 1, '#3a363e');
+      r(7, 3, 2, 2, '#f08a2a');
+      r(5, 10, 2, 1, '#e8602a');
+      r(9, 8, 1, 1, '#ffb04a');
+    },
+    wraith_cinder: (r) => {
+      r(5, 4, 6, 8, '#4a3a42');
+      r(4, 6, 8, 4, '#4a3a42');
+      r(6, 3, 4, 1, '#4a3a42');
+      r(6, 5, 4, 6, '#e8602a');
+      r(7, 6, 2, 4, '#ffb04a');
+      r(7, 7, 1, 2, '#fff0c0');
+      r(4, 6, 1, 4, '#6a5a62');
+    },
+    lizard_scale: (r) => {
+      r(5, 3, 6, 2, '#c0502a');
+      r(3, 5, 10, 5, '#d8643a');
+      r(5, 10, 6, 3, '#c0502a');
+      r(3, 5, 10, 1, '#f09a6a');
+      r(5, 7, 1, 3, '#f09a6a');
+      r(8, 7, 1, 3, '#f09a6a');
+      r(12, 6, 1, 4, '#8a3a1e');
+    },
+    wisp_ember: (r) => {
+      r(7, 1, 2, 3, '#ffb04a');
+      r(6, 4, 4, 2, '#ffb04a');
+      r(5, 6, 6, 5, '#f07a2a');
+      r(6, 11, 4, 2, '#e8602a');
+      r(7, 7, 2, 4, '#ffe08a');
+      r(7, 9, 1, 2, '#ffffff');
+    },
+    wolf_ember_pelt: (r) => {
+      r(3, 3, 10, 10, '#3a3036');
+      r(2, 5, 1, 4, '#3a3036');
+      r(13, 6, 1, 4, '#3a3036');
+      r(4, 13, 3, 2, '#3a3036');
+      r(9, 13, 3, 2, '#3a3036');
+      r(4, 4, 4, 3, '#5a4a52');
+      r(8, 8, 4, 3, '#241c22');
+      r(5, 9, 2, 2, '#e8602a');
+      r(9, 5, 2, 1, '#f08a2a');
+    },
+    wight_clinker: (r) => {
+      r(4, 4, 8, 8, '#4a4448');
+      r(3, 6, 10, 4, '#4a4448');
+      r(5, 3, 5, 1, '#4a4448');
+      r(4, 4, 8, 1, '#7a7478');
+      r(6, 6, 2, 2, '#f08a2a');
+      r(9, 9, 2, 1, '#e8602a');
+      r(5, 10, 1, 1, '#ffb04a');
+      r(11, 7, 1, 4, '#2a2528');
+    },
+    salamander_gland: (r) => {
+      r(6, 2, 4, 2, '#8a6a44');
+      r(5, 4, 6, 1, '#cfd6e4');
+      r(4, 5, 8, 8, '#e8902a');
+      r(5, 13, 6, 1, '#b8601a');
+      r(5, 6, 2, 5, '#ffd070');
+      r(9, 8, 2, 2, '#c8601a');
+      r(8, 6, 1, 1, '#fff0b0');
+    },
+    thrall_brand: (r) => {
+      r(7, 1, 2, 8, '#6a5a58');
+      r(7, 1, 1, 8, '#8a7a78');
+      r(3, 9, 10, 5, '#4a3a3a');
+      r(3, 9, 10, 1, '#7a6a68');
+      r(5, 10, 6, 3, '#f08a2a');
+      r(6, 10, 1, 3, '#ffd070');
+      r(9, 10, 2, 1, '#ffd070');
+      r(8, 12, 3, 1, '#c8401a');
+    },
+    elemental_core: (r) => {
+      r(4, 3, 8, 10, '#3a2e32');
+      r(3, 5, 10, 6, '#3a2e32');
+      r(5, 2, 6, 1, '#3a2e32');
+      r(5, 4, 6, 8, '#e8602a');
+      r(4, 6, 8, 4, '#e8602a');
+      r(6, 5, 3, 4, '#ffb04a');
+      r(7, 6, 1, 2, '#fff4c0');
+      r(10, 9, 1, 3, '#8a2a12');
+    },
+    phoenix_down: (r) => {
+      r(10, 1, 3, 2, '#ffd070');
+      r(8, 3, 4, 3, '#f09a3a');
+      r(6, 6, 5, 3, '#e8602a');
+      r(4, 8, 5, 3, '#d8401a');
+      r(3, 11, 3, 2, '#b82a12');
+      r(9, 3, 1, 5, '#ffe9a0');
+      r(7, 7, 1, 3, '#ffb04a');
+      r(2, 13, 2, 1, '#8a2a12');
+    },
+    drake_scale: (r) => {
+      r(6, 1, 4, 2, '#7a1e1e');
+      r(4, 3, 8, 6, '#a82a2a');
+      r(3, 5, 10, 4, '#a82a2a');
+      r(5, 9, 6, 3, '#8a2222');
+      r(7, 12, 2, 2, '#5a1414');
+      r(4, 3, 8, 1, '#e86a5a');
+      r(4, 3, 1, 6, '#d8504a');
+      r(7, 5, 2, 3, '#d8504a');
+      r(12, 6, 1, 3, '#5a1414');
+    },
+    ashroot: (r) => {
+      r(7, 1, 2, 5, '#6a8a4a');
+      r(5, 3, 2, 3, '#7a9a5a');
+      r(6, 6, 4, 4, '#8a7a6a');
+      r(5, 9, 2, 5, '#6e5e50');
+      r(9, 9, 2, 4, '#6e5e50');
+      r(7, 10, 2, 4, '#8a7a6a');
+      r(6, 6, 1, 3, '#b0a090');
+    },
+    sulfur: (r) => {
+      r(3, 8, 4, 5, '#e8d43a');
+      r(7, 5, 4, 8, '#f4e24a');
+      r(11, 9, 2, 4, '#d8c42a');
+      r(3, 12, 10, 1, '#a89a1a');
+      r(7, 5, 1, 8, '#fff6a0');
+      r(3, 8, 1, 4, '#fff6a0');
+      r(9, 7, 1, 3, '#b8a81e');
+    },
+    obsidian_chunk: (r) => {
+      r(3, 5, 10, 8, '#2a2433');
+      r(5, 3, 6, 2, '#2a2433');
+      r(2, 8, 1, 3, '#2a2433');
+      r(3, 12, 10, 1, '#140f1c');
+      r(5, 4, 1, 7, '#6a5e88');
+      r(6, 5, 2, 1, '#9a8ec0');
+      r(10, 6, 2, 5, '#1f1a28');
+    },
+    lizard_meat: (r) => {
+      r(4, 4, 8, 7, '#c8483e');
+      r(3, 6, 10, 3, '#c8483e');
+      r(5, 11, 6, 1, '#a8382e');
+      r(4, 4, 8, 1, '#e8806a');
+      r(6, 6, 3, 2, '#e8806a');
+      r(11, 5, 1, 5, '#8a2a22');
+      r(12, 10, 2, 4, '#f0ead4');
+      r(13, 13, 2, 2, '#f0ead4');
+    },
+    kiln_key_half: (r) => {
+      r(2, 4, 6, 6, '#c8962a');
+      r(4, 6, 2, 2, '#241a30');
+      r(2, 4, 6, 1, '#f0cc5a');
+      r(8, 6, 6, 2, '#c8962a');
+      r(8, 6, 6, 1, '#f0cc5a');
+      r(11, 8, 3, 2, '#c8962a');
+      r(9, 7, 1, 1, '#8a6414');
+      r(12, 5, 2, 1, '#a87a1e');
+    },
+    wyrm_tooth: (r) => {
+      r(5, 1, 6, 4, '#f4eedc');
+      r(5, 5, 5, 4, '#f4eedc');
+      r(6, 9, 4, 3, '#e8dfc4');
+      r(7, 12, 2, 3, '#d8cca8');
+      r(5, 1, 1, 8, '#ffffff');
+      r(10, 3, 1, 6, '#b8ac88');
+      r(5, 1, 6, 1, '#a8452e');
+    },
+    ember_stew: (r) => {
+      r(2, 7, 12, 6, '#5a4a44');
+      r(3, 13, 10, 1, '#3a2e2a');
+      r(2, 7, 12, 1, '#8a7a74');
+      r(3, 6, 10, 2, '#d8603a');
+      r(4, 6, 3, 1, '#f08a4a');
+      r(9, 7, 2, 1, '#ffb04a');
+      r(6, 3, 1, 3, '#cfd6e4');
+      r(9, 2, 1, 4, '#cfd6e4');
+      r(2, 8, 1, 4, '#7a6a64');
+    },
+    smoked_lizard: (r) => {
+      r(1, 12, 14, 1, '#8a6a44');
+      r(3, 5, 9, 5, '#8a5a34');
+      r(2, 6, 2, 3, '#8a5a34');
+      r(11, 6, 3, 2, '#8a5a34');
+      r(4, 10, 2, 3, '#6a4020');
+      r(9, 10, 2, 3, '#6a4020');
+      r(3, 5, 9, 1, '#b88a5a');
+      r(5, 7, 5, 1, '#6a4020');
+      r(13, 6, 1, 1, '#241a30');
+    },
+    cragmaw_tusk: (r) => {
+      r(3, 2, 5, 3, '#f0ead4');
+      r(5, 5, 5, 3, '#f0ead4');
+      r(8, 8, 4, 3, '#e4dcc0');
+      r(10, 11, 3, 2, '#d8cfae');
+      r(3, 2, 1, 3, '#ffffff');
+      r(5, 5, 1, 3, '#ffffff');
+      r(9, 5, 1, 3, '#b8ac88');
+      r(3, 1, 5, 1, '#d8b04a');
+      r(4, 0, 1, 2, '#6a4020');
+    },
+    brask_ring: ringIcon('#5a5660', '#8a8690', '#e8602a', ''),
+    pyre_priest_ring: ringIcon('#7a1e1e', '#c8403a', '#ffb04a', 'gold'),
+    veyra_ring: ringIcon('#d87a2a', '#ffb04a', '#fff0a0', ''),
+    emberjaw_ring: ringIcon('#a82a2a', '#e86a5a', '#2a2433', 'tally'),
+    brask_belt: beltIcon('#4a464e', '#7a767e', '#f08a2a', 'studs'),
+    veyra_belt: beltIcon('#d8602a', '#ffa05a', '#fff0a0', 'knot'),
+    emberjaw_belt: beltIcon('#8a2222', '#c8403a', '#d8b04a', 'bone'),
+    brask_boon: boonIcon('#6a666e', '#a8a4ae', 'cairn'),
+    veyra_boon: boonIcon('#f07a2a', '#ffd070', 'flame'),
+    emberjaw_boon: boonIcon('#a82a2a', '#e86a5a', 'drop'),
+  });
+
   /** The lesser potions are smaller bottles; the full ones carry a gold cap. */
   function potionIcon(def) {
     const mana = Boolean(def.mana);
     const small = /^minor_/.test(def.id);
+    const greater = /^greater_/.test(def.id);
     const liquid = mana ? '#4a7fd8' : '#d84a4a';
     const light = mana ? '#8ab4f0' : '#f08a8a';
     return (r) => {
@@ -4767,6 +5686,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         r(4, 6, 8, 7, liquid);
         r(4, 6, 2, 5, light);
         r(10, 9, 2, 3, '#00000033');
+        if (greater) {
+          r(5, 1, 6, 2, '#e8e8f4');
+          r(6, 0, 4, 1, '#e8e8f4');
+          r(13, 3, 2, 1, '#fff4c0');
+          r(14, 2, 1, 3, '#fff4c0');
+          r(5, 12, 6, 1, light);
+        }
       }
     };
   }
@@ -5063,6 +5989,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       b.type = 'button';
       b.textContent = pet.name;
       b.dataset.pet = pet.id;
+      const lockedBy = pet.id && G && G.locks && G.locks.pets[pet.id];
+      if (lockedBy) {
+        b.disabled = true;
+        b.textContent = `${pet.name} (locked)`;
+        b.title = `Finish the quest "${lockedBy}" to unlock.`;
+      }
       b.addEventListener('click', () => {
         const me = G && G.self();
         if (me) me.pet = pet.id || undefined;

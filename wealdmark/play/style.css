@@ -946,3 +946,37 @@ button.qtrack.on { background: #2f6b3a; }
 }
 #chattabs button:hover, #chatnav button:hover { background: rgba(70, 54, 110, 0.6); opacity: 1; }
 #chattabs button.on { background: rgba(110, 82, 36, 0.6); border-top-color: var(--trim-hi); box-shadow: none; opacity: 1; }
+
+/* Bottom HUD, one pass: a single 64-unit row. Globes, side slots and the action plate share a bottom edge,
+   and the window buttons are a grid of equal buttons that matches the plate height. */
+#bhud { align-items: flex-end; gap: 8px; }
+#hotrow { padding: 6px 8px; gap: 8px; align-items: flex-end; }
+#hotcol .meter.xp { height: 16px; margin: 0 0 12px; }
+#hotcol .meter.xp span { line-height: 12px; font-size: 11px; }
+#hotbar:before { top: -13px; font-size: 11px; line-height: 12px; }
+.bslot { max-width: 36px; width: 36px; height: 36px; aspect-ratio: auto; flex: none; }
+#hotbar { gap: 4px; }
+.qslot, .sslot { width: 32px; height: 32px; font-size: 11px; padding-top: 0; }
+.qcol { gap: 4px; height: 68px; justify-content: space-between; margin-bottom: 8px; }
+#bhud > .qcol { margin-bottom: 8px; }
+#side-l, #side-r { height: auto; margin-bottom: 0; justify-content: flex-end; }
+.globe { width: 64px; height: 64px; margin-bottom: 8px; }
+.globe span { bottom: 4px; font-size: 11px; }
+.wide-hud #toolbar { bottom: 10px; width: 264px; padding: 0; }
+.wide-hud #menu-list, .wide-hud #menu-list.hidden { grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 6px; }
+.wide-hud #toolbar button { height: 32px; min-height: 0; padding: 0 4px; font-size: 11px; line-height: 1; letter-spacing: 0; align-items: center; justify-content: center; white-space: nowrap; }
+.wide-hud #toolbar button:not(#menu-btn):not(.hidden) { display: flex; }
+.wide-hud #menu-btn, .wide-hud #toolbar button.hidden { display: none; }
+.wide-hud .grp { display: flex; }
+.wide-hud .grp-btn { flex: 1; }
+.wide-hud #toolbar .grp:last-child { grid-column: auto; }
+.wide-hud .grp-pop button { height: 28px; justify-content: flex-start; padding: 0 10px; }
+.sslot { width: 44px; height: 32px; flex-direction: column; gap: 0; line-height: 1.1; text-align: center; }
+.sslot .hk { position: static; padding: 0; background: none; border-radius: 0; font-size: 11px; line-height: 12px; }
+.barsw { width: 24px; height: 68px; }
+#side-l, #side-r { gap: 4px; }
+#side-l { height: 68px; justify-content: space-between; }
+/* Look window: companion buttons share one grid, equal width. */
+#look-pet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#look-pet button { width: 100%; min-height: 32px; margin: 0; padding: 0 8px; white-space: nowrap; }
+#look-pet button:disabled { opacity: 0.55; cursor: not-allowed; }
