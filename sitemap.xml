@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://maxedskillgaming.github.io/</loc></url>
-  <url><loc>https://maxedskillgaming.github.io/wealdmark/</loc></url>
-  <url><loc>https://maxedskillgaming.github.io/wealdmark/play/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url><loc>https://maxedskillgaming.github.io/</loc><lastmod>2026-11-04</lastmod></url>
+  <url>
+    <loc>https://maxedskillgaming.github.io/wealdmark/</loc>
+    <lastmod>2026-11-04</lastmod>
+    <image:image><image:loc>https://maxedskillgaming.github.io/wealdmark/shots/fight.jpg</image:loc><image:caption>A hero fighting an imp in Heroes of the Wealdmark</image:caption></image:image>
+    <image:image><image:loc>https://maxedskillgaming.github.io/wealdmark/shots/wilds.jpg</image:loc><image:caption>Monsters waiting on the south road</image:caption></image:image>
+    <image:image><image:loc>https://maxedskillgaming.github.io/wealdmark/shots/town.jpg</image:loc><image:caption>Bellstone Plaza, a safe town square</image:caption></image:image>
+  </url>
+  <url><loc>https://maxedskillgaming.github.io/wealdmark/play/</loc><lastmod>2026-11-04</lastmod></url>
 </urlset>
