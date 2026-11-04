@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://webcast-justify-mounting-breaking.trycloudflare.com",
-  "authUrl": "https://hits-arguments-task-tcp.trycloudflare.com",
+  "server": "wss://government-strengths-ips-centres.trycloudflare.com",
+  "authUrl": "https://farmers-count-faced-mar.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -37,15 +37,15 @@
     },
     {
       "path": "data/npcs.json",
-      "size": 45013,
-      "sha256": "631d4f04b2dc7d9d13132d036e2b027a652208bf049e00d22f0bea917383fcd2",
-      "url": "c/631d4f04b2dc7d9d13132d036e2b027a652208bf049e00d22f0bea917383fcd2"
+      "size": 44382,
+      "sha256": "777bf93006373786e8ff16c8976d8a55eb98c9b49a1bde32edeceac2a599f79e",
+      "url": "c/777bf93006373786e8ff16c8976d8a55eb98c9b49a1bde32edeceac2a599f79e"
     },
     {
       "path": "data/quests.json",
-      "size": 33565,
-      "sha256": "98dd0692122b20b58f4d5f90474a078c79be0cd65b9b70dd743216c0764e85f0",
-      "url": "c/98dd0692122b20b58f4d5f90474a078c79be0cd65b9b70dd743216c0764e85f0"
+      "size": 33412,
+      "sha256": "9c65cbe9c136fc3a00630a069275c5fc032c9456061f7b9beeecf368502ed472",
+      "url": "c/9c65cbe9c136fc3a00630a069275c5fc032c9456061f7b9beeecf368502ed472"
     },
     {
       "path": "data/recipes.json",
@@ -61,15 +61,15 @@
     },
     {
       "path": "data/stations.json",
-      "size": 14651,
-      "sha256": "5f67dd05f6f69adcba8284e00f9a96faf0e0d532229c686517dd0c52f6f24496",
-      "url": "c/5f67dd05f6f69adcba8284e00f9a96faf0e0d532229c686517dd0c52f6f24496"
+      "size": 14136,
+      "sha256": "8a20ae0e606854ce8ad82a9747f558214a09d62ff76d29c23653867f14fa4cca",
+      "url": "c/8a20ae0e606854ce8ad82a9747f558214a09d62ff76d29c23653867f14fa4cca"
     },
     {
       "path": "maps/mossgate.json",
-      "size": 419260,
-      "sha256": "371ffbb663af8ba1100d22a27a61fd8f90571ab2f97198066f18301c35c40f19",
-      "url": "c/371ffbb663af8ba1100d22a27a61fd8f90571ab2f97198066f18301c35c40f19"
+      "size": 419258,
+      "sha256": "cfb59667b3ab0d665bd46e73a25f82f9f32343bcf52a2a43ce0c758da64658c0",
+      "url": "c/cfb59667b3ab0d665bd46e73a25f82f9f32343bcf52a2a43ce0c758da64658c0"
     },
     {
       "path": "tiles/placeholder.png",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 304203,
-      "sha256": "f9b5194f40ecf7c3b798de3b36e9977e22bf3d9a9ef42e8ee205007cceef8002",
-      "url": "c/f9b5194f40ecf7c3b798de3b36e9977e22bf3d9a9ef42e8ee205007cceef8002"
+      "size": 313292,
+      "sha256": "29c8f9562b255294e3f45d90df3420750eb67e0dde71ff9bbc5daf915ea82b95",
+      "url": "c/29c8f9562b255294e3f45d90df3420750eb67e0dde71ff9bbc5daf915ea82b95"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -97,9 +97,9 @@
     },
     {
       "path": "ui/hero-layers.js",
-      "size": 5862,
-      "sha256": "bd360908e51b4b9e7eb3a66d73e614e7571decf8fcb77ba96ee57325e68490fb",
-      "url": "c/bd360908e51b4b9e7eb3a66d73e614e7571decf8fcb77ba96ee57325e68490fb"
+      "size": 12876,
+      "sha256": "cd6d28bf5f9f5f8cdaf65624d73f0ff9f610a5f21b5ef89194854089f981efd9",
+      "url": "c/cd6d28bf5f9f5f8cdaf65624d73f0ff9f610a5f21b5ef89194854089f981efd9"
     },
     {
       "path": "ui/hero-layers.png",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 47492,
-      "sha256": "c785355c688a83213155d3cdfee1c4737db68200a9e3c09d8b7a0e103ab72d12",
-      "url": "c/c785355c688a83213155d3cdfee1c4737db68200a9e3c09d8b7a0e103ab72d12"
+      "size": 47754,
+      "sha256": "4b906ba7e1416e4e88579b4bd8aae651becc9ff17358792352e2c461ae49eaa2",
+      "url": "c/4b906ba7e1416e4e88579b4bd8aae651becc9ff17358792352e2c461ae49eaa2"
     }
   ],
-  "signature": "8XKxglswHxlvNf1lXmonuNFQ/Q5e2L643RnTsW3U3HW+0tep/VGigpdQjldPywSgLsSays4p3n4SoSYU/XmaBA=="
+  "signature": "dX+deMxDp3WFAS1gDYdDzb8dHht8yDXBqTauxYeOWfETsCeJOMMXYnG5ow/U3WDSuj6m4w/QdbRBcplxrqZQCw=="
 }
