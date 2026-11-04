@@ -2,80 +2,80 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://caused-evolution-july-underlying.trycloudflare.com",
-  "authUrl": "https://suitable-rebecca-probe-shoe.trycloudflare.com",
+  "server": "wss://lips-persian-politics-formed.trycloudflare.com",
+  "authUrl": "https://largely-rubber-blue-capable.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
-      "size": 1153,
-      "sha256": "e2ff63ecb63024b4d90fa8b655db0543401a3d59b26adaae6ff73515c5bef7d8",
-      "url": "c/e2ff63ecb63024b4d90fa8b655db0543401a3d59b26adaae6ff73515c5bef7d8"
+      "size": 1508,
+      "sha256": "a851b382b2712513620d3b98e508820b3fa431617f36141168dc9d43c003d92e",
+      "url": "c/a851b382b2712513620d3b98e508820b3fa431617f36141168dc9d43c003d92e"
     },
     {
       "path": "data/game.json",
-      "size": 201,
-      "sha256": "91db573198202771be7d3f44630564eaeac6e839c207251d5db681157ad0c71d",
-      "url": "c/91db573198202771be7d3f44630564eaeac6e839c207251d5db681157ad0c71d"
+      "size": 221,
+      "sha256": "44b30ed6808ca3e64199e6ad2016f949cd5a565239cd72dce9167f4b74cb3c18",
+      "url": "c/44b30ed6808ca3e64199e6ad2016f949cd5a565239cd72dce9167f4b74cb3c18"
     },
     {
       "path": "data/items.json",
-      "size": 26570,
-      "sha256": "9af2b6fde110d7d4058d5679299d876fe2cc440bb2150aa67c509f9f86d25dcb",
-      "url": "c/9af2b6fde110d7d4058d5679299d876fe2cc440bb2150aa67c509f9f86d25dcb"
+      "size": 33562,
+      "sha256": "f9dee98e132421e568a03beaa3586ff2736e2379bc3eeadbb3078f457176b80d",
+      "url": "c/f9dee98e132421e568a03beaa3586ff2736e2379bc3eeadbb3078f457176b80d"
     },
     {
       "path": "data/monsters.json",
-      "size": 11888,
-      "sha256": "b38318b4e3182927e2bdfad12e81e420eb510c4be506d72d02a60f5181618a4c",
-      "url": "c/b38318b4e3182927e2bdfad12e81e420eb510c4be506d72d02a60f5181618a4c"
+      "size": 24056,
+      "sha256": "fb892e3b19b2d68e65ce4618ca0128284ace7886e485459ac50e7bf12df3db8d",
+      "url": "c/fb892e3b19b2d68e65ce4618ca0128284ace7886e485459ac50e7bf12df3db8d"
     },
     {
       "path": "data/nodes.json",
-      "size": 5595,
-      "sha256": "06826fe501b2323f8a58c9a6067d2781f5bf6b0c0838e7a4c9ff02729b2a9e86",
-      "url": "c/06826fe501b2323f8a58c9a6067d2781f5bf6b0c0838e7a4c9ff02729b2a9e86"
+      "size": 6928,
+      "sha256": "86ae7407fb7403bd1d9397a95de47b3102798d3ab1da3f06da0c4817c4663ca1",
+      "url": "c/86ae7407fb7403bd1d9397a95de47b3102798d3ab1da3f06da0c4817c4663ca1"
     },
     {
       "path": "data/npcs.json",
-      "size": 44382,
-      "sha256": "777bf93006373786e8ff16c8976d8a55eb98c9b49a1bde32edeceac2a599f79e",
-      "url": "c/777bf93006373786e8ff16c8976d8a55eb98c9b49a1bde32edeceac2a599f79e"
+      "size": 52625,
+      "sha256": "9ed71b811c5cbdbd7f04d5c60412ee352714f1b42d3be3d2d4b9f5aee59edf3c",
+      "url": "c/9ed71b811c5cbdbd7f04d5c60412ee352714f1b42d3be3d2d4b9f5aee59edf3c"
     },
     {
       "path": "data/quests.json",
-      "size": 33412,
-      "sha256": "9c65cbe9c136fc3a00630a069275c5fc032c9456061f7b9beeecf368502ed472",
-      "url": "c/9c65cbe9c136fc3a00630a069275c5fc032c9456061f7b9beeecf368502ed472"
+      "size": 64306,
+      "sha256": "1edfe487c42e2b899addd35461e803eac7e0f991ef554ce17e469412dea5e5fa",
+      "url": "c/1edfe487c42e2b899addd35461e803eac7e0f991ef554ce17e469412dea5e5fa"
     },
     {
       "path": "data/recipes.json",
-      "size": 12526,
-      "sha256": "2439d2735ad9bf4bed8d03f08d0aecfbebdbe630e2332599f105f385ce598d78",
-      "url": "c/2439d2735ad9bf4bed8d03f08d0aecfbebdbe630e2332599f105f385ce598d78"
+      "size": 13901,
+      "sha256": "e38d51b7cec52a84480bdc4b35111987783d86c50743a11982cefc6887071274",
+      "url": "c/e38d51b7cec52a84480bdc4b35111987783d86c50743a11982cefc6887071274"
     },
     {
       "path": "data/shops.json",
-      "size": 15686,
-      "sha256": "c4b53e83d11a654c248b187848540a6a537c6a99dd4110048eb3a84c55a093e3",
-      "url": "c/c4b53e83d11a654c248b187848540a6a537c6a99dd4110048eb3a84c55a093e3"
+      "size": 17691,
+      "sha256": "24c887fd502619227119c3aa870039179f8c641210f468660804365b8f0b3423",
+      "url": "c/24c887fd502619227119c3aa870039179f8c641210f468660804365b8f0b3423"
     },
     {
       "path": "data/stations.json",
-      "size": 14136,
-      "sha256": "8a20ae0e606854ce8ad82a9747f558214a09d62ff76d29c23653867f14fa4cca",
-      "url": "c/8a20ae0e606854ce8ad82a9747f558214a09d62ff76d29c23653867f14fa4cca"
+      "size": 16790,
+      "sha256": "3fbcd7fdd9b97b004eb46a02ca78b67cbaa2946eb13fd4d3f85cb12dfdbafcb9",
+      "url": "c/3fbcd7fdd9b97b004eb46a02ca78b67cbaa2946eb13fd4d3f85cb12dfdbafcb9"
     },
     {
       "path": "maps/mossgate.json",
-      "size": 425245,
-      "sha256": "34538f7c27684dd9005b89ec7d5dedd39e2e4fcba511f3bbd67c9eb890639e63",
-      "url": "c/34538f7c27684dd9005b89ec7d5dedd39e2e4fcba511f3bbd67c9eb890639e63"
+      "size": 923472,
+      "sha256": "5b5cec3999468a635dece5165ec8ac085106d7c8d0cac59cc0e04a8aa664b0d1",
+      "url": "c/5b5cec3999468a635dece5165ec8ac085106d7c8d0cac59cc0e04a8aa664b0d1"
     },
     {
       "path": "tiles/placeholder.png",
-      "size": 2760,
-      "sha256": "be2f44f9273a94d9ca334e1bcfc8abfedec1e11fab910be4f2ca8adcf3d6d602",
-      "url": "c/be2f44f9273a94d9ca334e1bcfc8abfedec1e11fab910be4f2ca8adcf3d6d602"
+      "size": 3240,
+      "sha256": "f928c3309ef7c6708d4e006a671abdc5c1366f1c829a3ac3721d86a1df1b17e8",
+      "url": "c/f928c3309ef7c6708d4e006a671abdc5c1366f1c829a3ac3721d86a1df1b17e8"
     },
     {
       "path": "ui/audio.js",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 319736,
-      "sha256": "703c1922fe819b494286233e2e19c060f0209f6874fbc1ac2325242e587a017f",
-      "url": "c/703c1922fe819b494286233e2e19c060f0209f6874fbc1ac2325242e587a017f"
+      "size": 359143,
+      "sha256": "c30e38fc6259e22bbf47ae047230ce723fc292b7a82b74c694c34b7e10629c2f",
+      "url": "c/c30e38fc6259e22bbf47ae047230ce723fc292b7a82b74c694c34b7e10629c2f"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 47641,
-      "sha256": "117c3abad8cb100de09ffecd79d8d3ba33e4ee97b934f78665c6cef00f9f4353",
-      "url": "c/117c3abad8cb100de09ffecd79d8d3ba33e4ee97b934f78665c6cef00f9f4353"
+      "size": 51004,
+      "sha256": "25a49c0548bbab75c83a4be814c688c0b55a6ee5a1b6118049b936f1e89a3adf",
+      "url": "c/25a49c0548bbab75c83a4be814c688c0b55a6ee5a1b6118049b936f1e89a3adf"
     }
   ],
-  "signature": "vBZFXEZ05Aii/OKXPF7KKPdlID7HKLmvXVweyW4r3Yx0IiijXUlQBzQlpZHf8RzxNQ9JukabddM1mNsWYsKMBw=="
+  "signature": "DoqDnF+/CmnCK9/m/XjW3iE9EEk6ssLvIW/HQC4DY7oCa3S1mpk4ogY7LovcoQkO/AC4ozf31h9SC/G6UvfGDQ=="
 }

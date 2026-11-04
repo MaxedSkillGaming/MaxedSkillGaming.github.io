@@ -1,0 +1,1431 @@
+[
+  {
+    "id": "moss_imp",
+    "name": "Imp",
+    "level": 2,
+    "maxHp": 15,
+    "maxHit": 3,
+    "armor": 1,
+    "speed": 11,
+    "movement": 3,
+    "ironBits": [
+      1,
+      4
+    ],
+    "respawnTicks": 50,
+    "wanderRadius": 3
+  },
+  {
+    "id": "glowcap_crawler",
+    "name": "Spider",
+    "level": 3,
+    "maxHp": 19,
+    "maxHit": 4,
+    "armor": 2,
+    "speed": 9,
+    "movement": 2,
+    "ironBits": [
+      2,
+      6
+    ],
+    "respawnTicks": 60,
+    "wanderRadius": 3
+  },
+  {
+    "id": "gnasher",
+    "name": "Wild Dog",
+    "level": 6,
+    "maxHp": 36,
+    "maxHit": 6,
+    "armor": 3,
+    "speed": 10,
+    "movement": 3,
+    "ironBits": [
+      3,
+      10
+    ],
+    "respawnTicks": 80,
+    "wanderRadius": 4
+  },
+  {
+    "id": "pinegrub_goblin",
+    "name": "Goblin",
+    "level": 8,
+    "maxHp": 58,
+    "maxHit": 8,
+    "armor": 5,
+    "speed": 10,
+    "movement": 3,
+    "ironBits": [
+      6,
+      16
+    ],
+    "respawnTicks": 90,
+    "wanderRadius": 3
+  },
+  {
+    "id": "nutcracker_goblin",
+    "name": "Goblin Warrior",
+    "level": 9,
+    "maxHp": 70,
+    "maxHit": 9,
+    "armor": 6,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      8,
+      20
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 3
+  },
+  {
+    "id": "mind_goblin",
+    "name": "Mind Goblin",
+    "level": 12,
+    "maxHp": 260,
+    "maxHit": 10,
+    "armor": 7,
+    "speed": 8,
+    "movement": 2,
+    "ironBits": [
+      120,
+      200
+    ],
+    "respawnTicks": 600,
+    "wanderRadius": 1,
+    "ability": "pine_nut_throw",
+    "boss": true,
+    "drops": [
+      {
+        "item": "nutshell_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "mind_goblin_sash",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "goblin_wit_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      }
+    ],
+    "legendary": "nutcracker_buckler"
+  },
+  {
+    "id": "sump_rat",
+    "name": "Rat",
+    "level": 4,
+    "maxHp": 24,
+    "maxHit": 3,
+    "armor": 0,
+    "speed": 14,
+    "movement": 4,
+    "ironBits": [
+      2,
+      7
+    ],
+    "respawnTicks": 60,
+    "wanderRadius": 3,
+    "drops": [
+      {
+        "item": "crew_note",
+        "chance": 0.1,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "cave_bat",
+    "name": "Cave Bat",
+    "level": 5,
+    "maxHp": 22,
+    "maxHit": 4,
+    "armor": 0,
+    "speed": 16,
+    "movement": 5,
+    "ironBits": [
+      3,
+      9
+    ],
+    "respawnTicks": 70,
+    "wanderRadius": 4,
+    "flies": true,
+    "drops": [
+      {
+        "item": "crew_note",
+        "chance": 0.1,
+        "rarity": "basic"
+      }
+    ],
+    "ability": "wing_buffet"
+  },
+  {
+    "id": "bog_wretch",
+    "name": "Ghoul",
+    "level": 7,
+    "maxHp": 60,
+    "maxHit": 6,
+    "armor": 2,
+    "speed": 6,
+    "movement": 2,
+    "ironBits": [
+      6,
+      16
+    ],
+    "respawnTicks": 90,
+    "wanderRadius": 2,
+    "ability": "wretch_bite",
+    "drops": [
+      {
+        "item": "crew_note",
+        "chance": 0.3,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "stone_boar",
+    "name": "Wild Boar",
+    "level": 8,
+    "maxHp": 80,
+    "maxHit": 9,
+    "armor": 7,
+    "speed": 12,
+    "movement": 5,
+    "ironBits": [
+      8,
+      20
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 3,
+    "ability": "gore",
+    "charge": true
+  },
+  {
+    "id": "foreman_below",
+    "name": "Foreman Below",
+    "level": 13,
+    "maxHp": 380,
+    "maxHit": 13,
+    "armor": 10,
+    "speed": 9,
+    "movement": 2,
+    "ironBits": [
+      160,
+      260
+    ],
+    "respawnTicks": 800,
+    "wanderRadius": 1,
+    "ability": "pick_throw",
+    "boss": true,
+    "drops": [
+      {
+        "item": "tally_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "foremans_belt",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "sump_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "foremans_pick",
+        "chance": 0.5,
+        "rarity": "basic"
+      }
+    ],
+    "legendary": "foremans_hardhat"
+  },
+  {
+    "id": "skrit",
+    "name": "The Rat King",
+    "level": 6,
+    "maxHp": 140,
+    "maxHit": 6,
+    "armor": 3,
+    "speed": 14,
+    "movement": 4,
+    "ironBits": [
+      20,
+      50
+    ],
+    "respawnTicks": 400,
+    "wanderRadius": 2,
+    "miniboss": true,
+    "drops": [
+      {
+        "item": "crew_note",
+        "chance": 0.3,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "harl_dunmarsh",
+    "name": "Harry Dunmarsh",
+    "level": 9,
+    "maxHp": 220,
+    "maxHit": 9,
+    "armor": 6,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      60,
+      110
+    ],
+    "respawnTicks": 500,
+    "wanderRadius": 1,
+    "ability": "dust_cloud",
+    "miniboss": true,
+    "hardened": true,
+    "drops": [
+      {
+        "item": "crew_note",
+        "chance": 0.5,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "wisp_hound",
+    "name": "Wolf",
+    "level": 10,
+    "maxHp": 95,
+    "maxHit": 9,
+    "armor": 4,
+    "speed": 14,
+    "movement": 5,
+    "ironBits": [
+      10,
+      26
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 4
+  },
+  {
+    "id": "dire_wolf",
+    "name": "Dire Wolf",
+    "level": 12,
+    "maxHp": 130,
+    "maxHit": 13,
+    "armor": 7,
+    "speed": 13,
+    "movement": 5,
+    "ironBits": [
+      14,
+      34
+    ],
+    "respawnTicks": 110,
+    "wanderRadius": 4,
+    "charge": true
+  },
+  {
+    "id": "grave_wolf",
+    "name": "Grey Wolf",
+    "level": 11,
+    "maxHp": 110,
+    "maxHit": 11,
+    "armor": 5,
+    "speed": 13,
+    "movement": 5,
+    "ironBits": [
+      12,
+      30
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 4,
+    "charge": true
+  },
+  {
+    "id": "barrow_wight",
+    "name": "Skeleton",
+    "level": 13,
+    "maxHp": 150,
+    "maxHit": 13,
+    "armor": 9,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      18,
+      40
+    ],
+    "respawnTicks": 140,
+    "wanderRadius": 3,
+    "drops": [
+      {
+        "item": "grave_dust",
+        "chance": 0.3,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "ghashul",
+    "name": "Greymuzzle the Pack-Lord",
+    "level": 12,
+    "maxHp": 330,
+    "maxHit": 15,
+    "armor": 8,
+    "speed": 14,
+    "movement": 5,
+    "ironBits": [
+      90,
+      160
+    ],
+    "respawnTicks": 700,
+    "wanderRadius": 1,
+    "ability": "wretch_bite",
+    "miniboss": true,
+    "charge": true,
+    "drops": [
+      {
+        "item": "wolf_pelt",
+        "chance": 0.6,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "ethelgar",
+    "name": "Barrow-Warden Ethelgar",
+    "level": 14,
+    "maxHp": 420,
+    "maxHit": 16,
+    "armor": 13,
+    "speed": 8,
+    "movement": 2,
+    "ironBits": [
+      110,
+      190
+    ],
+    "respawnTicks": 800,
+    "wanderRadius": 1,
+    "miniboss": true,
+    "hardened": true,
+    "drops": [
+      {
+        "item": "grave_dust",
+        "chance": 0.6,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "morwenna_pickman",
+    "name": "Morwenna Pickman",
+    "level": 15,
+    "maxHp": 560,
+    "maxHit": 18,
+    "armor": 11,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      220,
+      340
+    ],
+    "respawnTicks": 1200,
+    "wanderRadius": 1,
+    "ability": "pick_throw",
+    "boss": true,
+    "drops": [
+      {
+        "item": "pickman_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "bone_sash",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "cairn_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      }
+    ],
+    "legendary": "pickmans_bone_mask"
+  },
+  {
+    "id": "mere_eel",
+    "name": "Eel",
+    "level": 15,
+    "maxHp": 150,
+    "maxHit": 15,
+    "armor": 7,
+    "speed": 14,
+    "movement": 5,
+    "ironBits": [
+      14,
+      34
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 3,
+    "ability": "wretch_bite",
+    "charge": true
+  },
+  {
+    "id": "drowned_sailor",
+    "name": "Zombie",
+    "level": 16,
+    "maxHp": 190,
+    "maxHit": 16,
+    "armor": 10,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      18,
+      44
+    ],
+    "respawnTicks": 140,
+    "wanderRadius": 3,
+    "drops": [
+      {
+        "item": "drowned_coin",
+        "chance": 0.3,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "drowned_voice",
+    "name": "Voice of the Drowned",
+    "level": 17,
+    "maxHp": 170,
+    "maxHit": 16,
+    "armor": 7,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      60,
+      100
+    ],
+    "respawnTicks": 700,
+    "wanderRadius": 1,
+    "ability": "pick_throw",
+    "miniboss": true,
+    "drops": [
+      {
+        "item": "drowned_coin",
+        "chance": 0.5,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "nyth_ael",
+    "name": "Nyth-Ael, the Tide Matron",
+    "level": 17,
+    "maxHp": 520,
+    "maxHit": 18,
+    "armor": 13,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      120,
+      200
+    ],
+    "respawnTicks": 800,
+    "wanderRadius": 1,
+    "ability": "wretch_bite",
+    "miniboss": true,
+    "drops": [
+      {
+        "item": "eel_skin",
+        "chance": 0.6,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "ambrose_silt",
+    "name": "Ambrose Silt",
+    "level": 18,
+    "maxHp": 560,
+    "maxHit": 20,
+    "armor": 15,
+    "speed": 9,
+    "movement": 2,
+    "ironBits": [
+      130,
+      210
+    ],
+    "respawnTicks": 850,
+    "wanderRadius": 1,
+    "miniboss": true,
+    "hardened": true,
+    "drops": [
+      {
+        "item": "drowned_coin",
+        "chance": 0.6,
+        "rarity": "basic"
+      }
+    ]
+  },
+  {
+    "id": "prince_elrenor",
+    "name": "Prince Elrenor the Drowned",
+    "level": 20,
+    "maxHp": 820,
+    "maxHit": 23,
+    "armor": 17,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      300,
+      460
+    ],
+    "respawnTicks": 1500,
+    "wanderRadius": 1,
+    "ability": "pick_throw",
+    "boss": true,
+    "drops": [
+      {
+        "item": "elrenor_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "tide_sash",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "mere_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      }
+    ],
+    "legendary": "tidal_aegis"
+  },
+  {
+    "id": "thorn_sprite",
+    "name": "Thorn Sprite",
+    "level": 3,
+    "maxHp": 20,
+    "maxHit": 4,
+    "armor": 2,
+    "speed": 12,
+    "movement": 3,
+    "ironBits": [
+      1,
+      5
+    ],
+    "respawnTicks": 55,
+    "wanderRadius": 3
+  },
+  {
+    "id": "feral_ram",
+    "name": "Feral Ram",
+    "level": 7,
+    "maxHp": 52,
+    "maxHit": 7,
+    "armor": 4,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      4,
+      12
+    ],
+    "respawnTicks": 80,
+    "wanderRadius": 4,
+    "charge": true
+  },
+  {
+    "id": "quarry_golem",
+    "name": "Quarry Golem",
+    "level": 10,
+    "maxHp": 110,
+    "maxHit": 10,
+    "armor": 10,
+    "speed": 7,
+    "movement": 2,
+    "ironBits": [
+      8,
+      22
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 3
+  },
+  {
+    "id": "bandit_cutthroat",
+    "name": "Cutthroat",
+    "level": 10,
+    "maxHp": 85,
+    "maxHit": 10,
+    "armor": 5,
+    "speed": 12,
+    "movement": 4,
+    "ironBits": [
+      10,
+      28
+    ],
+    "respawnTicks": 95,
+    "wanderRadius": 4
+  },
+  {
+    "id": "crypt_spider",
+    "name": "Crypt Spider",
+    "level": 12,
+    "maxHp": 100,
+    "maxHit": 12,
+    "armor": 5,
+    "speed": 13,
+    "movement": 4,
+    "ironBits": [
+      12,
+      30
+    ],
+    "respawnTicks": 100,
+    "wanderRadius": 4
+  },
+  {
+    "id": "salt_crab",
+    "name": "Salt Crab",
+    "level": 14,
+    "maxHp": 170,
+    "maxHit": 14,
+    "armor": 12,
+    "speed": 8,
+    "movement": 2,
+    "ironBits": [
+      14,
+      36
+    ],
+    "respawnTicks": 110,
+    "wanderRadius": 3
+  },
+  {
+    "id": "ember_hound",
+    "name": "Ember Hound",
+    "level": 20,
+    "maxHp": 205,
+    "maxHit": 22,
+    "armor": 10,
+    "speed": 14,
+    "movement": 5,
+    "ironBits": [
+      28,
+      72
+    ],
+    "respawnTicks": 130,
+    "wanderRadius": 5,
+    "charge": true,
+    "ability": "ember_bite",
+    "drops": [
+      {
+        "item": "hound_fang",
+        "chance": 0.4,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ash_crawler",
+    "name": "Ash Crawler",
+    "level": 21,
+    "maxHp": 293,
+    "maxHit": 24,
+    "armor": 24,
+    "speed": 8,
+    "movement": 3,
+    "ironBits": [
+      29,
+      76
+    ],
+    "respawnTicks": 132,
+    "wanderRadius": 3,
+    "ability": "ash_spit",
+    "drops": [
+      {
+        "item": "ash_chitin",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cinder_imp",
+    "name": "Cinder Imp",
+    "level": 22,
+    "maxHp": 208,
+    "maxHit": 30,
+    "armor": 14,
+    "speed": 12,
+    "movement": 4,
+    "ironBits": [
+      31,
+      79
+    ],
+    "respawnTicks": 134,
+    "wanderRadius": 4,
+    "ability": "ember_burst",
+    "drops": [
+      {
+        "item": "ember_shard",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "char_stalker",
+    "name": "Char Stalker",
+    "level": 23,
+    "maxHp": 277,
+    "maxHit": 34,
+    "armor": 18,
+    "speed": 13,
+    "movement": 5,
+    "ironBits": [
+      32,
+      83
+    ],
+    "respawnTicks": 136,
+    "wanderRadius": 4,
+    "charge": true,
+    "drops": [
+      {
+        "item": "charred_hide",
+        "chance": 0.4,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "scorch_vulture",
+    "name": "Scorch Vulture",
+    "level": 24,
+    "maxHp": 251,
+    "maxHit": 30,
+    "armor": 13,
+    "speed": 15,
+    "movement": 6,
+    "ironBits": [
+      34,
+      86
+    ],
+    "respawnTicks": 138,
+    "wanderRadius": 6,
+    "flies": true,
+    "ability": "wing_buffet",
+    "drops": [
+      {
+        "item": "scorched_feather",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "slag_beetle",
+    "name": "Slag Beetle",
+    "level": 25,
+    "maxHp": 391,
+    "maxHit": 30,
+    "armor": 33,
+    "speed": 7,
+    "movement": 2,
+    "ironBits": [
+      35,
+      90
+    ],
+    "respawnTicks": 140,
+    "wanderRadius": 3,
+    "hardened": true,
+    "drops": [
+      {
+        "item": "slag_plate",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "obsidian_golem",
+    "name": "Obsidian Golem",
+    "level": 26,
+    "maxHp": 530,
+    "maxHit": 35,
+    "armor": 39,
+    "speed": 6,
+    "movement": 2,
+    "ironBits": [
+      36,
+      94
+    ],
+    "respawnTicks": 142,
+    "wanderRadius": 2,
+    "hardened": true,
+    "ability": "molten_slam",
+    "drops": [
+      {
+        "item": "obsidian_shard",
+        "chance": 0.55,
+        "rarity": "basic",
+        "qty": [
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "magma_snake",
+    "name": "Magma Snake",
+    "level": 27,
+    "maxHp": 314,
+    "maxHit": 37,
+    "armor": 19,
+    "speed": 13,
+    "movement": 4,
+    "ironBits": [
+      38,
+      97
+    ],
+    "respawnTicks": 144,
+    "wanderRadius": 4,
+    "ability": "ember_bite",
+    "drops": [
+      {
+        "item": "snake_scale",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pyre_cultist",
+    "name": "Pyre Cultist",
+    "level": 28,
+    "maxHp": 331,
+    "maxHit": 39,
+    "armor": 22,
+    "speed": 11,
+    "movement": 3,
+    "ironBits": [
+      39,
+      101
+    ],
+    "respawnTicks": 146,
+    "wanderRadius": 3,
+    "ability": "lava_spit",
+    "drops": [
+      {
+        "item": "cultist_ash",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "quarry_wraith",
+    "name": "Quarry Wraith",
+    "level": 29,
+    "maxHp": 369,
+    "maxHit": 40,
+    "armor": 18,
+    "speed": 12,
+    "movement": 4,
+    "ironBits": [
+      41,
+      104
+    ],
+    "respawnTicks": 148,
+    "wanderRadius": 4,
+    "ability": "searing_gaze",
+    "drops": [
+      {
+        "item": "wraith_cinder",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lava_lizard",
+    "name": "Lava Lizard",
+    "level": 30,
+    "maxHp": 408,
+    "maxHit": 42,
+    "armor": 27,
+    "speed": 12,
+    "movement": 4,
+    "ironBits": [
+      42,
+      108
+    ],
+    "respawnTicks": 150,
+    "wanderRadius": 4,
+    "ability": "ember_bite",
+    "drops": [
+      {
+        "item": "lizard_scale",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flame_wisp",
+    "name": "Flame Wisp",
+    "level": 31,
+    "maxHp": 300,
+    "maxHit": 60,
+    "armor": 20,
+    "speed": 15,
+    "movement": 5,
+    "ironBits": [
+      43,
+      112
+    ],
+    "respawnTicks": 152,
+    "wanderRadius": 5,
+    "flies": true,
+    "ability": "lava_spit",
+    "drops": [
+      {
+        "item": "wisp_ember",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ember_wolf",
+    "name": "Ember Wolf",
+    "level": 32,
+    "maxHp": 449,
+    "maxHit": 57,
+    "armor": 36,
+    "speed": 14,
+    "movement": 5,
+    "ironBits": [
+      45,
+      115
+    ],
+    "respawnTicks": 154,
+    "wanderRadius": 5,
+    "charge": true,
+    "ability": "ember_bite",
+    "drops": [
+      {
+        "item": "wolf_ember_pelt",
+        "chance": 0.4,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "forge_wight",
+    "name": "Forge Wight",
+    "level": 33,
+    "maxHp": 565,
+    "maxHit": 56,
+    "armor": 53,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      46,
+      119
+    ],
+    "respawnTicks": 156,
+    "wanderRadius": 3,
+    "ability": "molten_slam",
+    "drops": [
+      {
+        "item": "wight_clinker",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "salamander",
+    "name": "Salamander",
+    "level": 34,
+    "maxHp": 541,
+    "maxHit": 64,
+    "armor": 47,
+    "speed": 12,
+    "movement": 4,
+    "ironBits": [
+      48,
+      122
+    ],
+    "respawnTicks": 158,
+    "wanderRadius": 4,
+    "ability": "flame_breath",
+    "drops": [
+      {
+        "item": "salamander_gland",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "thrall_of_fire",
+    "name": "Thrall of Fire",
+    "level": 35,
+    "maxHp": 670,
+    "maxHit": 62,
+    "armor": 57,
+    "speed": 9,
+    "movement": 3,
+    "ironBits": [
+      49,
+      126
+    ],
+    "respawnTicks": 160,
+    "wanderRadius": 3,
+    "ability": "molten_slam",
+    "drops": [
+      {
+        "item": "thrall_brand",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ash_wraith",
+    "name": "Ash Wraith",
+    "level": 36,
+    "maxHp": 537,
+    "maxHit": 67,
+    "armor": 31,
+    "speed": 13,
+    "movement": 4,
+    "ironBits": [
+      50,
+      130
+    ],
+    "respawnTicks": 162,
+    "wanderRadius": 4,
+    "ability": "searing_gaze",
+    "drops": [
+      {
+        "item": "wraith_cinder",
+        "chance": 0.5,
+        "rarity": "basic",
+        "qty": [
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "magma_elemental",
+    "name": "Magma Elemental",
+    "level": 37,
+    "maxHp": 896,
+    "maxHit": 66,
+    "armor": 74,
+    "speed": 6,
+    "movement": 2,
+    "ironBits": [
+      52,
+      133
+    ],
+    "respawnTicks": 164,
+    "wanderRadius": 2,
+    "hardened": true,
+    "ability": "cinder_nova",
+    "drops": [
+      {
+        "item": "elemental_core",
+        "chance": 0.4,
+        "rarity": "basic",
+        "qty": [
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  {
+    "id": "phoenix_hatchling",
+    "name": "Phoenix Hatchling",
+    "level": 38,
+    "maxHp": 526,
+    "maxHit": 71,
+    "armor": 29,
+    "speed": 15,
+    "movement": 6,
+    "ironBits": [
+      53,
+      137
+    ],
+    "respawnTicks": 166,
+    "wanderRadius": 6,
+    "flies": true,
+    "ability": "flame_breath",
+    "drops": [
+      {
+        "item": "phoenix_down",
+        "chance": 0.4,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "drake_of_the_peak",
+    "name": "Peak Drake",
+    "level": 39,
+    "maxHp": 851,
+    "maxHit": 72,
+    "armor": 69,
+    "speed": 11,
+    "movement": 4,
+    "ironBits": [
+      55,
+      140
+    ],
+    "respawnTicks": 168,
+    "wanderRadius": 3,
+    "charge": true,
+    "ability": "flame_breath",
+    "drops": [
+      {
+        "item": "drake_scale",
+        "chance": 0.45,
+        "rarity": "basic",
+        "qty": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kiln_warden_brask",
+    "name": "Kiln-Warden Brask",
+    "level": 30,
+    "maxHp": 1877,
+    "maxHit": 45,
+    "armor": 34,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      360,
+      600
+    ],
+    "respawnTicks": 1500,
+    "wanderRadius": 1,
+    "ability": "molten_slam",
+    "boss": true,
+    "drops": [
+      {
+        "item": "brask_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "brask_belt",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "brask_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "sparkmother_veyra",
+    "name": "Sparkmother Veyra",
+    "level": 36,
+    "maxHp": 2470,
+    "maxHit": 67,
+    "armor": 59,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      432,
+      720
+    ],
+    "respawnTicks": 1500,
+    "wanderRadius": 1,
+    "ability": "cinder_nova",
+    "boss": true,
+    "drops": [
+      {
+        "item": "veyra_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "veyra_belt",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "veyra_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "emberjaw",
+    "name": "Emberjaw, the Cinder Wyrm",
+    "level": 40,
+    "maxHp": 2907,
+    "maxHit": 74,
+    "armor": 65,
+    "speed": 10,
+    "movement": 2,
+    "ironBits": [
+      480,
+      800
+    ],
+    "respawnTicks": 1500,
+    "wanderRadius": 1,
+    "ability": "flame_breath",
+    "boss": true,
+    "drops": [
+      {
+        "item": "emberjaw_ring",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "emberjaw_belt",
+        "chance": 0.35,
+        "rarity": "rare"
+      },
+      {
+        "item": "emberjaw_boon",
+        "chance": 0.35,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "cragmaw_the_unburned",
+    "name": "Cragmaw the Unburned",
+    "level": 27,
+    "maxHp": 838,
+    "maxHit": 37,
+    "armor": 26,
+    "speed": 11,
+    "movement": 3,
+    "ironBits": [
+      324,
+      540
+    ],
+    "respawnTicks": 600,
+    "wanderRadius": 2,
+    "ability": "gore",
+    "miniboss": true,
+    "drops": [
+      {
+        "item": "cragmaw_tusk",
+        "chance": 0.3,
+        "rarity": "rare"
+      }
+    ]
+  },
+  {
+    "id": "hollow_pyre_priest",
+    "name": "The Hollow Pyre-Priest",
+    "level": 33,
+    "maxHp": 1130,
+    "maxHit": 56,
+    "armor": 45,
+    "speed": 11,
+    "movement": 3,
+    "ironBits": [
+      396,
+      660
+    ],
+    "respawnTicks": 600,
+    "wanderRadius": 2,
+    "ability": "lava_spit",
+    "miniboss": true,
+    "drops": [
+      {
+        "item": "pyre_priest_ring",
+        "chance": 0.3,
+        "rarity": "rare"
+      }
+    ]
+  }
+]
