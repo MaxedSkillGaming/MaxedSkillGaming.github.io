@@ -13,6 +13,12 @@
   const BUBBLE_MS = 6000;
   const LOG_LINES = 80;
   const MOVE_STEP_MS = 130;
+  // Real-time fights (mirrors the combat engine): an action takes RT_ACT_MS, a round of statuses and cooldowns RT_ROUND_MS.
+  const RT_ACT_MS = 1500;
+  const RT_ROUND_MS = 2400;
+  /** Status and cooldown counts are rounds. In a real-time fight say seconds, which is what the player feels. */
+  const spanOf = (rounds) => (G && G.fight && G.fight.rt ? `${Math.max(1, Math.round((rounds * RT_ROUND_MS) / 1000))} seconds` : `${rounds} rounds`);
+  const spanNum = (rounds) => (G && G.fight && G.fight.rt ? Math.max(1, Math.round((rounds * RT_ROUND_MS) / 1000)) : rounds);
   const MAX_LEVEL = 100;
   const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-party', 'panel-merc', 'panel-dungeon'];
   /** Iron bits each hero pays to enter a dungeon run. Matches the server's default. */
@@ -32,7 +38,7 @@
     crushing_strike: ['Crushing Strike', 'A boss marks tiles after its turn. Anyone still standing on one when its next turn starts loses a quarter of their health, armor or not.'],
     dust_cloud: ['Dust Cloud', 'A choking cloud of rock dust. Halves your mana regeneration for two rounds.'],
     wing_buffet: ['Wing Buffet', 'Leathery wings in your face. Blinded: your attacks lose 30 points of hit chance for two rounds. Spells can miss while you are blinded.'],
-    gore: ['Gore', 'A tusk blow. Stone boars charge and strike first.'],
+    gore: ['Gore', 'A tusk blow. Wild boars charge and strike first.'],
     multi_strike: ['Multi Strike', '85% damage to up to 4 enemies in the 3 by 3 block in front of you.'],
     power_strike: ['Power Strike', '200% damage to an adjacent enemy.'],
     rend: ['Rend', '100% damage now, then bleed for 60% over 3 rounds.'],
@@ -1906,8 +1912,25 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   const KIND_LABEL = { safe: 'Safe', road: 'Road', wilds: 'Wilds', dungeon: 'Dungeon' };
 
+  // Lines from fight events go to the Combat tab; everything else goes to Chat.
+  let logKind = 'chat';
+  const inCombatLog = (fn) => {
+    const was = logKind;
+    logKind = 'combat';
+    try {
+      return fn();
+    } finally {
+      logKind = was;
+    }
+  };
   function addLog(text, cls) {
     const li = document.createElement('li');
+    li.dataset.kind = logKind;
+    const box = $('chat');
+    if (box && box.dataset.tab !== logKind) {
+      const tab = document.querySelector('#chattabs [data-tab="' + logKind + '"]');
+      if (tab) tab.classList.add('new');
+    }
     if (cls) li.className = cls;
     li.textContent = text;
     const log = $('chatlog');
@@ -1947,6 +1970,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const el = $('toast');
     el.textContent = text;
     el.classList.add('show');
+    // A refusal or hint also goes to the chat, so it can be read again.
+    const last = $('chatlog').lastElementChild;
+    if (!(last && last.dataset.kind === 'chat' && last.textContent === text)) {
+      const was = logKind;
+      logKind = 'chat';
+      addLog(text, 'notice');
+      logKind = was;
+    }
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
   }
@@ -2052,6 +2083,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       case 'close':
         return closeTown(false);
       case 'error':
+        // Real time: the server refused a fight action, so give the hero back the ready time we locked when sending.
+        if (G.fight && G.fight.rt && G.fight.readyAt === Infinity) G.fight.readyAt = G.fight.lockedReady;
+        if (msg.code === 'not_ready') return;
+        if (msg.code === 'stunned') return toast('You are stunned.');
         if (msg.code === 'cast_cancelled' && G.portal && G.portal.stage === 'open') G.portal = null;
         play('error');
         return toast(ERRORS[msg.code] || `Server: ${msg.code}`);
@@ -2125,6 +2160,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       have.statuses = a.statuses;
       have.facing = a.facing;
       if (!have.anim) have.pos = a.pos;
+      if (a.readyIn !== undefined) {
+        const now = performance.now();
+        const left = have.readyAt === undefined ? 0 : Math.max(0, have.readyAt - now);
+        if (a.readyIn > left + 60) have.readyTotal = a.readyIn;
+        have.readyAt = now + a.readyIn;
+      }
     }
     f.round = state.round;
     f.order = state.order;
@@ -2133,19 +2174,31 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   function startFight(msg, now) {
-    G.fight = { id: msg.id, actors: new Map(), queue: [], until: now, pending: null, selected: null, options: null, end: null, round: 0, order: [], turn: null, outcome: null, hover: null, result: null };
+    G.fight = { id: msg.id, actors: new Map(), queue: [], until: now, pending: null, selected: null, options: null, end: null, round: 0, order: [], turn: null, outcome: null, hover: null, result: null, rt: Boolean(msg.state.rt), readyAt: 0, readyTotal: RT_ACT_MS, optAt: now, sentAt: 0, lockedReady: 0 };
     syncFromState(msg.state);
     G.fight.options = null;
     G.fight.mates = msg.state.actors.filter((a) => a.side === 'hero' && a.id !== G.selfId).map((a) => a.name);
     G.dest = null;
-    if (G.auto && bossFight()) {
-      setAuto(false);
-      toast('Auto combat is off: not available against bosses and minibosses.');
-    }
+    G.autoLootSent = false;
+    if (G.auto && bossFight()) toast('Auto combat is paused for this fight: not available against bosses and minibosses.');
     addLog('A fight begins!', 'round');
-    $('turns').classList.remove('hidden');
-    $('fightbar').classList.remove('hidden');
+    G.barSig = null;
     renderFightUi();
+  }
+
+  /**
+   * Real time: the server adds up the clock, so an option list is only a snapshot. Turn the snapshot into what the bar needs:
+   * busy is a matter of time (the client counts it down), so it never greys out an ability.
+   */
+  function rtOptions(o, now) {
+    if (!o) return null;
+    const alt = Boolean(G.inv && G.inv.equipment && G.inv.equipment.weapon2) || o.canSwap;
+    return {
+      ...o,
+      acted: false,
+      canSwap: alt,
+      abilities: o.abilities.map((a) => (a.reason === 'busy' ? { ...a, usable: true, reason: undefined } : a)),
+    };
   }
 
   function onFightUpdate(msg) {
@@ -2153,9 +2206,52 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!f) return;
     for (const ev of msg.events) f.queue.push(ev);
     f.pending = { state: msg.state, options: msg.options };
+    if (!f.rt) return;
+    // Real time: your own timers and ability list are current at once. Only the picture waits for the event queue.
+    const now = performance.now();
+    f.options = rtOptions(msg.options, now);
+    f.optAt = now;
+    if (f.options && f.options.actor === G.selfId) {
+      const ri = msg.options.readyIn || 0;
+      const left = f.readyAt === Infinity ? 0 : Math.max(0, f.readyAt - now);
+      if (ri > left + 60) f.readyTotal = ri; // a fresh wait began, so the sweep restarts full
+      f.readyAt = now + ri;
+      const stale = !f.options.abilities.some((a) => a.id === f.selected);
+      if (!f.selected || stale) f.baseSel = f.selected = basicOf(f.options);
+    }
+    if (f.baseSel === undefined && f.options) f.baseSel = basicOf(f.options);
   }
 
   function eventDuration(ev) {
+    const f = G.fight;
+    if (f && f.rt) {
+      // Real time plays the picture a little faster than the turn version and skips ahead when it falls behind.
+      if (f.queue.length > 8) return 0;
+      const d = rtEventDuration(ev);
+      return f.queue.length > 3 ? d / 2 : d;
+    }
+    return turnEventDuration(ev);
+  }
+
+  function rtEventDuration(ev) {
+    switch (ev.type) {
+      case 'move':
+        return ev.path.length * MOVE_STEP_MS * 0.8;
+      case 'hit':
+      case 'miss':
+      case 'heal':
+      case 'mana':
+      case 'dot':
+      case 'parry':
+        return 120;
+      case 'death':
+        return 300;
+      default:
+        return 0;
+    }
+  }
+
+  function turnEventDuration(ev) {
     switch (ev.type) {
       case 'move':
         return ev.path.length * MOVE_STEP_MS + 60;
@@ -2195,21 +2291,24 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   function applyEvent(ev, now) {
+    return inCombatLog(() => applyEventNow(ev, now));
+  }
+
+  function applyEventNow(ev, now) {
     const f = G.fight;
     const act = (id) => f.actors.get(id);
     switch (ev.type) {
       case 'round':
         f.round = ev.round;
-        addLog(`Round ${ev.round}`, 'round');
+        if (!f.rt) addLog(`Round ${ev.round}`, 'round');
         break;
       case 'mark':
         f.marks = (f.marks || []).concat(ev.tiles.map((t) => ({ owner: ev.owner, x: t.x, y: t.y })));
-        addLog(`${who(ev.owner)} raises its weapon: the marked ground will be crushed on its next turn. Step off it.`, 'bad');
+        addLog(`${who(ev.owner)} raises its weapon: the marked ground will be crushed ${f.rt ? 'in a moment' : 'on its next turn'}. Step off it.`, 'bad');
         break;
       case 'turn':
         f.marks = (f.marks || []).filter((m) => m.owner !== ev.actor);
         f.turnActor = ev.actor;
-        renderTurns();
         break;
       case 'regen': {
         const a = act(ev.actor);
@@ -2287,10 +2386,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const a = act(ev.actor);
         if (a) a.statuses = a.statuses.filter((s) => s.id !== ev.status).concat([{ id: ev.status, rounds: ev.rounds }]);
         const you = ev.actor === G.selfId;
-        if (ev.status === 'phase_shield') addLog(`${who(ev.actor)} ${you ? 'raise' : 'raises'} a shield. Break it within ${ev.rounds} rounds or it heals.`, you ? 'mine' : 'bad');
+        if (ev.status === 'phase_shield') addLog(`${who(ev.actor)} ${you ? 'raise' : 'raises'} a shield. Break it within ${spanOf(ev.rounds)} or it heals.`, you ? 'mine' : 'bad');
         else if (ev.status === 'stagger') addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} staggered.`);
-        else if (ev.status === 'stunned') addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} stunned and cannot act for ${ev.rounds} rounds.`, you ? 'bad' : 'mine');
-        else if (ev.status === 'stun_immune') addLog(`${who(ev.actor)} ${you ? 'shake' : 'shakes'} off the stun and cannot be stunned for ${ev.rounds} rounds.`);
+        else if (ev.status === 'stunned') addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} stunned and cannot act for ${spanOf(ev.rounds)}.`, you ? 'bad' : 'mine');
+        else if (ev.status === 'stun_immune') addLog(`${who(ev.actor)} ${you ? 'shake' : 'shakes'} off the stun and cannot be stunned for ${spanOf(ev.rounds)}.`);
         else if (ev.status === 'enrage') addLog(`${who(ev.actor)} ${you ? 'fly' : 'flies'} into a rage: more damage, more speed.`, you ? 'bad' : 'mine');
         else if (DEBUFFS.has(ev.status)) addLog(`${who(ev.actor)} ${you ? 'are' : 'is'} afflicted: ${pretty(ev.status)}.`, you ? 'bad' : 'mine');
         else addLog(`${who(ev.actor)} ${you ? 'gain' : 'gains'} ${pretty(ev.status)}.`);
@@ -2377,20 +2476,26 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const { state, options } = f.pending;
       f.pending = null;
       syncFromState(state);
-      f.options = options;
-      if (options && options.actor === G.selfId) f.baseSel = f.selected = basicOf(options);
+      if (!f.rt) {
+        f.options = options;
+        if (options && options.actor === G.selfId) f.baseSel = f.selected = basicOf(options);
+        if (options && options.actor === G.selfId) scheduleAuto();
+      }
       renderFightUi();
-      if (options && options.actor === G.selfId) scheduleAuto();
     }
     if (f.end && !f.options && !f.pending) finishFight();
   }
 
   function finishFight() {
+    return inCombatLog(finishFightNow);
+  }
+
+  function finishFightNow() {
     const f = G.fight;
     const end = f.end;
     G.fight = null;
-    $('turns').classList.add('hidden');
-    $('fightbar').classList.add('hidden');
+    G.barSig = null;
+    $('hotbar').style.setProperty('--gcd', '0');
     $('toast').classList.remove('show');
 
     // The outcome and everything gained go to the chat log, one line each. No window to close.
@@ -2405,11 +2510,24 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     for (const it of end.loot.items || []) addLog(`You find ${itemName(it)}.`, `loot ${it.rarity || ''}`.trim());
     if (end.penalty && end.penalty.iron_bits > 0) addLog(`You lose ${end.penalty.iron_bits} iron bits.`, 'bad');
     if (end.outcome === 'defeat') addLog('You wake at the bellstone, weary but whole.', 'round');
-    if (end.outcome === 'fled') addLog('You escaped from the fight.', 'round');
+    if (end.outcome === 'fled') {
+      addLog('You walk away from the fight.', 'round');
+      if (G.walkAway) {
+        const d = G.walkAway;
+        G.walkAway = null;
+        G.dest = { x: d.x, y: d.y };
+        window.wealdmark.send({ t: 'move', x: d.x, y: d.y });
+      }
+    }
     play(end.outcome === 'victory' ? 'victory' : end.outcome === 'defeat' ? 'defeat' : 'flee');
     if (end.levelUps.length) setTimeout(() => play('level'), 700);
     if (end.loot.iron_bits > 0 || (end.loot.items && end.loot.items.length)) setTimeout(() => play('coin'), 400);
-    if (lootCount(G.loot.fight)) showLoot('fight');
+    if (lootCount(G.loot.fight)) {
+      if (G.autoloot && !G.autoLootSent) {
+        G.autoLootSent = true;
+        window.wealdmark.send({ t: 'loot', op: 'all', pool: 'fight' });
+      } else showLoot('fight');
+    }
   }
 
   // ---- mercenaries
@@ -2442,6 +2560,22 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   // ---- loot window: drops wait here until the hero takes them
 
+  /** On/off switches that stay set between fights and sessions. Kept per device. */
+  function readPref(key) {
+    try {
+      return localStorage.getItem(key) === '1';
+    } catch {
+      return false;
+    }
+  }
+  function writePref(key, on) {
+    try {
+      localStorage.setItem(key, on ? '1' : '0');
+    } catch {
+      // blocked storage: the switch lasts until the page closes
+    }
+  }
+
   const lootCount = (pile) => (pile ? pile.items.length + (pile.iron_bits > 0 ? 1 : 0) : 0);
 
   function onLoot(msg) {
@@ -2451,9 +2585,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const want = G.lootWanted != null;
     if (n) {
       // New drops open the window once the fight animation is over; an answer to the Loot button opens it at once.
-      if ((n > had || want) && !G.fight) showLoot(msg.pool);
+      if (G.autoloot && msg.pool === 'fight' && !G.fight && n > had && !want && !G.autoLootSent) {
+        // Autoloot takes the pile at once. If something is left (full bag), the next answer opens the window.
+        G.autoLootSent = true;
+        window.wealdmark.send({ t: 'loot', op: 'all', pool: 'fight' });
+      } else if (G.autoLootSent && msg.pool === 'fight' && !G.fight) {
+        // The bag could not hold it all: show what is left.
+        G.autoLootSent = false;
+        showLoot(msg.pool);
+      } else if ((n > had || want) && !G.fight) {
+        G.autoLootSent = false;
+        showLoot(msg.pool);
+      }
       else if (G.lootView === msg.pool) renderLoot();
     } else if (G.lootView === msg.pool) {
+      G.autoLootSent = false;
       const other = G.loot[msg.pool === 'fight' ? 'box' : 'fight'];
       if (lootCount(other)) showLoot(other.pool);
       else hideLoot();
@@ -2495,7 +2641,30 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       return r;
     };
     if (pile.iron_bits > 0) {
-      const coin = el('span', 'lootbits', 'ib');
+      // Same tile as a bag slot: a drawn coin with the amount in the corner.
+      const coin = document.createElement('button');
+      coin.type = 'button';
+      coin.className = 'slot';
+      coin.title = 'Iron bits';
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 16;
+      cv.className = 'icon';
+      const c = cv.getContext('2d');
+      c.fillStyle = '#000';
+      c.fillRect(4, 2, 8, 12);
+      c.fillRect(2, 4, 12, 8);
+      c.fillStyle = '#9aa0aa';
+      c.fillRect(5, 3, 6, 10);
+      c.fillRect(3, 5, 10, 6);
+      c.fillStyle = '#d4d8de';
+      c.fillRect(5, 4, 3, 2);
+      c.fillStyle = '#6c717b';
+      c.fillRect(9, 10, 3, 2);
+      coin.appendChild(cv);
+      const q = document.createElement('i');
+      q.textContent = String(pile.iron_bits);
+      coin.appendChild(q);
+      coin.addEventListener('click', () => take(-1));
       body.appendChild(row(coin, `${pile.iron_bits} iron bits`, '', -1));
     }
     pile.items.forEach((ref, i) => {
@@ -2514,7 +2683,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   // ---- fight controls
 
-  const isMyTurn = () => Boolean(G.fight && G.fight.options && G.fight.options.actor === G.selfId && !G.fight.queue.length);
+  /** Turn fights: it is your turn. Real-time fights: your hero is ready (the action time of the last move has run out). */
+  const isMyTurn = () => {
+    const f = G.fight;
+    if (!f || !f.options || f.options.actor !== G.selfId) return false;
+    if (!f.rt) return !f.queue.length;
+    return performance.now() >= f.readyAt;
+  };
+  const NOT_READY = 'Not ready yet.';
   const hero = () => G.fight.actors.get(G.selfId);
 
   // ---- auto combat: plays the hero's turns for you. Never in boss or miniboss fights.
@@ -2523,19 +2699,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   const bossFight = () => Boolean(G.fight) && [...G.fight.actors.values()].some((a) => a.side === 'enemy' && isBossActor(a));
   const cheb = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 
+  /** The Auto and Loot switches live on the hotbar; asking for a new bar draws them again. */
   function renderAutoBtn() {
     G.barSig = null;
-    const b = $('auto-btn');
-    if (!b) return;
-    const blocked = bossFight();
-    b.disabled = blocked;
-    b.classList.toggle('selected', Boolean(G.auto) && !blocked);
-    b.textContent = G.auto && !blocked ? 'X Combat: Auto' : 'X Combat: Manual';
-    b.title = blocked ? 'Auto combat is not available against bosses and minibosses.' : 'Switch between Auto and Manual (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. You can still pick an ability yourself on any turn and Auto stays on.';
   }
 
   function setAuto(on) {
     G.auto = on;
+    writePref('wealdmark.auto', on);
     clearTimeout(G.autoTimer);
     G.autoTimer = null;
     renderAutoBtn();
@@ -2546,12 +2717,35 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!G) return;
     if (G.fight && bossFight()) return toast('Auto combat is not available against bosses and minibosses.');
     setAuto(!G.auto);
-    toast(G.auto ? 'Auto combat on. Press X to turn it off.' : 'Auto combat off. Press X to turn it on.');
+    toast(G.auto ? 'Auto combat on. It stays on until you turn it off (X).' : 'Auto combat off. Press X to turn it on.');
   }
 
+  function toggleAutoLoot() {
+    if (!G) return;
+    G.autoloot = !G.autoloot;
+    G.autoLootSent = false;
+    writePref('wealdmark.autoloot', G.autoloot);
+    G.barSig = null;
+    toast(G.autoloot ? 'Autoloot on. Drops go straight to your bag until you turn it off.' : 'Autoloot off. Drops wait in the Loot window.');
+    // Switching on also takes whatever is already waiting.
+    if (G.autoloot && !G.fight && lootCount(G.loot.fight)) {
+      G.autoLootSent = true;
+      window.wealdmark.send({ t: 'loot', op: 'all', pool: 'fight' });
+    }
+  }
+
+  /** Turn fights: act a moment after your turn starts. */
   function scheduleAuto() {
     if (!G.auto || G.autoTimer) return;
     G.autoTimer = setTimeout(autoStep, 450);
+  }
+
+  /** Real-time fights: whenever the hero is ready, take the next action. Called every frame. */
+  function autoTick(now) {
+    const f = G.fight;
+    if (!G.auto || !f || !f.rt || now < (f.autoAt || 0) || !isMyTurn() || bossFight()) return;
+    f.autoAt = now + 200;
+    autoStep();
   }
 
   /**
@@ -2661,15 +2855,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!G.auto || !isMyTurn()) return;
     // You picked an ability yourself this turn: let you finish it. Auto stays on and takes the next turn.
     if (G.fight.selected !== G.fight.baseSel) return;
-    if (bossFight()) {
-      setAuto(false);
-      return toast('Auto combat is off: not available against bosses and minibosses.');
-    }
+    if (bossFight()) return;
     const f = G.fight;
     const o = f.options;
     const h = hero();
     const foes = [...f.actors.values()].filter((a) => a.side === 'enemy' && a.alive);
-    if (!h || foes.length === 0) return sendFight({ t: 'end' });
+    // Turn fights hand the turn back when there is nothing to do. Real-time fights simply wait for the next chance.
+    const done = () => (f.rt ? undefined : sendFight({ t: 'end' }));
+    if (!h || foes.length === 0) return done();
 
     if (!o.acted) {
       const pct = h.hp / h.maxHp;
@@ -2687,12 +2880,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const step = [...o.reach].sort((p, q) => manhattan(p, near.pos) - manhattan(q, near.pos))[0];
       if (step && manhattan(step, near.pos) < here) return sendFight({ t: 'move', to: { x: step.x, y: step.y } });
     }
-    sendFight({ t: 'end' });
+    done();
   }
 
   function sendFight(action) {
     if (!isMyTurn()) return;
-    G.fight.options = null;
+    const f = G.fight;
+    if (f.rt) {
+      // Wait for the server's answer, which carries the new timer. A refusal gives the old ready time back (see the error handler).
+      f.lockedReady = f.readyAt;
+      f.readyAt = Infinity;
+      f.sentAt = performance.now();
+      f.selected = f.baseSel;
+    } else {
+      f.options = null;
+    }
     renderFightUi();
     window.wealdmark.send({ t: 'fight', action });
   }
@@ -2719,7 +2921,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!isMyTurn()) return;
     const opt = G.fight.options.abilities.find((a) => a.id === id);
     if (!opt) return;
-    if (!opt.usable) return toast(opt.reason === 'mana' ? 'Not enough mana.' : opt.reason === 'cooldown' ? `Ready in ${opt.cooldown} rounds.` : opt.reason === 'acted' ? 'You have already acted this turn.' : 'No enemy in reach.');
+    if (!opt.usable) {
+      const left = G.fight.rt && opt.cooldownMs ? Math.max(1, Math.ceil((opt.cooldownMs - (performance.now() - G.fight.optAt)) / 1000)) : 0;
+      return toast(
+        opt.reason === 'mana' ? 'Not enough mana.' : opt.reason === 'cooldown' ? (G.fight.rt ? `Ready in ${left} seconds.` : `Ready in ${opt.cooldown} rounds.`) : opt.reason === 'acted' ? 'You have already acted this turn.' : opt.reason === 'stunned' ? 'You are stunned.' : 'No enemy in reach.',
+      );
+    }
     play('click');
     if (opt.shape === 'self' || opt.shape === 'ring') return sendFight({ t: 'ability', id });
     G.fight.selected = id;
@@ -2768,11 +2975,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
     if (target) return toast(sel ? 'Pick a different ability, or move.' : "You can't attack right now.");
     if (f.options.reach.some((p) => p.x === t.x && p.y === t.y)) return sendFight({ t: 'move', to: { x: t.x, y: t.y } });
-    toast("You can't move there.");
+    if (f.options.acted) return toast('You have already acted this turn.');
+    if ([...f.actors.values()].some((a) => a.side === 'enemy' && a.alive && isBossActor(a))) return toast("You can't walk away from a boss.");
+    G.walkAway = { x: t.x, y: t.y };
+    sendFight({ t: 'flee' });
   }
 
   function fightKey(key) {
-    if (!isMyTurn()) return false;
+    if (!isMyTurn()) {
+      // Real time: a key pressed a moment early is dropped, not passed on to a panel shortcut.
+      return Boolean(G.fight && G.fight.rt && G.fight.options && /^([1-8qgeQGE ]|Arrow(Up|Down|Left|Right)|[wasdWASD])$/.test(key));
+    }
     const f = G.fight;
     const k = key.length === 1 ? key.toLowerCase() : key;
     if (/^[0-9]$/.test(k)) {
@@ -2785,8 +2998,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       return true;
     }
     if (k === 'g') return sendFight({ t: 'guard' }), true;
-    if (k === 'f') return sendFight({ t: 'flee' }), true;
-    if (k === ' ') return sendFight({ t: 'end' }), true;
+    if (k === ' ') return f.rt || sendFight({ t: 'end' }), true;
     if (k === 'e') {
       const slot = foodSlot();
       if (slot < 0) toast('You have no food.');
@@ -2808,69 +3020,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   // ---- fight and panel UI
 
-  function renderTurns() {
-    const f = G.fight;
-    if (!f) return;
-    const el = $('turns');
-    el.textContent = '';
-    for (const id of f.order) {
-      const a = f.actors.get(id);
-      if (!a || !a.alive) continue;
-      const chip = document.createElement('span');
-      chip.className = 'chip ' + a.side + (id === f.turnActor ? ' active' : '');
-      const nm = document.createElement('div');
-      nm.textContent = id === G.selfId ? 'You' : a.name;
-      chip.appendChild(nm);
-      if (a.statuses.length) {
-        const row = document.createElement('div');
-        row.className = 'chip-status';
-        for (const st of a.statuses) {
-          const tag = document.createElement('span');
-          tag.className = 'st ' + (DEBUFFS.has(st.id) ? 'debuff' : 'buff');
-          const ic = new Image();
-          ic.src = statusIcon(st.id);
-          ic.alt = '';
-          tag.append(ic, document.createTextNode(`${pretty(st.id)} ${st.rounds}`));
-          row.appendChild(tag);
-        }
-        chip.appendChild(row);
-      }
-      el.appendChild(chip);
-    }
-  }
-
+  /** The fight needs no window of its own: the hero's buffs show under the vitals and the rest lives on the hotbar. */
   function renderFightUi() {
-    const f = G.fight;
-    if (!f) return;
-    renderTurns();
+    if (!G.fight) return;
     renderBuffs();
-    renderAutoBtn();
-    const info = $('fightinfo');
-    const h = hero();
-    const opts = f.options;
-    info.textContent =
-      `Round ${f.round}: ` +
-      (opts && opts.actor === G.selfId ? `Your turn, ${opts.moveLeft} moves left` : 'Waiting for the other side');
-
-    const box = $('actions');
-    const util = $('fight-util');
-    box.textContent = '';
-    for (const x of util.querySelectorAll('.x')) x.remove();
-    if (!opts || opts.actor !== G.selfId) return;
-    const extra = (label, onClick, disabled) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'act x';
-      b.textContent = label;
-      b.disabled = Boolean(disabled);
-      b.addEventListener('click', onClick);
-      util.appendChild(b);
-    };
-    if (opts.canSwap || G.inv?.equipment?.weapon2) extra('Q Swap weapon', () => (opts.canSwap ? sendFight({ t: 'swap' }) : toast('You have already acted this turn.')), !opts.canSwap);
-    extra('G Guard', () => sendFight({ t: 'guard' }), opts.acted);
-    extra('E Eat', () => (foodSlot() < 0 ? toast('You have no food.') : sendFight({ t: 'eat', slot: foodSlot() })), opts.acted);
-    extra('F Flee', () => sendFight({ t: 'flee' }), opts.acted);
-    extra('Space End turn', () => sendFight({ t: 'end' }), false);
   }
 
   /** The hero's own buffs and debuffs as icons with rounds left, under the vitals. */
@@ -2884,8 +3037,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const img = new Image();
       img.src = statusIcon(st.id);
       img.alt = '';
-      b.title = `${pretty(st.id)}, ${st.rounds} rounds left`;
-      b.append(img, el('span', 'n', String(st.rounds)));
+      b.title = `${pretty(st.id)}, ${spanOf(st.rounds)} left`;
+      b.append(img, el('span', 'n', String(spanNum(st.rounds))));
       box.appendChild(b);
     }
   }
@@ -2961,8 +3114,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return Number(getComputedStyle(document.documentElement).getPropertyValue('--ui')) || 1;
   }
   function updateUiScale() {
-    const ui = Math.max(1, Math.min(1.75, Math.min(window.innerWidth / 1500, window.innerHeight / 720)));
     const fine = window.matchMedia('(pointer: fine)').matches;
+    // Shrink with the window on a desktop so every panel stays whole; phones keep full size and scroll.
+    const ui = Math.max(fine ? 0.5 : 1, Math.min(2, Math.min(window.innerWidth / 1500, window.innerHeight / 720)));
     document.documentElement.classList.toggle('wide-hud', window.innerWidth / ui >= 1360 && fine);
     document.documentElement.classList.toggle('narrow-hud', window.innerWidth / ui < 1620);
     const root = document.documentElement.style;
@@ -3118,7 +3272,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
     // Jobs on offer or ready to hand in, for anyone inside the view.
     c.textAlign = 'center';
-    c.font = 'bold 10px "Courier New", monospace';
+    c.font = 'bold 10px Tahoma, Verdana, sans-serif';
     for (const n of map.npcs || []) {
       const mark = questMark(n.npc);
       if (!mark) continue;
@@ -3210,7 +3364,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         c.fillRect(z.x * px, z.y * px, z.w * px, z.h * px);
       }
       c.textAlign = 'center';
-      c.font = 'bold 11px "Courier New", monospace';
+      c.font = 'bold 11px Tahoma, Verdana, sans-serif';
       for (const z of map.zones) {
         if (z.kind !== 'safe') continue;
         const tx = (z.x + z.w / 2) * px;
@@ -3226,7 +3380,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const ctx = cv.getContext('2d');
     ctx.drawImage(G.worldBase, 0, 0);
     ctx.textAlign = 'center';
-    ctx.font = 'bold 8px "Courier New", monospace';
+    ctx.font = 'bold 8px Tahoma, Verdana, sans-serif';
     const kinds = new Map(WORLD_KINDS.map((k) => [k.id, k]));
     for (const p of worldPoints()) {
       if (worldHidden.has(p.k)) continue;
@@ -3419,7 +3573,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const held = heldWeapon();
       if (held && held.id === entry.id) return toast('You are already holding it.');
       if (G.fight) {
-        if (!isMyTurn()) return toast('Not your turn to act.');
+        if (!isMyTurn()) return toast(NOT_READY);
         const alt = G.inv && G.inv.equipment && G.inv.equipment.weapon2;
         if (alt && alt.id === entry.id) return G.fight.options.canSwap ? sendFight({ t: 'swap' }) : toast('You have already acted this turn.');
         return toast('In a fight you can only swap to the weapon in your swap slot.');
@@ -3429,7 +3583,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
     const info = ABILITY_INFO[entry.id];
     if (!G.fight) return fromKey ? undefined : openBarPicker('bar', i);
-    if (!isMyTurn()) return toast('Not your turn to act.');
+    if (!isMyTurn()) return toast(NOT_READY);
     const opt = G.fight.options.abilities.find((a) => a.id === entry.id);
     if (!opt) return toast(`${info ? info[0] : 'That ability'} needs a different weapon or shield.`);
     if (opt.reason === 'buff') return toast('Another buff of that kind is still running. Only one damage buff and one defensive buff can be held at a time.');
@@ -3442,7 +3596,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!item) return openBarPicker('quick', q.id);
     if (idx < 0) return toast(`You have none of that. Click the slot to change it.`);
     if (G.fight) {
-      if (!isMyTurn() || G.fight.options.acted) return toast('Not your turn to act.');
+      if (!isMyTurn() || G.fight.options.acted) return toast(NOT_READY);
       return sendFight({ t: 'eat', slot: idx });
     }
     window.wealdmark.send({ t: 'use', slot: idx });
@@ -3549,6 +3703,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         img.src = abilityIcon(entry.id);
         img.alt = '';
         b.appendChild(img);
+        b.dataset.ability = entry.id;
         const info = ABILITY_INFO[entry.id];
         const opt = G.fight && G.fight.options ? G.fight.options.abilities.find((a) => a.id === entry.id) : null;
         const lines = [info ? `${info[0]}: ${info[1]}` : entry.id];
@@ -3563,7 +3718,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
             }
             if (!opt.usable) on = false;
             if (opt.reason === 'buff') lines.push('Another buff of that kind is running.');
-            if (opt.cooldown) b.appendChild(el('span', 'cd', String(opt.cooldown)));
+            // Real time counts the cooldown down in seconds every frame (updateBarTimers); turn fights show the rounds.
+            if (opt.cooldown && !G.fight.rt) b.appendChild(el('span', 'cd', String(opt.cooldown)));
             if (G.fight.selected === entry.id) b.classList.add('selected');
           }
         }
@@ -3611,7 +3767,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const want = STYLES[(STYLES.indexOf(style) + dir * step + STYLES.length * 2) % STYLES.length];
       if (G.fight) {
         if (alt && (CLASS_SKILL[weaponClassOf(alt)] || 'melee') === want) {
-          if (!isMyTurn()) return toast('Not your turn to act.');
+          if (!isMyTurn()) return toast(NOT_READY);
           return G.fight.options.canSwap ? sendFight({ t: 'swap' }) : toast('You have already acted this turn.');
         }
         continue;
@@ -3644,6 +3800,34 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return box;
   }
 
+  /**
+   * Real time: every frame, sweep the action timer over the bar (--gcd goes from 1 to 0) and count each ability's cooldown down.
+   * The bar itself is only rebuilt when the server sends something new.
+   */
+  function updateBarTimers(now) {
+    const f = G.fight;
+    const host = $('hotbar');
+    if (!f || !f.rt || !host) return;
+    const total = Math.max(1, f.readyTotal || RT_ACT_MS);
+    const left = f.readyAt === Infinity ? total : Math.max(0, f.readyAt - now);
+    host.style.setProperty('--gcd', (Math.min(1, left / total)).toFixed(3));
+    for (const b of host.children) {
+      const id = b.dataset.ability;
+      if (!id) continue;
+      const opt = f.options && f.options.abilities.find((a) => a.id === id);
+      const ms = opt && opt.cooldownMs ? Math.max(0, opt.cooldownMs - (now - f.optAt)) : 0;
+      let cd = b.querySelector('.cd');
+      if (ms > 0) {
+        if (!cd) {
+          cd = el('span', 'cd');
+          b.appendChild(cd);
+        }
+        const txt = ms >= 10000 ? String(Math.ceil(ms / 1000)) : (ms / 1000).toFixed(1);
+        if (cd.textContent !== txt) cd.textContent = txt;
+      } else if (cd) cd.remove();
+    }
+  }
+
   /** Rebuild the bar only when something it shows has changed. */
   function renderBar() {
     const host = $('hotbar');
@@ -3656,7 +3840,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       slots,
       G.auto && !bossFight(),
       bossFight(),
-      opts ? [opts.actor, opts.acted, G.fight.selected, opts.abilities.map((a) => [a.id, a.usable, a.cooldown, a.mana])] : 0,
+      opts ? [opts.actor, opts.acted, G.fight.selected, G.fight.rt, opts.abilities.map((a) => [a.id, a.usable, a.cooldown, a.mana])] : 0,
       heldWeapon() && heldWeapon().id,
       G.inv && G.inv.equipment && G.inv.equipment.weapon2 && G.inv.equipment.weapon2.id,
       G.inv ? G.inv.items.map((s) => s && s.id + s.qty) : 0,
@@ -3681,7 +3865,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const right = $('side-r');
     left.textContent = '';
     right.textContent = '';
-    left.append(auto);
+    const loot = el('button', 'sslot auto' + (G.autoloot ? ' on' : ''));
+    loot.type = 'button';
+    loot.append(el('b', '', 'LOOT'), el('span', 'st', G.autoloot ? 'ON' : 'OFF'));
+    loot.title = 'Autoloot. Drops go straight to your bag, with no Loot window. It stays on until you turn it off.';
+    loot.addEventListener('click', toggleAutoLoot);
+    left.append(auto, loot);
 
     const alt = G.inv && G.inv.equipment && G.inv.equipment.weapon2;
     const swap = el('button', 'sslot swap' + (alt ? '' : ' off'));
@@ -3696,12 +3885,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     swap.title = alt ? `Swap to ${altDef ? altDef.name : 'your second weapon'} (Q). In a fight it uses your action.` : 'Swap weapon (Q). Shift-click a weapon in your bag to place it in the swap slot.';
     swap.addEventListener('click', () => {
       if (G.fight) {
-        if (!isMyTurn()) return toast('Not your turn to act.');
+        if (!isMyTurn()) return toast(NOT_READY);
         if (!G.fight.options.canSwap) return toast(G.fight.options.acted ? 'You have already acted this turn.' : 'You have no second weapon. Shift-click a weapon in your bag to place it in the swap slot.');
         return sendFight({ t: 'swap' });
       }
       toast('You can swap weapons in a fight. Out of one, change your weapon in Gear (E) or from the bar.');
     });
+    if (G.fight) {
+      // Guard is a fight action, so its slot only shows during one.
+      const guard = el('button', 'sslot guard');
+      guard.type = 'button';
+      guard.append(el('b', '', 'GUARD'), el('span', 'hk', 'G'));
+      guard.title = G.fight.rt ? 'Guard (G). Take less damage for the next few seconds.' : 'Guard (G). Take less damage until your next turn.';
+      guard.addEventListener('click', () => (isMyTurn() ? sendFight({ t: 'guard' }) : toast(NOT_READY)));
+      right.append(guard);
+    }
     right.append(swap, barSwitcher(style));
 
     for (const q of QUICK) {
@@ -3748,6 +3946,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     $('globe-hp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`);
     $('globe-mp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`);
     $('globe-hp-text').textContent = `${hp}/${maxHp}`;
+    const hpBox = $('globe-hp');
+    hpBox.classList.toggle('low', hp > 0 && hp / maxHp < 0.3);
+    hpBox.classList.toggle('dead', hp <= 0);
+    hpBox.setAttribute('role', 'img');
+    hpBox.setAttribute('aria-label', `Health ${hp} of ${maxHp}`);
+    $('globe-mp').setAttribute('role', 'img');
+    $('globe-mp').setAttribute('aria-label', `Mana ${mp} of ${maxMp}`);
     $('globe-mp-text').textContent = `${mp}/${maxMp}`;
   }
 
@@ -3933,6 +4138,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (def.value) lines.push(`Worth ${def.value} iron bits`);
     if (def.bossOnly) lines.push('Dropped only by dungeon bosses.');
     else if (def.dropOnly) lines.push('Monster drop only. Not sold in shops.');
+    if (G.data && G.data.quests) {
+      for (const q of G.data.quests.values()) {
+        const step = (q.steps || []).find((s) => s.need && s.need.type === 'have' && s.need.item === ref.id);
+        if (step) lines.push(`Quest item: ${step.need.count} needed for "${q.name}".`);
+      }
+    }
     const power = def.power && POWER_TEXT[def.power];
     if (power) lines.push(`Power, ${power[0]}: ${power[1]} Cost: ${power[2]}`);
     for (const m of ref.mods || []) lines.push(modText(m));
@@ -4638,7 +4849,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           if (def.kind === 'food' || def.kind === 'potion') {
             if (G.fight) {
               if (isMyTurn() && !G.fight.options.acted) sendFight({ t: 'eat', slot: i });
-              else toast('Not your turn to act.');
+              else toast(NOT_READY);
             } else window.wealdmark.send({ t: 'use', slot: i });
           } else if (def.kind === 'tool') window.wealdmark.send({ t: 'belt', slot: i });
           else if (G.fight) toast("You can't change gear in a fight.");
@@ -4765,6 +4976,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function setupWindows() {
     for (const p of [...PANELS, ...TOWN_PANELS]) {
       const el = $(p);
+      if (el.querySelector(':scope > .xbtn')) continue; // already set up (the world was joined again)
       const x = document.createElement('button');
       x.type = 'button';
       x.className = 'xbtn';
@@ -4843,6 +5055,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** Clear the chat after a yes, and resize it by dragging the corner at its top right. */
   function setupChat() {
     const nav = $('chatnav');
+    const box = $('chat');
+    box.dataset.tab = 'chat';
+    for (const b of document.querySelectorAll('#chattabs button')) {
+      b.addEventListener('click', () => {
+        box.dataset.tab = b.dataset.tab;
+        for (const o of document.querySelectorAll('#chattabs button')) o.classList.toggle('on', o === b);
+        b.classList.remove('new');
+        const log = $('chatlog');
+        log.scrollTop = log.scrollHeight;
+      });
+    }
     const idle = () => {
       nav.textContent = '';
       const b = el('button', '', 'Clear');
@@ -4911,6 +5134,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     $('vol-music').value = s.music;
     $('mute').checked = s.muted;
     $('hide-others').checked = hideOthers.on;
+    $('hide-roofs').checked = hideRoofs.on;
   }
 
   // ---- talking, shopping, storage, crafting, and the journal
@@ -4945,6 +5169,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function price(amount, cur) {
     const span = el('span', 'price');
+    span.title = { iron_bits: 'Iron bits', gold_coins: 'Gold coins', favor_tokens: 'Favor tokens (premium currency)' }[cur] || '';
     span.append(el('span', `coin ${CUR_CLASS[cur]}`), document.createTextNode(String(amount)));
     return span;
   }
@@ -5282,7 +5507,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const list = G.anchors || [];
     const here = list.find((a) => a.id === G.town.id);
     const crystals = ((G.inv && G.inv.items) || []).reduce((n, s) => (s && s.id === 'teleport_crystal' ? n + s.qty : n), 0);
-    $('anchor-title').textContent = here ? here.name : 'Teleport anchor';
+    $('anchor-title').textContent = here ? `Teleport Stone (${here.name})` : 'Teleport Stone';
     const box = $('anchor-body');
     box.textContent = '';
     box.appendChild(el('p', 'muted', 'Early anchors are free to attune. Later anchors need a Teleport Crystal. Once an anchor is attuned, you can travel between your attuned anchors as often as you like, at no cost.'));
@@ -5308,7 +5533,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     box.appendChild(el('h3', '', 'Your anchors'));
     for (const a of list) {
       const row = el('div', 'perk');
-      row.appendChild(el('span', 'name', a.name));
+      row.appendChild(el('span', 'name', `Teleport Stone (${a.name})`));
       const b = el('button', 'act');
       b.type = 'button';
       if (a.attuned) {
@@ -5652,6 +5877,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   } catch {
     // blocked storage: show everyone
   }
+  /** Whether building roofs are left off so the inside always shows. Kept per device. */
+  const hideRoofs = { on: readPref('wealdmark.hideRoofs') };
   const hidden = (e) => hideOthers.on && e.kind === 'player' && e.id !== G.selfId;
 
   /** Everything to draw this frame, world and fight alike. */
@@ -5705,8 +5932,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return list;
   }
 
+  /** Teleport and resurrection stones carry the name of the place they stand in. */
+  function stationName(e) {
+    if (e.kind !== 'station' || (e.ref !== 'anchor' && e.ref !== 'bellstone')) return e.name;
+    const z = G && G.map ? zoneAt(G.map, Math.round(e.x), Math.round(e.y)) : null;
+    const base = e.ref === 'anchor' ? 'Teleport Stone' : 'Resurrection Stone';
+    return z ? `${base} (${z.name})` : base;
+  }
+
   function labelFor(r) {
-    if (r.kind === 'monster') return `${r.name} (Lv ${r.level})`;
+    if (r.kind === 'station') return stationName(r);
+    if (r.kind === 'monster') {
+      const lv = r.fightActor ? r.fightActor.level : r.level;
+      const hit = myHitChance(lv);
+      return `${r.name}${r.fightActor ? '' : ` (Lv ${lv})`}${hit === null ? '' : ` (${pctText(hit)})`}`;
+    }
     if (r.kind === 'node') {
       const def = G.data && G.data.nodes.get(r.ref);
       if (!def) return r.name;
@@ -5718,7 +5958,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function labelColor(r) {
     if (r.self) return '#e6b34a';
-    if (r.kind === 'npc') return '#9fe8c8';
+    if (r.kind === 'npc') return '#ffd84a';
     if (r.kind === 'station') return '#f0d890';
     if (r.kind === 'node') {
       const def = G.data && G.data.nodes.get(r.ref);
@@ -5734,6 +5974,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const { canvas, ctx, map, tileset } = G;
     const now = performance.now();
     if (G.fight && !G.modal) runFightQueue(now);
+    if (G.fight && G.fight.rt) {
+      const f = G.fight;
+      // No answer from the server for a moment: take the old ready time back so a lost message cannot freeze the hero.
+      if (f.readyAt === Infinity && now - f.sentAt > 1500) f.readyAt = f.lockedReady;
+      autoTick(now);
+      updateBarTimers(now);
+    }
 
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
@@ -5759,6 +6006,18 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     } else {
       const p = worldPos(G.self(), now);
       cam = { x: p.x, y: p.y };
+    }
+    // Click-and-drag (or one-finger drag) looks ahead; letting go eases the view back to the hero.
+    if (G.look) {
+      if (!G.panning) {
+        G.look.x *= 0.82;
+        G.look.y *= 0.82;
+        if (Math.abs(G.look.x) < 0.05 && Math.abs(G.look.y) < 0.05) G.look = null;
+      }
+      if (G.look) {
+        cam.x += G.look.x;
+        cam.y += G.look.y;
+      }
     }
     const offX = Math.round(w / 2 - (cam.x * TILE + TILE / 2) * s);
     const offY = Math.round(h / 2 - (cam.y * TILE + TILE / 2) * s);
@@ -5873,10 +6132,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           ctx.filter = 'brightness(2.2)';
         }
         if (r.kind === 'monster') drawMonster(ctx, r.mon, sx, sy, s, step, bob);
-        else if (r.kind === 'npc') {
-          const def = G.data && G.data.npcs.get(r.ref);
-          if (def) drawFigure(ctx, sx, sy, s, npcLook(def), 0, 0, {});
-        } else drawFigure(ctx, sx, sy, s, r.look, step, bob, heldGear(r.id));
+        else {
+          // Heroes and townsfolk are drawn a fifth larger with a dark rim, so they do not melt into the grass.
+          const o = Math.max(1, Math.round(s * 0.5));
+          const rim = ['drop-shadow(' + o + 'px 0 0 #120a14)', 'drop-shadow(-' + o + 'px 0 0 #120a14)', 'drop-shadow(0 ' + o + 'px 0 #120a14)', 'drop-shadow(0 -' + o + 'px 0 #120a14)', 'saturate(1.2)'].join(' ');
+          ctx.save();
+          ctx.translate(sx + 8 * s, sy + 15 * s);
+          ctx.scale(1.2, 1.2);
+          ctx.translate(-(sx + 8 * s), -(sy + 15 * s));
+          ctx.filter = r.flash ? 'brightness(2.2) ' + rim : rim;
+          if (r.kind === 'npc') {
+            const def = G.data && G.data.npcs.get(r.ref);
+            if (def) drawFigure(ctx, sx, sy, s, npcLook(def), 0, 0, {});
+          } else drawFigure(ctx, sx, sy, s, r.look, step, bob, heldGear(r.id));
+          ctx.restore();
+        }
         ctx.filter = 'none';
         ctx.globalAlpha = 1;
       }
@@ -5893,7 +6163,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
     // Names, health bars, speech, and floating numbers on top.
     ctx.textAlign = 'center';
-    ctx.font = `bold ${Math.max(10, 4 * s)}px "Courier New", monospace`;
+    ctx.font = `bold ${Math.max(9, 3.4 * s)}px Tahoma, Verdana, sans-serif`;
     const mp = worldPos(G.self(), now);
     for (const r of list) {
       if (r.alpha <= 0.05 || r.kind === 'pet') continue;
@@ -5904,12 +6174,76 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       let y = top;
       if (r.fightActor) {
         const a = r.fightActor;
-        const bw = px;
-        const by = y - 5 * s;
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.fillRect(cx - bw / 2, by, bw, Math.max(3, s));
-        ctx.fillStyle = a.side === 'hero' ? '#6fd28a' : '#e05a5a';
-        ctx.fillRect(cx - bw / 2, by, Math.max(0, bw * (a.hp / a.maxHp)), Math.max(3, s));
+        // Health bar with the numbers in it, and the fighter's buffs and debuffs in a row under it.
+        const bw = Math.max(px * 1.6, 48);
+        const bh = Math.max(9, 3 * s);
+        const by = y - 5 * s - bh - 11;
+        const boss = a.side !== 'hero' && isBossActor(a);
+        ctx.fillStyle = r.active ? '#e6b34a' : boss ? '#b8801a' : '#000';
+        ctx.fillRect(cx - bw / 2 - 2, by - 2, bw + 4, bh + 4);
+        ctx.fillStyle = '#1a1018';
+        ctx.fillRect(cx - bw / 2, by, bw, bh);
+        const frac = Math.max(0, Math.min(1, a.hp / a.maxHp));
+        const grad = ctx.createLinearGradient(0, by, 0, by + bh);
+        if (a.side === 'hero') { grad.addColorStop(0, '#7fd89a'); grad.addColorStop(1, '#2f7a45'); }
+        else { grad.addColorStop(0, '#e86a6a'); grad.addColorStop(1, '#8a2222'); }
+        ctx.fillStyle = grad;
+        ctx.fillRect(cx - bw / 2, by, bw * frac, bh);
+        // Level badge, coloured by how the fight rates against you.
+        const bs = bh + 6;
+        const bx = cx - bw / 2 - bs - 1;
+        const dl = a.side === 'hero' ? 0 : a.level - myCombat();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(bx - 1, by - 4, bs + 2, bs + 2);
+        ctx.fillStyle = a.side === 'hero' ? '#3a5a9a' : dl > 2 ? '#a02020' : dl > 0 ? '#b8601a' : dl === 0 ? '#a88a1a' : '#2f6b3a';
+        ctx.fillRect(bx, by - 3, bs, bs);
+        ctx.font = `bold ${Math.max(8, bh - 1)}px Tahoma, Verdana, sans-serif`;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000';
+        ctx.fillStyle = '#fff';
+        ctx.strokeText(String(a.level), bx + bs / 2, by + bh - 1);
+        ctx.fillText(String(a.level), bx + bs / 2, by + bh - 1);
+        const nameFont = ctx.font;
+        ctx.font = `bold ${Math.max(8, bh - 1)}px Tahoma, Verdana, sans-serif`;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000';
+        ctx.fillStyle = '#fff';
+        ctx.strokeText(`${a.hp}/${a.maxHp}`, cx, by + bh - 1);
+        ctx.fillText(`${a.hp}/${a.maxHp}`, cx, by + bh - 1);
+        // Real time: a thin bar under the health shows how long until this fighter can act again.
+        const rtBar = G.fight && G.fight.rt && a.alive;
+        if (rtBar) {
+          const readyAt = a.id === G.selfId ? G.fight.readyAt : a.readyAt;
+          const total = Math.max(1, (a.id === G.selfId ? G.fight.readyTotal : a.readyTotal) || RT_ACT_MS);
+          const left = readyAt === undefined ? 0 : readyAt === Infinity ? total : Math.max(0, readyAt - now);
+          ctx.fillStyle = '#000';
+          ctx.fillRect(cx - bw / 2 - 2, by + bh + 2, bw + 4, 6);
+          ctx.fillStyle = '#2a2140';
+          ctx.fillRect(cx - bw / 2, by + bh + 3, bw, 4);
+          ctx.fillStyle = left <= 0 ? '#f4d77f' : a.side === 'hero' ? '#6aa0ff' : '#ffb347';
+          ctx.fillRect(cx - bw / 2, by + bh + 3, bw * (left <= 0 ? 1 : 1 - Math.min(1, left / total)), 4);
+        }
+        const sts = a.statuses || [];
+        const isz = 11;
+        sts.forEach((st, k) => {
+          const ix = cx - (sts.length * (isz + 2)) / 2 + k * (isz + 2);
+          const iy = by + bh + 2 + (rtBar ? 8 : 0);
+          let ic = G.stIcons && G.stIcons.get(st.id);
+          if (!ic) {
+            ic = new Image();
+            ic.src = statusIcon(st.id);
+            (G.stIcons = G.stIcons || new Map()).set(st.id, ic);
+          }
+          ctx.fillStyle = DEBUFFS.has(st.id) ? '#8a2f2f' : '#2f6b3a';
+          ctx.fillRect(ix - 1, iy - 1, isz + 2, isz + 2);
+          if (ic.complete) ctx.drawImage(ic, ix, iy, isz, isz);
+          ctx.font = 'bold 8px Tahoma, Verdana, sans-serif';
+          ctx.fillStyle = '#fff';
+          ctx.strokeText(String(spanNum(st.rounds)), ix + isz - 2, iy + isz + 1);
+          ctx.fillText(String(spanNum(st.rounds)), ix + isz - 2, iy + isz + 1);
+        });
+        ctx.font = nameFont;
+        ctx.lineWidth = 3;
         y = by - 3;
         if (r.active) {
           ctx.fillStyle = '#e6b34a';
@@ -5922,10 +6256,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         }
       }
       let label = labelFor(r);
-      if (r.fightActor && r.fightActor.side === 'enemy') {
-        const hit = myHitChance(r.fightActor.level);
-        if (hit !== null) label += ` ${pctText(hit)}`;
-      }
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#000';
       ctx.fillStyle = labelColor(r);
@@ -5974,7 +6304,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       ctx.fillRect(Math.round(nx - 2 * s), Math.round(ny - 2 * s), 2 * s, 2 * s);
     }
     G.floaters = G.floaters.filter((f) => now - f.t0 < 900);
-    ctx.font = `bold ${Math.max(12, 5 * s)}px "Courier New", monospace`;
+    ctx.font = `bold ${Math.max(10, 4 * s)}px Tahoma, Verdana, sans-serif`;
     for (const f of G.floaters) {
       const t = (now - f.t0) / 900;
       ctx.globalAlpha = 1 - t * t;
@@ -6033,7 +6363,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
     ctx.save();
     ctx.globalAlpha = 0.4;
-    ctx.font = '10px "Courier New", monospace';
+    ctx.font = '10px Tahoma, Verdana, sans-serif';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
     ctx.fillStyle = '#000';
@@ -6082,6 +6412,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
     let pinch = null;
     let press = null;
+    const look = lookDrag();
     const cancelPress = () => {
       if (press) clearTimeout(press.timer);
       press = null;
@@ -6093,6 +6424,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         pinch = { d: dist(ev.touches), z: G.zoom };
       } else if (ev.touches.length === 1 && !pinch) {
         const t = ev.touches[0];
+        look.begin(t.clientX, t.clientY);
         press = {
           x: t.clientX,
           y: t.clientY,
@@ -6111,12 +6443,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         ev.preventDefault();
         G.noClick = performance.now() + 400;
         setZoom(pinch.z + Math.round(Math.log(dist(ev.touches) / pinch.d) / Math.log(1.25)));
-      } else if (press && ev.touches.length === 1) {
+      } else if (ev.touches.length === 1) {
         const t = ev.touches[0];
-        if (Math.hypot(t.clientX - press.x, t.clientY - press.y) > 10) cancelPress();
+        if (look.move(t.clientX, t.clientY)) {
+          ev.preventDefault();
+          cancelPress();
+        } else if (press && Math.hypot(t.clientX - press.x, t.clientY - press.y) > 10) cancelPress();
       }
     }, { passive: false });
     on(canvas, 'touchend', (ev) => {
+      if (ev.touches.length === 0 && look.end()) ev.preventDefault();
       if (pinch) G.noClick = performance.now() + 400;
       if (ev.touches.length < 2) pinch = null;
       if (press) {
@@ -6125,6 +6461,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       }
     }, { passive: false });
     on(canvas, 'touchcancel', () => {
+      look.end();
       pinch = null;
       cancelPress();
     });
@@ -6132,6 +6469,37 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('mb-zout'), 'click', () => setZoom(G.zoom - 1));
     on($('mb-map'), 'click', () => setZoom(G.zoom === -12 ? 0 : -12));
     on($('mb-chat'), 'click', () => $('chatinput').focus());
+  }
+
+  /** Drag the view to see what is ahead. begin() on press, move() with the pointer, end() on release. */
+  function lookDrag() {
+    let st = null;
+    return {
+      begin(x, y) {
+        st = { x, y, base: G.look ? { ...G.look } : { x: 0, y: 0 }, moved: false };
+      },
+      move(x, y) {
+        if (!st || !G) return false;
+        const dx = x - st.x;
+        const dy = y - st.y;
+        if (!st.moved && Math.hypot(dx, dy) < 8) return false;
+        st.moved = true;
+        G.panning = true;
+        const px = TILE * G.scale;
+        const lim = 60;
+        G.look = { x: Math.max(-lim, Math.min(lim, st.base.x - dx / px)), y: Math.max(-lim, Math.min(lim, st.base.y - dy / px)) };
+        return true;
+      },
+      end() {
+        const moved = Boolean(st && st.moved);
+        st = null;
+        if (G) {
+          G.panning = false;
+          if (moved) G.noClick = performance.now() + 300;
+        }
+        return moved;
+      },
+    };
   }
 
   function onMouseMove(ev) {
@@ -6154,7 +6522,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (e) {
         const def = e.kind === 'monster' && G.data && G.data.monsters.get(e.mon);
         const npc = e.kind === 'npc' && G.data && G.data.npcs.get(e.ref);
-        text = e.kind === 'monster' ? `${e.name}, level ${e.level}${def ? `, ${def.maxHp} health, hits up to ${def.maxHit}` : ''}` : npc ? `${e.name}, ${npc.role}` : e.kind === 'node' || e.kind === 'station' ? e.name : `${e.name}, level ${e.level}`;
+        text = e.kind === 'monster' ? `${e.name}, level ${e.level}${def ? `, ${def.maxHp} health, hits up to ${def.maxHit}` : ''}` : npc ? `${e.name}, ${npc.role}` : e.kind === 'node' ? e.name : e.kind === 'station' ? stationName(e) : `${e.name}, level ${e.level}`;
       }
     }
     G.inspect = { x: t.x, y: t.y, until: performance.now() + 4000 };
@@ -6184,7 +6552,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       m.appendChild(b);
     };
     const verb = node.kind === 'station' ? 'use' : def && def.verb ? def.verb : 'gather';
-    add(`${verb[0].toUpperCase()}${verb.slice(1)} ${node.name}`, () => {
+    add(`${verb[0].toUpperCase()}${verb.slice(1)} ${stationName(node)}`, () => {
       G.dest = null;
       window.wealdmark.send({ t: 'interact', target: node.id });
     });
@@ -6876,7 +7244,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   /** Fade each roof out while the hero stands inside, and draw it over everything else. */
   function drawRoofs(ctx, offX, offY, px) {
-    if (!G.buildings) return;
+    if (!G.buildings || hideRoofs.on) return;
     const me = G.self();
     const mx = Math.round(me.x);
     const my = Math.round(me.y);
@@ -6891,7 +7259,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.globalAlpha = 1;
   }
 
-  const roofed = (x, y) => !!G.buildings && G.buildings.some((b) => b.alpha > 0.5 && x > b.x0 && x < b.x1 && y > b.y0 && y < b.y1);
+  const roofed = (x, y) => !hideRoofs.on && !!G.buildings && G.buildings.some((b) => b.alpha > 0.5 && x > b.x0 && x < b.x1 && y > b.y0 && y < b.y1);
 
   // ---- what is under the mouse
   const TILE_INFO = {
@@ -6948,7 +7316,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const ok = have >= def.level;
         return [e.name, `${SKILL_LABEL[def.skill] || pretty(def.skill)} level ${def.level}. You have ${have}.`, e.depleted ? 'Depleted. It will grow back soon.' : ok ? 'Click to gather.' : 'Your skill level is too low.'];
       }
-      if (e.kind === 'station') return [e.name, 'Click to use.'];
+      if (e.kind === 'station') return [stationName(e), 'Click to use.'];
       return [e.name, `Level ${e.level}`];
     }
     const dec = TILE_INFO.decor[map.layers.decor[t.y * map.width + t.x]];
@@ -7029,6 +7397,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       tip,
       mouse: null,
       loot: { fight: null, box: null },
+      auto: readPref('wealdmark.auto'),
+      autoloot: readPref('wealdmark.autoloot'),
       tickMs: welcome.tickMs,
       selfId: welcome.you.id,
       entities: new Map(),
@@ -7079,6 +7449,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       updateTip();
     });
     on(canvas, 'click', onClick);
+    const drag = lookDrag();
+    on(canvas, 'mousedown', (ev) => { if (ev.button === 0 && !ev.shiftKey) drag.begin(ev.clientX, ev.clientY); });
+    on(window, 'mousemove', (ev) => { if (ev.buttons & 1) drag.move(ev.clientX, ev.clientY); });
+    on(window, 'mouseup', () => drag.end());
     setupTouch(canvas);
     on(canvas, 'wheel', (ev) => {
       ev.preventDefault();
@@ -7112,7 +7486,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (!ev.target.closest('#toolbar')) $('menu-list').classList.add('hidden');
     });
     on($('btn-trades'), 'click', () => togglePanel('panel-trades'));
-    on($('auto-btn'), 'click', toggleAuto);
     setupBar();
     on($('bc-no'), 'click', closeBuyConfirm);
     on($('bc-yes'), 'click', () => {
@@ -7174,6 +7547,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       }
     });
 
+    on($('hide-roofs'), 'change', (e) => {
+      hideRoofs.on = e.target.checked;
+      writePref('wealdmark.hideRoofs', hideRoofs.on);
+    });
+
     for (const m of early.splice(0)) handle(m);
     if (welcome.intro) {
       playIntro(() => {
@@ -7192,7 +7570,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (window.wealdmarkAudio) window.wealdmarkAudio.music(null);
     for (const off of listeners.splice(0)) off();
     openOrder.length = 0;
-    for (const p of [...PANELS, ...TOWN_PANELS, 'turns', 'fightbar', 'busy']) $(p).classList.add('hidden');
+    for (const p of [...PANELS, ...TOWN_PANELS, 'busy']) $(p).classList.add('hidden');
     G = null;
     early.length = 0;
   }

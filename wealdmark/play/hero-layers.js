@@ -115,7 +115,7 @@
 
   /**
    * A 20x20 canvas (the 16 px cell plus a 2 px margin, like the code art) with the figure's layers stacked,
-   * or null when it cannot be drawn yet. The sheet has no walk frames: step 1 lifts the figure 1 px, step 2 mirrors it.
+   * or null when it cannot be drawn yet. The sheet has no walk frames: step 1 lifts the figure 1 px, step 2 mirrors the body but not what it holds.
    */
   function paint(look, held, step) {
     const cat = root.HERO_CATALOG;
@@ -130,16 +130,21 @@
     c.width = c.height = 20;
     const g = c.getContext('2d');
     g.imageSmoothingEnabled = false;
+    // The trailing cells are the weapon and the offhand. They stay in the same hand on the mirrored step.
+    let held_n = 0;
+    if (held.weapon) held_n++;
+    if (held.offPistol ? cat.offPistol : held.shield && held.oid && cat.shield[held.oid]) held_n++;
+    const body_n = cells.length - held_n;
+    const dy = step === 1 ? 1 : 2;
+    const draw = (cell) => g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 2, dy, cat.cell, cat.cell);
     if (step === 2) {
       g.save();
       g.translate(20, 0);
       g.scale(-1, 1);
     }
-    const dy = step === 1 ? 1 : 2;
-    for (const cell of cells) {
-      g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 2, dy, cat.cell, cat.cell);
-    }
+    for (let i = 0; i < body_n; i++) draw(cells[i]);
     if (step === 2) g.restore();
+    for (let i = body_n; i < cells.length; i++) draw(cells[i]);
     if (cache.size > 400) cache.clear();
     cache.set(key, c);
     return c;

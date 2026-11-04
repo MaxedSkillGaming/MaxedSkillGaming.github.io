@@ -115,8 +115,6 @@
       <div class="meter mp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div>
     </div>
 
-    <div id="buffs"></div>
-
     <div id="bhud">
       <div class="qcol">
         <button class="qslot" data-q="hp" type="button"></button>
@@ -124,10 +122,13 @@
       </div>
       <div class="globe hp" id="globe-hp"><span id="globe-hp-text"></span></div>
       <div id="hotcol">
-        <div class="meter xp"><div id="xp-fill" class="meter-fill"></div><span id="xp-text"></span></div>
+        <div id="buffs"></div>
         <div id="hotrow">
           <div id="side-l" class="qcol"></div>
-          <div id="hotbar"></div>
+          <div id="hotmid">
+            <div class="meter xp"><div id="xp-fill" class="meter-fill"></div><span id="xp-text"></span></div>
+            <div id="hotbar"></div>
+          </div>
           <div id="side-r" class="qcol"></div>
         </div>
       </div>
@@ -167,10 +168,8 @@
         <button id="btn-dungeon" type="button">Dungeon (O)</button>
         <button id="btn-town" type="button">Town (T)</button>
       </div></div>
-      <div class="grp"><button class="grp-btn" type="button" aria-haspopup="true">More</button><div class="grp-pop">
-        <button id="btn-sound" type="button">Sound</button>
-        <button id="leave" type="button">Log Out</button>
-      </div></div>
+      <button id="btn-sound" type="button">Settings</button>
+      <button id="leave" type="button">Log Out</button>
       </div>
     </div>
 
@@ -183,13 +182,6 @@
 
     <div id="toast" role="status"></div>
 
-    <div id="turns" class="hidden" aria-label="Turn order"></div>
-
-    <div id="fightbar" class="hidden">
-      <div id="fightinfo"></div>
-      <div id="actions"></div>
-      <div id="fight-util"><button id="auto-btn" class="act" type="button">X Combat: Manual</button></div>
-    </div>
 
     <div id="panel-skills" class="side hidden">
       <h2>Skills</h2>
@@ -207,7 +199,7 @@
       <div id="wallet" title="Your coins: iron bits, gold coins, favor tokens">
         <span class="coin iron" title="Iron bits"></span><span id="w-iron">0</span>
         <span class="coin gold" title="Gold coins"></span><span id="w-gold">0</span>
-        <span class="coin favor" title="Favor tokens"></span><span id="w-favor">0</span>
+        <span class="coin favor" title="Favor tokens (premium currency)"></span><span id="w-favor">0</span>
       </div>
       <div id="bag-grid"></div>
       <p class="muted">Click food to eat it, or gear to wear it. Shift-click a weapon to put it in the swap slot. Hover for details.</p>
@@ -250,6 +242,7 @@
       <label>Music <input id="vol-music" type="range" min="0" max="1" step="0.05" /></label>
       <label class="check"><input id="mute" type="checkbox" /> Mute everything</label>
       <label class="check"><input id="hide-others" type="checkbox" /> Hide other players</label>
+      <label class="check"><input id="hide-roofs" type="checkbox" /> Hide building roofs</label>
     </div>
 
     <div id="panel-party" class="side hidden">
@@ -315,7 +308,7 @@
     </div>
 
     <div id="panel-anchor" class="side wide hidden">
-      <h2 id="anchor-title">Teleport anchor</h2>
+      <h2 id="anchor-title">Teleport Stone</h2>
       <div id="anchor-body"></div>
       <button id="anchor-close" type="button">Done</button>
     </div>
@@ -364,6 +357,7 @@
 
     <div id="chat">
       <div id="chat-grip" title="Drag to resize the chat"></div>
+      <div id="chattabs"><button type="button" data-tab="chat" class="on">Chat</button><button type="button" data-tab="combat">Combat</button></div>
       <div id="chatnav"><button id="chat-clear" type="button" title="Clear the chat">Clear</button></div>
       <ul id="chatlog"></ul>
       <form id="chatform" autocomplete="off">
