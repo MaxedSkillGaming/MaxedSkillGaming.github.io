@@ -203,6 +203,9 @@ footer { margin-top: 16px; text-align: right; }
 #buffs .buff img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
 #buffs .buff .n { position: absolute; right: -2px; bottom: -3px; font-size: 10px; line-height: 10px; padding: 0 2px; background: #000; color: #fff; }
 #rctl { position: absolute; top: 56px; right: 10px; display: flex; gap: 3px; z-index: 6; }
+#recenter { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 7; margin: 0; padding: 4px 12px; min-height: 28px; font-size: 12px; white-space: nowrap; }
+#recenter.hidden { display: none; }
+@media (pointer: coarse) { #recenter { min-height: 40px; } }
 .fbox { position: absolute; display: flex; flex-direction: column; min-width: 90px; min-height: 60px; overflow: hidden; resize: both; background: rgba(20, 16, 28, 0.9); border: 3px solid var(--edge); z-index: 5; }
 .fbox.off, .fbox.hidden { display: none; }
 .fgrip { flex: none; padding: 0 6px; font-size: 11px; line-height: 16px; color: var(--gold); background: #2a2040; cursor: move; user-select: none; touch-action: none; }
@@ -263,7 +266,7 @@ footer { margin-top: 16px; text-align: right; }
 #tracker .short { color: #e8c070; }
 .meter span { position: absolute; inset: 0; text-align: center; line-height: 12px; font-size: 11px; text-shadow: 1px 1px 0 #000; }
 #wallet { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
-#wallet span:not(.coin) { margin-right: 8px; min-width: 14px; }
+#wallet span:not(.coin) { margin-right: 8px; min-width: 14px; white-space: nowrap; flex: none; }
 /* Currencies: iron bits (grey coin), gold coins (gold coin), favor tokens (purple gem, the premium currency). */
 .coin { display: inline-block; flex: none; width: 12px; height: 12px; vertical-align: -2px; margin-right: 3px; border: 2px solid #000; border-radius: 50%; box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.28), inset 2px 2px 0 rgba(255, 255, 255, 0.4); }
 .coin.iron { background: #9aa0aa; }
@@ -791,45 +794,23 @@ button.qtrack.on { background: #2f6b3a; }
 #chattabs button.on { opacity: 1; color: var(--trim-hi); border-color: var(--hud-line); box-shadow: inset 0 -3px 0 var(--trim), inset 0 1px 0 var(--hud-bevel); }
 .grp.open .grp-btn { background: linear-gradient(180deg, #6d59a8, #43356d); }
 
-/* Vials: a stepped pixel gem in a gold frame, filled in hard colour bands (no smooth glass). */
+/* Vials: a pixel potion flask drawn on a 16x16 grid (see drawFlask in game.js), no smooth glass. */
 .globe {
   --f: 1;
-  width: 88px;
-  height: 88px;
+  width: 80px;
+  height: 80px;
   border: 0;
   border-radius: 0;
-  overflow: hidden;
-  clip-path: polygon(16% 0, 84% 0, 100% 16%, 100% 84%, 84% 100%, 16% 100%, 0 84%, 0 16%);
-  background: repeating-conic-gradient(#170f26 0 25%, #0d0818 0 50%) 0 0 / 8px 8px;
+  overflow: visible;
+  background: none;
   box-shadow: none;
+  clip-path: none;
 }
-.globe:before {
-  left: 7%;
-  right: 7%;
-  bottom: 7%;
-  height: calc((100% - 14%) * var(--f));
-  transition: height 180ms steps(6);
-}
-.globe.hp:before { background: linear-gradient(90deg, transparent 0 14%, rgba(255, 255, 255, 0.24) 14% 24%, transparent 24% 78%, rgba(0, 0, 0, 0.28) 78%), linear-gradient(180deg, var(--hp-hi) 0 6%, var(--hp-mid) 6% 55%, var(--hp-lo) 55%); }
-.globe.mp:before { background: linear-gradient(90deg, transparent 0 14%, rgba(255, 255, 255, 0.24) 14% 24%, transparent 24% 78%, rgba(0, 0, 0, 0.28) 78%), linear-gradient(180deg, var(--mp-hi) 0 6%, var(--mp-mid) 6% 55%, var(--mp-lo) 55%); }
-.globe:after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  left: 0;
-  top: 0;
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  background: linear-gradient(135deg, var(--trim-hi) 0 12%, var(--trim) 12% 55%, var(--trim-lo) 55%);
-  clip-path: polygon(evenodd, 16% 0, 84% 0, 100% 16%, 100% 84%, 84% 100%, 16% 100%, 0 84%, 0 16%, 0 16%, 7% 16%, 7% 78%, 22% 93%, 78% 93%, 93% 78%, 93% 22%, 78% 7%, 22% 7%, 7% 22%, 7% 16%, 0 16%);
-}
-.globe span { z-index: 2; font-size: 14px; font-weight: bold; letter-spacing: 0.3px; text-shadow: 1px 1px 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 0 0 #000; }
-.globe.hp.low:after { background: linear-gradient(135deg, #ff8a78 0 12%, #d8402f 12% 55%, #7a1f1a 55%); animation: orblow 900ms steps(4) infinite; }
-.globe.hp.low span:before { content: "\2665\00a0"; color: #ffb0a0; }
-.globe.hp.dead:before { height: 0; }
+.globe:before, .globe:after { content: none; }
+.globe canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+.globe span { z-index: 2; top: auto; bottom: 8px; height: auto; font-size: 12px; font-weight: bold; letter-spacing: 0; white-space: nowrap; text-shadow: 1px 1px 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 0 0 #000; }
+.globe.hp.low canvas { animation: orblow 900ms steps(4) infinite; }
+@media (pointer: coarse), (max-width: 760px) { .globe { width: 48px; height: 48px; } .globe span { font-size: 10px; bottom: 4px; } }
 @keyframes orblow { 0%, 100% { filter: brightness(0.9); } 50% { filter: brightness(1.5); } }
 
 /* Hotbar and quick slots: bevelled plates with a key hint, lift on hover, sink on press. */
@@ -868,7 +849,7 @@ button.qtrack.on { background: #2f6b3a; }
 
 
 @media (prefers-reduced-motion: reduce) {
-  .globe.hp.low:after { animation: none; }
+  .globe.hp.low canvas { animation: none; }
   .bslot, .qslot, .sslot, #toolbar button, #rctl button { transition: none; }
   #hotcol .meter.xp.gain { animation: none; }
 }
@@ -932,3 +913,36 @@ button.qtrack.on { background: #2f6b3a; }
 #hotbar .bslot:not(.empty)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--gcd) * 100%); background: rgba(8, 4, 16, 0.55); pointer-events: none; }
 .sslot.guard { border-color: #4a6aa0; }
 .sslot.guard b { font-weight: normal; color: #e8e0f0; }
+
+/* Chat, RuneScape style: one see-through panel, hard-shadowed text, the input under the log, tabs along the bottom. */
+#chat {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-areas: "log log" "form form" "tabs nav";
+  background: rgba(8, 6, 14, 0.55);
+  border: 2px solid rgba(0, 0, 0, 0.7);
+  opacity: 1;
+}
+#chat:not(:hover):not(:focus-within) { opacity: 1; }
+#chatlog { grid-area: log; margin: 0; padding: 4px 8px; background: none; border: 0; box-shadow: none; font-size: 13px; color: #f0e8ff; text-shadow: 1px 1px 0 #000; }
+#chatform { grid-area: form; margin: 0; border-top: 1px solid rgba(255, 255, 255, 0.14); }
+#chatinput { background: rgba(0, 0, 0, 0.4); border: 0; border-radius: 0; box-shadow: none; padding: 4px 8px; font-size: 13px; text-shadow: 1px 1px 0 #000; }
+#chattabs { grid-area: tabs; margin: 0; gap: 0; }
+#chatnav { grid-area: nav; margin: 0; }
+#chattabs button, #chatnav button, #chattabs button:hover, #chatnav button:hover, #chattabs button:active, #chatnav button:active {
+  margin: 0;
+  padding: 3px 12px;
+  min-height: 24px;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 0;
+  border-top: 2px solid transparent;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+  opacity: 0.85;
+}
+#chattabs button:hover, #chatnav button:hover { background: rgba(70, 54, 110, 0.6); opacity: 1; }
+#chattabs button.on { background: rgba(110, 82, 36, 0.6); border-top-color: var(--trim-hi); box-shadow: none; opacity: 1; }

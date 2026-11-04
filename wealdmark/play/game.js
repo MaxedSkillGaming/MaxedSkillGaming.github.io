@@ -954,6 +954,108 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         r(10, -1, 2, 2, '#f0d860');
         r(14, 2, 1, 11, '#c0c8d8');
         r(13, 1, 3, 2, '#7affe8');
+      } else if (mon === 'thorn_sprite') {
+        const fl = step === 1 ? 1 : 0;
+        const fr = step === 2 ? 1 : 0;
+        r(5, 13 - fl, 2, 2, '#4a3418');
+        r(9, 13 - fr, 2, 2, '#4a3418');
+        r(3, 5, 10, 8, '#3c6a2c');
+        r(3, 5, 4, 3, '#5a8a40');
+        r(4, 12, 8, 1, '#24421c');
+        r(2, 3, 1, 3, '#7a5a30');
+        r(6, 2, 1, 3, '#7a5a30');
+        r(10, 2, 1, 3, '#7a5a30');
+        r(13, 4, 1, 3, '#7a5a30');
+        r(5, 7, 2, 2, '#1a0a0a');
+        r(9, 7, 2, 2, '#1a0a0a');
+        r(5, 7, 1, 1, '#ff5a4a');
+        r(9, 7, 1, 1, '#ff5a4a');
+        r(6, 10, 4, 1, '#1a0a0a');
+      } else if (mon === 'feral_ram') {
+        const fl = step === 1 ? 1 : 0;
+        const fr = step === 2 ? 1 : 0;
+        r(3, 12 - fl, 2, 3, '#3a2c20');
+        r(6, 12 - fr, 2, 3, '#2a2018');
+        r(9, 12 - fl, 2, 3, '#3a2c20');
+        r(12, 12 - fr, 2, 3, '#2a2018');
+        r(2, 6, 11, 7, '#e0d8c4');
+        r(2, 6, 11, 2, '#f4eedc');
+        r(2, 12, 11, 1, '#b4ac98');
+        r(11, 5, 4, 6, '#6a5a48');
+        r(14, 8, 2, 3, '#8a7a68');
+        r(15, 9, 1, 1, '#1a1010');
+        r(11, 4, 3, 2, '#c8b890');
+        r(10, 3, 2, 3, '#a89870');
+        r(13, 3, 2, 2, '#a89870');
+        r(12, 6, 1, 1, '#ff8a3a');
+      } else if (mon === 'quarry_golem') {
+        const fl = step === 1 ? 1 : 0;
+        const fr = step === 2 ? 1 : 0;
+        r(3, 12 - fl, 4, 3, '#5a5650');
+        r(9, 12 - fr, 4, 3, '#4a4640');
+        r(2, 5, 12, 8, '#8a867c');
+        r(2, 5, 12, 2, '#aaa69a');
+        r(2, 12, 12, 1, '#5a564e');
+        r(0, 6, 3, 6, '#7a766c');
+        r(13, 6, 3, 6, '#7a766c');
+        r(4, 1, 8, 5, '#9a968a');
+        r(4, 1, 8, 1, '#bab6aa');
+        r(5, 3, 2, 2, '#ffb02a');
+        r(9, 3, 2, 2, '#ffb02a');
+        r(6, 8, 1, 3, '#5a564e');
+        r(9, 7, 1, 2, '#5a564e');
+      } else if (mon === 'bandit_cutthroat') {
+        const fl = step === 1 ? 1 : 0;
+        const fr = step === 2 ? 1 : 0;
+        r(4, 13 - fl, 3, 2, '#2a2018');
+        r(9, 13 - fr, 3, 2, '#2a2018');
+        r(4, 6, 8, 8, '#4a3a2c');
+        r(4, 6, 3, 3, '#6a5844');
+        r(4, 11, 8, 1, '#2a2018');
+        r(3, 7, 1, 5, '#e0b890');
+        r(12, 7, 1, 5, '#e0b890');
+        r(4, 1, 8, 6, '#3a2c26');
+        r(5, 3, 6, 3, '#e0b890');
+        r(5, 4, 2, 1, '#10080a');
+        r(9, 4, 2, 1, '#10080a');
+        r(5, 6, 6, 1, '#7a2a2a');
+        r(13, 5, 1, 6, '#c8ced6');
+        r(13, 4, 1, 1, '#ffffff');
+      } else if (mon === 'crypt_spider') {
+        const lg = step === 1 ? 1 : 0;
+        r(0, 8 + lg, 3, 1, '#2a1a3a');
+        r(1, 10 - lg, 3, 1, '#2a1a3a');
+        r(13, 8 + lg, 3, 1, '#2a1a3a');
+        r(12, 10 - lg, 3, 1, '#2a1a3a');
+        r(1, 12, 2, 2, '#2a1a3a');
+        r(13, 12, 2, 2, '#2a1a3a');
+        r(5, 11, 1, 3, '#2a1a3a');
+        r(10, 11, 1, 3, '#2a1a3a');
+        r(4, 5, 9, 7, '#3c2a54');
+        r(4, 5, 4, 3, '#5a4478');
+        r(7, 7, 3, 1, '#a8f08a');
+        r(2, 6, 4, 4, '#2a1a3a');
+        r(3, 7, 1, 1, '#ff3a5a');
+        r(5, 7, 1, 1, '#ff3a5a');
+      } else if (mon === 'salt_crab') {
+        const lg = step === 1 ? 1 : 0;
+        r(2, 12 - lg, 2, 3, '#a8402a');
+        r(5, 13 - lg, 2, 2, '#a8402a');
+        r(9, 12 + lg - 1, 2, 3, '#a8402a');
+        r(12, 12 + lg - 1, 2, 3, '#a8402a');
+        r(3, 7, 10, 6, '#d0583a');
+        r(3, 7, 10, 2, '#ec7a58');
+        r(3, 12, 10, 1, '#8a2e1c');
+        r(0, 3, 4, 5, '#d0583a');
+        r(0, 3, 4, 1, '#ec7a58');
+        r(1, 5, 1, 2, '#8a2e1c');
+        r(12, 3, 4, 5, '#d0583a');
+        r(12, 3, 4, 1, '#ec7a58');
+        r(14, 5, 1, 2, '#8a2e1c');
+        r(5, 5, 1, 3, '#2a1a1a');
+        r(10, 5, 1, 3, '#2a1a1a');
+        r(5, 5, 1, 1, '#ffffff');
+        r(10, 5, 1, 1, '#ffffff');
       } else if (mon === 'foreman_below') {
         const fl = step === 1 ? 1 : 0;
         const fr = step === 2 ? 1 : 0;
@@ -1954,7 +2056,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     monster: 'Tip: click a monster to fight it. Shift-click looks at it without attacking.',
     fight: 'Tip: pick an ability, then click your target. An action ends your turn, so choose well.',
     bag: 'Tip: open the Bag to equip gear. Better weapons change your abilities.',
-    defeat: 'Tip: defeat costs a tenth of your iron bits. Your gear and skills are safe.',
+    defeat: 'Tip: defeat costs a share of your iron bits that grows with your level. Your gear and skills are safe.',
     town: 'Tip: click a person to talk, a tree or rock to gather, a furnace or anvil to craft. J opens your journal.',
   };
   function hint(key) {
@@ -2189,7 +2291,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     G.fight.mates = msg.state.actors.filter((a) => a.side === 'hero' && a.id !== G.selfId).map((a) => a.name);
     G.dest = null;
     G.autoLootSent = false;
-    if (G.auto && bossFight()) toast('Auto combat is paused for this fight: not available against bosses and minibosses.');
     addLog('A fight begins!', 'round');
     G.barSig = null;
     renderFightUi();
@@ -2353,11 +2454,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       }
       case 'hit': {
         const t = act(ev.target);
-        if (t) {
-          t.hp = ev.hp;
-          t.flash = now;
-        }
-        floater(ev.target, ev.crit ? `${ev.damage}!` : String(ev.damage), ev.target === G.selfId ? '#ff7a7a' : ev.crit ? '#ffb347' : '#ffe066');
+        const src = act(ev.source);
+        if (t) t.hp = ev.hp;
+        // The blow lands when the swing connects, not when it starts: flash, shove and damage number follow the wind-up.
+        const landed = () => {
+          if (!G || !G.fight) return;
+          const tt = act(ev.target);
+          const at = performance.now();
+          if (tt) {
+            tt.flash = at;
+            if (src && src !== tt) tt.kick = { dir: dirToward(src.pos, tt.pos), t0: at };
+          }
+          floater(ev.target, ev.crit ? `${ev.damage}!` : String(ev.damage), ev.target === G.selfId ? '#ff7a7a' : ev.crit ? '#ffb347' : '#ffe066');
+        };
+        if (src && src.lunge) setTimeout(landed, 170);
+        else landed();
         if (ev.ability === 'crushing_strike') {
           addLog(`The marked ground is crushed. ${who(ev.target)} ${ev.target === G.selfId ? 'take' : 'takes'} ${ev.damage}.`, ev.target === G.selfId ? 'bad' : 'mine');
           play(ev.target === G.selfId ? 'hurt' : 'hit');
@@ -2702,10 +2813,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   const NOT_READY = 'Not ready yet.';
   const hero = () => G.fight.actors.get(G.selfId);
 
-  // ---- auto combat: plays the hero's turns for you. Never in boss or miniboss fights.
+  // ---- auto combat: plays the hero's turns for you, in every fight including bosses and minibosses.
 
   const isBossActor = (a) => Boolean(a.boss || (a.mon && G.data && G.data.monsters.get(a.mon)?.miniboss));
-  const bossFight = () => Boolean(G.fight) && [...G.fight.actors.values()].some((a) => a.side === 'enemy' && isBossActor(a));
   const cheb = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 
   /** The Auto and Loot switches live on the hotbar; asking for a new bar draws them again. */
@@ -2724,7 +2834,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function toggleAuto() {
     if (!G) return;
-    if (G.fight && bossFight()) return toast('Auto combat is not available against bosses and minibosses.');
     setAuto(!G.auto);
     toast(G.auto ? 'Auto combat on. It stays on until you turn it off (X).' : 'Auto combat off. Press X to turn it on.');
   }
@@ -2752,7 +2861,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** Real-time fights: whenever the hero is ready, take the next action. Called every frame. */
   function autoTick(now) {
     const f = G.fight;
-    if (!G.auto || !f || !f.rt || now < (f.autoAt || 0) || !isMyTurn() || bossFight()) return;
+    if (!G.auto || !f || !f.rt || now < (f.autoAt || 0) || !isMyTurn()) return;
     f.autoAt = now + 200;
     autoStep();
   }
@@ -2864,7 +2973,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!G.auto || !isMyTurn()) return;
     // You picked an ability yourself this turn: let you finish it. Auto stays on and takes the next turn.
     if (G.fight.selected !== G.fight.baseSel) return;
-    if (bossFight()) return;
     const f = G.fight;
     const o = f.options;
     const h = hero();
@@ -3847,8 +3955,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const sig = JSON.stringify([
       style,
       slots,
-      G.auto && !bossFight(),
-      bossFight(),
+      G.auto,
       opts ? [opts.actor, opts.acted, G.fight.selected, G.fight.rt, opts.abilities.map((a) => [a.id, a.usable, a.cooldown, a.mana])] : 0,
       heldWeapon() && heldWeapon().id,
       G.inv && G.inv.equipment && G.inv.equipment.weapon2 && G.inv.equipment.weapon2.id,
@@ -3864,11 +3971,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       wirePicker(b, () => openBarPicker('bar', i));
       host.appendChild(b);
     });
-    const auto = el('button', 'sslot auto' + (G.auto && !bossFight() ? ' on' : ''));
+    const auto = el('button', 'sslot auto' + (G.auto ? ' on' : ''));
     auto.type = 'button';
     auto.disabled = false;
-    auto.append(el('b', '', 'AUTO'), el('span', 'st', G.auto && !bossFight() ? 'ON' : 'OFF'), el('span', 'hk', 'X'));
-    auto.title = bossFight() ? 'Auto combat is not available against bosses and minibosses.' : 'Auto combat (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. It stays on between fights until you turn it off.';
+    auto.append(el('b', '', 'AUTO'), el('span', 'st', G.auto ? 'ON' : 'OFF'), el('span', 'hk', 'X'));
+    auto.title = 'Auto combat (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. It stays on between fights until you turn it off.';
     auto.addEventListener('click', toggleAuto);
     const left = $('side-l');
     const right = $('side-r');
@@ -3951,7 +4058,68 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     });
   }
 
+  /** Potion flask on a 16x16 grid. '#' outline, 'c' cork, '.' glass that the fill rises through. */
+  const FLASK = [
+    '      cccc      ',
+    '      #cc#      ',
+    '      #..#      ',
+    '      #..#      ',
+    '     ##..##     ',
+    '    #......#    ',
+    '   #........#   ',
+    '  #..........#  ',
+    '  #..........#  ',
+    '  #..........#  ',
+    '  #..........#  ',
+    '  #..........#  ',
+    '   #........#   ',
+    '    #......#    ',
+    '     ######     ',
+    '                ',
+  ];
+  const FLASK_COLORS = {
+    hp: { hi: '#ff8a78', mid: '#c2413f', lo: '#6e1a22' },
+    mp: { hi: '#86b6ff', mid: '#3f6fd0', lo: '#1c3678' },
+  };
+  /** Redraw one flask when its fill (in 12 steps) or look changed. */
+  function drawFlask(box, kind, frac, low) {
+    let cv = box.querySelector('canvas');
+    if (!cv) {
+      cv = document.createElement('canvas');
+      cv.width = 16;
+      cv.height = 16;
+      cv.setAttribute('aria-hidden', 'true');
+      box.prepend(cv);
+    }
+    const steps = Math.round(Math.max(0, Math.min(1, frac)) * 12);
+    const sig = `${steps}|${low ? 1 : 0}`;
+    if (cv.dataset.sig === sig) return;
+    cv.dataset.sig = sig;
+    const c = cv.getContext('2d');
+    const col = FLASK_COLORS[kind];
+    c.clearRect(0, 0, 16, 16);
+    // Glass rows run from y=2 (top) to y=13 (bottom); the fill covers the lowest `steps` of them.
+    for (let y = 0; y < 16; y++) {
+      for (let x = 0; x < 16; x++) {
+        const ch = FLASK[y][x];
+        if (ch === ' ') continue;
+        let color = '#0c0814';
+        if (ch === '#') color = low && kind === 'hp' ? '#ff6a58' : '#e0b24a';
+        else if (ch === 'c') color = '#8a5a2a';
+        else if (13 - y < steps) {
+          const top = 13 - y === steps - 1;
+          color = top ? col.hi : y >= 10 ? col.lo : col.mid;
+          if (x === 4 && y >= 7 && y <= 10 && !top) color = col.hi;
+        }
+        c.fillStyle = color;
+        c.fillRect(x, y, 1, 1);
+      }
+    }
+  }
+
   function renderGlobes(hp, maxHp, mp, maxMp) {
+    drawFlask($('globe-hp'), 'hp', hp / maxHp, hp > 0 && hp / maxHp < 0.3);
+    drawFlask($('globe-mp'), 'mp', mp / maxMp, false);
     $('globe-hp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`);
     $('globe-mp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`);
     $('globe-hp').style.setProperty('--f', String(Math.max(0, Math.min(1, hp / maxHp))));
@@ -6003,9 +6171,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           if (t >= 1) a.lunge = null;
           else {
             swing = t;
-            const k = Math.sin(Math.max(0, t - 0.2) / 0.8 * Math.PI) * 0.35;
+            // Pull back a touch, snap forward, then settle: reads as a strike rather than a slide.
+            const k = t < 0.25 ? -0.12 * (t / 0.25) : t < 0.5 ? -0.12 + 0.52 * ((t - 0.25) / 0.25) : 0.4 * (1 - (t - 0.5) / 0.5);
             ox = VEC[a.lunge.dir][0] * k;
             oy = VEC[a.lunge.dir][1] * k;
+          }
+        }
+        if (a.kick) {
+          const t = (now - a.kick.t0) / 240;
+          if (t >= 1) a.kick = null;
+          else {
+            const k = 0.22 * Math.sin(Math.min(1, t * 2) * Math.PI / 2) * (1 - t);
+            ox += VEC[a.kick.dir][0] * k;
+            oy += VEC[a.kick.dir][1] * k;
           }
         }
         if (!a.alive) a.fade = Math.max(0, a.fade - 0.03);
@@ -6094,18 +6272,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const p = worldPos(G.self(), now);
       cam = { x: p.x, y: p.y };
     }
-    // Click-and-drag (or one-finger drag) looks ahead; letting go eases the view back to the hero.
+    // Click-and-drag (or one-finger drag) moves the view and it stays where you left it. The Recenter button (or
+    // walking far enough that the hero would leave the screen is not a trigger) brings it back to the hero.
     if (G.look) {
-      if (!G.panning) {
-        G.look.x *= 0.82;
-        G.look.y *= 0.82;
-        if (Math.abs(G.look.x) < 0.05 && Math.abs(G.look.y) < 0.05) G.look = null;
-      }
-      if (G.look) {
-        cam.x += G.look.x;
-        cam.y += G.look.y;
-      }
+      cam.x = Math.max(0, Math.min(map.width - 1, cam.x + G.look.x));
+      cam.y = Math.max(0, Math.min(map.height - 1, cam.y + G.look.y));
     }
+    const rc = $('recenter');
+    if (rc) rc.classList.toggle('hidden', !G.look);
     const offX = Math.round(w / 2 - (cam.x * TILE + TILE / 2) * s);
     const offY = Math.round(h / 2 - (cam.y * TILE + TILE / 2) * s);
     G.off = { x: offX, y: offY };
@@ -7651,6 +7825,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       updateTip();
     });
     on(canvas, 'click', onClick);
+    on($('recenter'), 'click', () => {
+      if (G) G.look = null;
+    });
     const drag = lookDrag();
     on(canvas, 'mousedown', (ev) => { if (ev.button === 0 && !ev.shiftKey) drag.begin(ev.clientX, ev.clientY); });
     on(window, 'mousemove', (ev) => { if (ev.buttons & 1) drag.move(ev.clientX, ev.clientY); });

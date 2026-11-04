@@ -97,11 +97,53 @@
   const cache = new Map();
 
   /** The sheet image once it has loaded; null while it loads or after it failed. Starts the load on first use. */
+  let graded = null;
+  /**
+   * Colour grade for the Kenney sheet so figures sit in the game's violet and gold world:
+   * shadows lean violet, highlights lean warm gold, saturation a touch lower. Alpha untouched.
+   */
+  function grade(image) {
+    try {
+      const c = document.createElement('canvas');
+      c.width = image.width;
+      c.height = image.height;
+      const g = c.getContext('2d');
+      if (typeof g.getImageData !== 'function') return null;
+      g.imageSmoothingEnabled = false;
+      g.drawImage(image, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height);
+      const px = d.data;
+      for (let i = 0; i < px.length; i += 4) {
+        if (px[i + 3] === 0) continue;
+        let r = px[i], gg = px[i + 1], b = px[i + 2];
+        const l = (0.3 * r + 0.59 * gg + 0.11 * b) / 255;
+        r = l * 255 + (r - l * 255) * 0.9;
+        gg = l * 255 + (gg - l * 255) * 0.9;
+        b = l * 255 + (b - l * 255) * 0.9;
+        if (l < 0.45) {
+          const k = 0.3 * (1 - l / 0.45);
+          r += (58 - r) * k; gg += (38 - gg) * k; b += (96 - b) * k;
+        } else if (l > 0.6) {
+          const k = 0.14 * ((l - 0.6) / 0.4);
+          r += (255 - r) * k; gg += (214 - gg) * k; b += (140 - b) * k;
+        }
+        px[i] = Math.max(0, Math.min(255, r));
+        px[i + 1] = Math.max(0, Math.min(255, gg));
+        px[i + 2] = Math.max(0, Math.min(255, b));
+      }
+      g.putImageData(d, 0, 0);
+      return c;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function sheet(cat) {
     if (failed) return null;
     if (!img) {
       img = new Image();
       img.onload = function () {
+        graded = grade(img);
         ready = true;
       };
       img.onerror = function () {
@@ -110,7 +152,7 @@
       };
       img.src = cat.sheet;
     }
-    return ready ? img : null;
+    return ready ? graded || img : null;
   }
 
   /**
