@@ -3820,12 +3820,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     document.body.appendChild(tip);
     let cur = null;
     const place = (ev) => {
-      const w = tip.offsetWidth;
-      const h = tip.offsetHeight;
-      const x = Math.min(ev.clientX + 14, window.innerWidth - w - 6);
-      const y = ev.clientY + 18 + h > window.innerHeight ? ev.clientY - h - 10 : ev.clientY + 18;
-      tip.style.left = `${Math.max(4, x)}px`;
-      tip.style.top = `${Math.max(4, y)}px`;
+      // The tip is zoomed with the rest of the UI, so measure it on screen and give left and top back in its own units.
+      const box = tip.getBoundingClientRect();
+      const z = uiScale();
+      const x = Math.min(ev.clientX + 14, window.innerWidth - box.width - 6);
+      const y = ev.clientY + 18 + box.height > window.innerHeight ? ev.clientY - box.height - 10 : ev.clientY + 18;
+      tip.style.left = `${Math.max(4, x) / z}px`;
+      tip.style.top = `${Math.max(4, y) / z}px`;
     };
     const hide = () => { cur = null; tip.classList.add('hidden'); };
     on(document, 'pointerover', (ev) => {
@@ -3940,6 +3941,26 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     } catch {
       /* nothing saved */
     }
+    // A saved spot from a bigger window can sit outside a smaller one: pull it back in, and let the phone layout place it.
+    const keepInside = () => {
+      if (box.style.right !== 'auto') return;
+      if (window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) {
+        for (const p of ['right', 'left', 'top', 'width', 'height']) box.style[p] = '';
+        return;
+      }
+      const z = uiScale();
+      const pr = (box.offsetParent || document.body).getBoundingClientRect();
+      const pw = pr.width / z;
+      const ph = pr.height / z;
+      const w = Math.min(parseFloat(box.style.width) || 150, pw - 16);
+      const h = Math.min(parseFloat(box.style.height) || 150, ph - 16);
+      box.style.width = `${w}px`;
+      box.style.height = `${h}px`;
+      box.style.left = `${Math.max(8 / z, Math.min(parseFloat(box.style.left) || 0, pw - w - 8 / z))}px`;
+      box.style.top = `${Math.max(8 / z, Math.min(parseFloat(box.style.top) || 0, ph - h - 8 / z))}px`;
+    };
+    keepInside();
+    window.addEventListener('resize', keepInside);
     dragBox(box, box.querySelector('.fgrip'), save);
     if (typeof ResizeObserver === 'function') {
       let t = null;
@@ -3951,7 +3972,92 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   /** The map and quest list: show or hide each, drag by the title, resize from the corner. */
+  function setupFrames() {
+    const gv = $('gameview');
+    const hide = () => {
+      const off = gv.classList.toggle('ui-off');
+      $('r-hide').textContent = off ? 'Show UI' : 'Hide UI';
+      try {
+        localStorage.setItem('wealdmark.uioff', off ? '1' : '');
+      } catch {
+        /* blocked storage */
+      }
+    };
+    try {
+      if (localStorage.getItem('wealdmark.uioff')) hide();
+    } catch {
+      /* blocked storage */
+    }
+    on($('r-hide'), 'click', hide);
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'F11' || gv.classList.contains('hidden')) return;
+      e.preventDefault();
+      hide();
+    });
+    const levels = ['o0', 'o1', 'o2'];
+    let lvl = 1;
+    try {
+      const v = Number(localStorage.getItem('wealdmark.chatopacity'));
+      if (v >= 0 && v <= 2 && localStorage.getItem('wealdmark.chatopacity') !== null) lvl = v;
+    } catch {
+      /* blocked storage */
+    }
+    const applyChat = () => {
+      $('chat').classList.remove(...levels);
+      $('chat').classList.add(levels[lvl]);
+      try {
+        localStorage.setItem('wealdmark.chatopacity', String(lvl));
+      } catch {
+        /* blocked storage */
+      }
+    };
+    applyChat();
+    setupFrames.chatOpacityButton = () => {
+      const b = el('button', '', 'Opacity');
+      b.type = 'button';
+      b.title = 'Chat background: clear, light, solid';
+      b.addEventListener('click', () => ((lvl = (lvl + 1) % 3), applyChat()));
+      return b;
+    };
+  }
+
+  function updateFrames(hp, maxHp, mp, maxMp) {
+    const me = G.self();
+    $('pf-name').textContent = (me && me.name) || '';
+    $('pf-lv').textContent = G.stats ? `Lv ${G.stats.combatLevel}` : '';
+    const s = G.stats;
+    if (s) {
+      const xp = (s.skills.combat && s.skills.combat.xp) || 0;
+      const cur = xpForLevel(s.combatLevel);
+      const next = xpForLevel(s.combatLevel + 1);
+      const max = s.combatLevel >= MAX_LEVEL;
+      $('pf-xp').style.width = `${max ? 100 : Math.max(0, Math.min(100, ((xp - cur) / Math.max(1, next - cur)) * 100))}%`;
+    }
+    const tf = $('tframe');
+    let foe = null;
+    if (G.fight) {
+      const h = hero();
+      let best = Infinity;
+      for (const a of G.fight.actors.values()) {
+        if (a.side !== 'enemy' || !a.alive) continue;
+        const d = h ? Math.abs(a.pos.x - h.pos.x) + Math.abs(a.pos.y - h.pos.y) : 0;
+        if (d < best) {
+          best = d;
+          foe = a;
+        }
+      }
+    }
+    tf.classList.toggle('hidden', !foe);
+    if (foe) {
+      $('tf-name').textContent = foe.name || 'Enemy';
+      $('tf-lv').textContent = `Lv ${foe.level}`;
+      $('tf-fill').style.width = `${Math.max(0, Math.min(100, (foe.hp / foe.maxHp) * 100))}%`;
+      $('tf-text').textContent = `${foe.hp}/${foe.maxHp}`;
+    }
+  }
+
   function setupCorner() {
+    setupFrames();
     updateUiScale();
     window.addEventListener('resize', updateUiScale);
     try {
@@ -6035,9 +6141,26 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   /** New windows open on the right, directly under the map and the quest list. */
   function placeWindow(el) {
-    if (el.dataset.moved) return;
     const z = uiScale();
     const pr = (el.offsetParent || document.body).getBoundingClientRect();
+    if (window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) {
+      // Phone: the CSS sheet places and sizes every window. The toolbar sits at the top there, so the desktop reserve would squash them.
+      el.style.maxHeight = '';
+      return;
+    }
+    if (el.dataset.moved) {
+      // A saved spot came from another window size: pull the window back inside, above the toolbar.
+      const tb0 = $('toolbar');
+      const keep = tb0 && tb0.offsetWidth ? (pr.bottom - tb0.getBoundingClientRect().top) / z + 8 : 8;
+      const W = pr.width / z;
+      const H = pr.height / z;
+      const left = Math.min(Math.max(0, parseFloat(el.style.left) || 0), Math.max(0, W - el.offsetWidth - Math.max(8, 12 / z)));
+      const top = Math.min(Math.max(0, parseFloat(el.style.top) || 0), Math.max(0, H - 160 - keep));
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
+      el.style.maxHeight = `${Math.max(160, H - top - keep)}px`;
+      return;
+    }
     let bottom = 56;
     for (const id of ['mapbox']) {
       const b = $(id);
@@ -6053,9 +6176,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const slot = Math.max(0, openOrder.indexOf(el.id));
     const top = bottom + 6 + slot * 28;
     el.style.left = 'auto';
-    el.style.right = `${10 + slot * 24}px`;
+    el.style.right = `${Math.max(10, 12 / z) + slot * 24}px`;
     el.style.top = `${top}px`;
-    el.style.maxHeight = `${Math.max(160, pr.height / z - top - 8)}px`;
+    // Stop above the toolbar so a tall window never covers the buttons that open and close it.
+    const tb = $('toolbar');
+    const reserve = tb && tb.offsetWidth ? (pr.bottom - tb.getBoundingClientRect().top) / z + 8 : 8;
+    el.style.maxHeight = `${Math.max(160, pr.height / z - top - reserve)}px`;
   }
 
   function raise(el) {
@@ -6183,6 +6309,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       b.type = 'button';
       b.title = 'Clear the chat';
       b.addEventListener('click', ask);
+      if (setupFrames.chatOpacityButton) nav.appendChild(setupFrames.chatOpacityButton());
       nav.appendChild(b);
     };
     const ask = () => {
@@ -7377,6 +7504,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.textAlign = 'center';
     ctx.font = `bold ${Math.max(9, 3.4 * s)}px Tahoma, Verdana, sans-serif`;
     const mp = worldPos(G.self(), now);
+    const placedLabels = [];
     for (const r of list) {
       if (r.alpha <= 0.05 || r.kind === 'pet') continue;
       if (roofed(Math.round(r.x), Math.round(r.y))) continue;
@@ -7471,8 +7599,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#000';
       ctx.fillStyle = labelColor(r);
-      ctx.strokeText(label, cx, y);
-      ctx.fillText(label, cx, y);
+      // Keep names from landing on each other, and from running off the top of the view.
+      const lh = Math.max(11, 3.4 * s + 3);
+      const lw = ctx.measureText(label).width;
+      y = Math.max(y, lh + 2);
+      const lx = Math.max(lw / 2 + 4, Math.min(w - lw / 2 - 4, cx));
+      for (let tries = 0; tries < 4; tries++) {
+        const hit = placedLabels.find((p) => Math.abs(p.x - lx) < (p.w + lw) / 2 && Math.abs(p.y - y) < lh);
+        if (!hit) break;
+        y = hit.y - lh;
+      }
+      placedLabels.push({ x: lx, y, w: lw });
+      ctx.strokeText(label, lx, y);
+      ctx.fillText(label, lx, y);
       if (r.kind === 'npc') {
         const mark = questMark(r.ref);
         if (mark) {
@@ -7563,6 +7702,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       $('hp-text').textContent = `HP ${hp}/${maxHp}`;
       $('mp-text').textContent = `Mana ${mp}/${maxMp}`;
       renderXpBar();
+      updateFrames(hp, maxHp, mp, maxMp);
       renderGlobes(hp, maxHp, mp, maxMp);
       renderBar();
       renderTracker();
@@ -8771,8 +8911,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }, { passive: false });
     on(window, 'keydown', onKey);
     on($('chatform'), 'submit', onChat);
-    setupChat();
     setupCorner();
+    setupChat();
     setupTips();
     on($('menu-btn'), 'click', (ev) => {
       ev.stopPropagation();

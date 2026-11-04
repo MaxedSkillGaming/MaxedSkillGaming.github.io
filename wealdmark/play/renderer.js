@@ -210,7 +210,8 @@ $('play').addEventListener('click', async () => {
   try {
     await window.wealdmarkGame.start(result.welcome, result.map);
     show('gameview');
-  } catch {
+  } catch (err) {
+    console.error('start failed', err);
     window.wealdmark.leave();
     $('home-error').textContent = 'Could not load the map.';
   }

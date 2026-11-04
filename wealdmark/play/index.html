@@ -111,8 +111,14 @@
     <div id="hud" aria-live="off"></div>
 
     <div id="vitals">
+      <div class="frow"><span id="pf-name"></span><span id="pf-lv"></span></div>
       <div class="meter hp"><div id="hp-fill" class="meter-fill"></div><span id="hp-text"></span></div>
       <div class="meter mp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div>
+      <div class="meter pxp"><div id="pf-xp" class="meter-fill"></div></div>
+    </div>
+    <div id="tframe" class="hidden">
+      <div class="frow"><span id="tf-name"></span><span id="tf-lv"></span></div>
+      <div class="meter thp"><div id="tf-fill" class="meter-fill"></div><span id="tf-text"></span></div>
     </div>
 
     <div id="bhud">
@@ -142,6 +148,7 @@
 
     <div id="rctl">
       <button id="r-map" type="button" title="Show or hide the map">Map</button>
+      <button id="r-hide" type="button" title="Hide or show the windows and menus (F11)">Hide UI</button>
       <button id="r-world" type="button" title="The whole world: shops, workshops, gathering spots and jobs" aria-label="World map">&#127760;</button>
     </div>
     <button id="recenter" class="hidden" type="button" title="Bring the view back to your hero">Back to hero</button>

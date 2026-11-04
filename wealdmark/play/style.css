@@ -611,7 +611,7 @@ button.link:hover { opacity: 1; }
   #chat { left: 6px; bottom: 156px; width: calc(calc(var(--vw, 100vw) * 1.0) - 80px); height: auto; min-height: 0; }
   #chatlog { max-height: 90px; }
   button.act { min-height: 38px; }
-  .side { left: 6px !important; right: 6px !important; top: 52px !important; width: auto !important; min-width: 0; max-height: calc(100% - 64px); resize: none; }
+  .side { left: 6px !important; right: 6px !important; top: calc(82px / var(--ui, 1)) !important; width: auto !important; min-width: 0; max-height: calc(100% - 82px / var(--ui, 1) - 64px); resize: none; }
   .side h2.grip { cursor: default; }
   .modal-box { min-width: 0; max-width: calc(calc(var(--vw, 100vw) * 1.0) - 16px); }
   #dialog { left: 6px !important; right: 6px !important; width: auto !important; max-width: none; }
@@ -980,3 +980,71 @@ button.qtrack.on { background: #2f6b3a; }
 #look-pet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 #look-pet button { width: 100%; min-height: 32px; margin: 0; padding: 0 8px; white-space: nowrap; }
 #look-pet button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* UI pass 2: hover never moves the element, so the pointer cannot slip off it and flicker. */
+#toolbar button:hover:not(:disabled), #toolbar button:active:not(:disabled),
+#rctl button:hover:not(:disabled), #rctl button:active:not(:disabled),
+#chattabs button:hover, #chattabs button:active,
+#chat-clear:hover, #chat-clear:active,
+#mbar button:hover:not(:disabled), #mbar button:active:not(:disabled),
+.bslot:hover:not(.empty):not(.off), .bslot:active,
+.qslot:hover, .qslot:active, .sslot:hover, .sslot:active { transform: none; }
+.bslot:hover:not(.empty):not(.off), .qslot:hover, .sslot:hover { box-shadow: inset 0 1px 0 var(--trim-hi), inset 0 0 0 2px var(--trim), inset 0 -3px 0 rgba(0, 0, 0, 0.4); }
+
+/* Panel tabs: one look and one size in every window, labels never wrap. */
+#tree-tabs { gap: 4px; }
+#tree-tabs button { min-width: 0; padding: 4px 0; font-size: 11px; line-height: 16px; white-space: nowrap; }
+#tree-grid button.node { height: 44px; overflow: hidden; overflow-wrap: anywhere; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tabs { gap: 4px; }
+.tabs button { margin: 0; flex: 1; min-width: 0; white-space: nowrap; font-size: 12px; }
+
+/* UI pass 3: AUTO / LOOT / Swap buttons hold two lines, hotkey shown in the tooltip only */
+.sslot.auto, .sslot.swap { width: 48px; height: 36px; padding: 0; gap: 0; white-space: nowrap; overflow: hidden; }
+.sslot.auto .hk, .sslot.swap .hk { display: none; }
+.sslot.auto b, .sslot.swap .plus { font-size: 11px; line-height: 14px; }
+.sslot.auto .st { font-size: 11px; line-height: 14px; }
+
+/* UI pass 4: player frame, target frame, Hide UI, chat opacity */
+#vitals, #tframe {
+  position: absolute;
+  top: max(10px, calc(8px / var(--ui, 1)));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 8px;
+  background: rgba(20, 16, 28, 0.88);
+  border: 2px solid #000;
+  box-shadow: inset 0 0 0 1px var(--trim-lo, #3a2f55);
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--ink);
+  pointer-events: none;
+  z-index: 5;
+}
+#vitals { left: max(10px, calc(8px / var(--ui, 1))); width: 176px; }
+#tframe { left: calc(max(10px, calc(8px / var(--ui, 1))) + 176px + 8px); width: 152px; }
+#tframe.hidden { display: none; }
+#vitals .meter.hp, #vitals .meter.mp, #vitals .meter.pxp, #tframe .meter.thp { display: block; margin: 0; height: 12px; }
+#vitals .meter.hp .meter-fill, #tframe .meter.thp .meter-fill { background: #b83a3a; }
+#vitals .meter.pxp { height: 4px; border-width: 1px; }
+#vitals .meter.pxp .meter-fill { background: #d8b040; }
+#vitals .meter span, #tframe .meter span { line-height: 8px; font-size: 11px; }
+.frow { display: flex; justify-content: space-between; gap: 8px; white-space: nowrap; overflow: hidden; }
+.frow span:first-child { color: var(--gold); overflow: hidden; text-overflow: ellipsis; }
+#hud { top: calc(max(10px, calc(8px / var(--ui, 1))) + 84px); }
+#rctl { gap: 4px; }
+#chat.o0 { background: rgba(8, 6, 14, 0.15); }
+#chat.o1 { background: rgba(8, 6, 14, 0.55); }
+#chat.o2 { background: rgba(8, 6, 14, 0.92); }
+#chat-opacity { margin: 0; }
+.ui-off #toolbar, .ui-off #mapbox, .ui-off #recenter, .ui-off #hud, .ui-off .side, .ui-off #r-map, .ui-off #r-world { display: none !important; }
+@media (pointer: coarse), (max-width: 760px) {
+  /* the phone scales the HUD to half: keep the two frames at full size so text stays at 11px */
+  #gameview > #vitals, #gameview > #tframe { zoom: 1; top: 8px; padding: 4px 6px; }
+  #gameview > #vitals { left: 8px; width: 148px; }
+  #gameview > #tframe { left: 164px; width: 120px; }
+  #gameview > #hud { top: calc(82px / var(--ui, 1)); }
+}
+#mapbox, #rctl, #toolbar { right: max(12px, calc(10px / var(--ui, 1))); }
+.wide-hud #toolbar { bottom: max(12px, calc(10px / var(--ui, 1))); }
