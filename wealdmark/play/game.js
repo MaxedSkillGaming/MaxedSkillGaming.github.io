@@ -346,8 +346,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
    * A hero on a 24x24 grid, shown in one tile: a big head, dark eyes with a single highlight, headgear that
    * changes the outline, and the weapon and shield in hand. `step` lifts one foot while walking.
    */
-  function drawFigure(ctx, x, y, s, l, step, bob, held) {
+  function drawFigure(ctx, x, y, s, l, step, bob, held, anim) {
     held = held || {};
+    if (anim && window.heroLayers && window.heroLayers.draw) {
+      // Animated Kenney paper-doll: shadow first, then the parts drawn straight to the canvas.
+      ctx.imageSmoothingEnabled = false;
+      ctx.fillStyle = 'rgba(20,10,5,0.28)';
+      ctx.beginPath();
+      ctx.ellipse(x + 8 * s, y + 15.2 * s, (5.5 - 0.6 * anim.mv) * s, 1.9 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+      if (window.heroLayers.draw(ctx, l, held, Math.round(x), Math.round(y + (bob || 0) * s), s, anim)) return;
+    }
     // The Kenney paper-doll first; it returns null for a figure it cannot dress (or while the sheet loads).
     const kenney = window.heroLayers && window.heroLayers.paint(l, held, step);
     if (kenney) {
@@ -3945,6 +3954,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function renderGlobes(hp, maxHp, mp, maxMp) {
     $('globe-hp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`);
     $('globe-mp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`);
+    $('globe-hp').style.setProperty('--f', String(Math.max(0, Math.min(1, hp / maxHp))));
+    $('globe-mp').style.setProperty('--f', String(Math.max(0, Math.min(1, mp / maxMp))));
     $('globe-hp-text').textContent = `${hp}/${maxHp}`;
     const hpBox = $('globe-hp');
     hpBox.classList.toggle('low', hp > 0 && hp / maxHp < 0.3);
@@ -5460,7 +5471,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!list.length) box.appendChild(el('p', 'muted', 'You have nothing to make here. Bring the materials, or train the skill.'));
   }
 
-  // the Crown Steward
+  // the Steward of Deeds
 
   function onPerks(msg) {
     G.perks = msg;
@@ -5882,6 +5893,80 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   const hidden = (e) => hideOthers.on && e.kind === 'player' && e.id !== G.selfId;
 
   /** Everything to draw this frame, world and fight alike. */
+  // ---- figure animation state: speed from real movement, so walking eases in and out and never pops
+
+  const animState = new Map();
+  /** Per figure: walk phase, smoothed walk strength, facing, and swing/hit progress for the Kenney renderer. */
+  // One shared pair of offscreen canvases for figures. ctx.filter on the main canvas runs once per
+  // draw call (about 100 per figure), which dropped the game to 3 fps; here the rim is a flat
+  // silhouette drawn at four offsets and the flash is a white overlay.
+  const FIGLAYER = { fig: null, sil: null, fx: null, sx: null };
+  function figureLayer(w, h) {
+    if (!FIGLAYER.fig) {
+      FIGLAYER.fig = document.createElement('canvas');
+      FIGLAYER.sil = document.createElement('canvas');
+    }
+    if (FIGLAYER.fig.width !== w || FIGLAYER.fig.height !== h) {
+      FIGLAYER.fig.width = FIGLAYER.sil.width = w;
+      FIGLAYER.fig.height = FIGLAYER.sil.height = h;
+    }
+    FIGLAYER.fx = FIGLAYER.fig.getContext('2d');
+    FIGLAYER.sx = FIGLAYER.sil.getContext('2d');
+    FIGLAYER.fx.imageSmoothingEnabled = false;
+    FIGLAYER.sx.imageSmoothingEnabled = false;
+    FIGLAYER.fx.clearRect(0, 0, w, h);
+    FIGLAYER.sx.clearRect(0, 0, w, h);
+    return FIGLAYER;
+  }
+
+  function figureAnim(r, now) {
+    let st = animState.get(r.id || r.ref);
+    if (!st) {
+      st = { x: r.x, y: r.y, t: now, mv: 0, phase: 0, flip: false, seed: (hash(String(r.id || r.ref)) % 628) / 100 };
+      animState.set(r.id || r.ref, st);
+    }
+    const dt = Math.max(1, Math.min(100, now - st.t));
+    const dx = r.x - st.x;
+    const dist = Math.hypot(dx, r.y - st.y);
+    const speed = dist / (dt / 1000);
+    const want = speed > 0.4 && speed < 40 ? 1 : 0;
+    st.mv += (want - st.mv) * Math.min(1, dt / (want ? 90 : 140));
+    // One step cycle per tile walked, so the feet match the ground speed.
+    if (speed < 40) st.phase += dist * Math.PI * 1.7 + (want ? 0 : 0);
+    if (Math.abs(dx) > 0.002) st.flip = dx < 0;
+    if (r.swing >= 0 && r.swingDir) {
+      if (r.swingDir === 'W') st.flip = true;
+      else if (r.swingDir === 'E') st.flip = false;
+    }
+    st.x = r.x;
+    st.y = r.y;
+    st.t = now;
+    return {
+      t: now, phase: st.phase, mv: st.mv, flip: st.flip, seed: st.seed,
+      swing: r.swing === undefined ? -1 : r.swing,
+      hit: r.hitT !== undefined && r.hitT >= 0 && r.hitT < 1 ? r.hitT : -1,
+      stance: r.fighting ? 1 : 0,
+    };
+  }
+
+  /** What townsfolk carry, chosen from their post: guards bear spears and helms, smiths a mace, scouts a bow. */
+  function npcGear(def) {
+    if (def.gear) return def.gear;
+    const role = String(def.role || '').toLowerCase();
+    const g = {};
+    const has = (...w) => w.some((x) => role.includes(x));
+    if (has('guard', 'warden', 'captain')) Object.assign(g, { weapon: 'spear', wt: 3, wid: '', hid: 'chain_head', bid: 'chain_body', cid: has('captain', 'warden') ? 'hard_leather_cloak' : '', shield: true, oid: 'chain_offhand' });
+    else if (has('sergeant', 'drill')) Object.assign(g, { weapon: 'blade', wt: 2, hid: 'hard_leather_head', bid: 'hard_leather_body', shield: true, oid: 'hard_leather_offhand' });
+    else if (has('smith')) Object.assign(g, { weapon: 'mace', wt: 2, bid: 'soft_leather_body' });
+    else if (has('archery', 'bowyer', 'scout', 'trapper')) Object.assign(g, { weapon: 'bow', wt: 2, bid: 'soft_leather_body', cid: has('scout') ? 'soft_leather_cloak' : '' });
+    else if (has('academy', 'bard', 'steward', 'hermit', 'royal art')) Object.assign(g, { weapon: 'staff', wt: has('royal art') ? 3 : 1, cid: has('royal art', 'hermit') ? 'soft_leather_cloak' : '' });
+    else if (has('woodcutter', 'miner', 'prospector', 'foreman')) Object.assign(g, { weapon: 'mace', wt: 1, bid: 'soft_leather_body' });
+    else if (has('shepherd')) Object.assign(g, { weapon: 'staff', wt: 1 });
+    else if (has('harbor')) Object.assign(g, { weapon: 'dagger', wt: 1, cid: 'soft_leather_cloak' });
+    def.gear = g;
+    return g;
+  }
+
   function renderables(now) {
     const list = [];
     const inFight = G.fight;
@@ -5912,11 +5997,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const p = actorPos(a, now);
         let ox = 0;
         let oy = 0;
+        let swing = -1;
         if (a.lunge) {
-          const t = (now - a.lunge.t0) / 220;
+          const t = (now - a.lunge.t0) / 380;
           if (t >= 1) a.lunge = null;
           else {
-            const k = Math.sin(t * Math.PI) * 0.35;
+            swing = t;
+            const k = Math.sin(Math.max(0, t - 0.2) / 0.8 * Math.PI) * 0.35;
             ox = VEC[a.lunge.dir][0] * k;
             oy = VEC[a.lunge.dir][1] * k;
           }
@@ -5924,7 +6011,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (!a.alive) a.fade = Math.max(0, a.fade - 0.03);
         list.push({
           id: a.id, name: a.name, kind: a.side === 'hero' && !a.mon ? 'player' : 'monster', level: a.level, mon: a.mon, look: a.look, x: p.x + ox, y: p.y + oy,
-          moving: p.moving, self: a.id === G.selfId, say: null, fighting: true, alpha: a.fade, fightActor: a, flash: now - a.flash < 140, active: inFight.turnActor === a.id,
+          moving: p.moving, self: a.id === G.selfId, say: null, fighting: true, alpha: a.fade, fightActor: a, flash: now - a.flash < 140, active: inFight.turnActor === a.id, swing, hitT: (now - a.flash) / 300, swingDir: a.lunge ? a.lunge.dir : null,
         });
       }
     }
@@ -6128,23 +6215,42 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         }
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
         ctx.fillRect(Math.round(sx + s), Math.round(sy + (r.kind === 'monster' ? 15 : 15) * s), 10 * s, 2 * s);
-        if (r.flash) {
+        if (r.flash && r.kind === 'monster') {
           ctx.filter = 'brightness(2.2)';
         }
         if (r.kind === 'monster') drawMonster(ctx, r.mon, sx, sy, s, step, bob);
         else {
           // Heroes and townsfolk are drawn a fifth larger with a dark rim, so they do not melt into the grass.
           const o = Math.max(1, Math.round(s * 0.5));
-          const rim = ['drop-shadow(' + o + 'px 0 0 #120a14)', 'drop-shadow(-' + o + 'px 0 0 #120a14)', 'drop-shadow(0 ' + o + 'px 0 #120a14)', 'drop-shadow(0 -' + o + 'px 0 #120a14)', 'saturate(1.2)'].join(' ');
+          const m = 10 * s;
+          const L = figureLayer(Math.ceil(16 * s + m * 2), Math.ceil(18 * s + m * 2));
+          const an = figureAnim(r, now);
+          if (r.kind === 'npc') {
+            const def = G.data && G.data.npcs.get(r.ref);
+            if (def) drawFigure(L.fx, m, m, s, npcLook(def), 0, 0, npcGear(def), an);
+          } else drawFigure(L.fx, m, m, s, r.look, step, bob, heldGear(r.id), an);
+          if (r.flash) {
+            L.fx.globalCompositeOperation = 'source-atop';
+            L.fx.fillStyle = 'rgba(255,255,255,0.55)';
+            L.fx.fillRect(0, 0, L.fig.width, L.fig.height);
+            L.fx.globalCompositeOperation = 'source-over';
+          }
+          L.sx.drawImage(L.fig, 0, 0);
+          L.sx.globalCompositeOperation = 'source-in';
+          L.sx.fillStyle = '#120a14';
+          L.sx.fillRect(0, 0, L.sil.width, L.sil.height);
+          L.sx.globalCompositeOperation = 'source-over';
           ctx.save();
           ctx.translate(sx + 8 * s, sy + 15 * s);
           ctx.scale(1.2, 1.2);
           ctx.translate(-(sx + 8 * s), -(sy + 15 * s));
-          ctx.filter = r.flash ? 'brightness(2.2) ' + rim : rim;
-          if (r.kind === 'npc') {
-            const def = G.data && G.data.npcs.get(r.ref);
-            if (def) drawFigure(ctx, sx, sy, s, npcLook(def), 0, 0, {});
-          } else drawFigure(ctx, sx, sy, s, r.look, step, bob, heldGear(r.id));
+          const ix = Math.round(sx - m);
+          const iy = Math.round(sy - m);
+          ctx.drawImage(L.sil, ix + o, iy);
+          ctx.drawImage(L.sil, ix - o, iy);
+          ctx.drawImage(L.sil, ix, iy + o);
+          ctx.drawImage(L.sil, ix, iy - o);
+          ctx.drawImage(L.fig, ix, iy);
           ctx.restore();
         }
         ctx.filter = 'none';
@@ -6828,136 +6934,199 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   // ---- intro cutscene, shown once to a new hero
   const INTRO_SLIDES = [
     {
-      scene: 'seam',
-      title: 'The Welling',
-      text: 'In the first days of the Wealdmark the hills were green and the rivers ran clear, and far beneath the roots of the mountains there lay a well that was not of water. Men called it the Welling. Where it seeped upward the soil remembered it: toadstools shone with a cold light, wolves cast two shadows, and the beasts of the wood grew wise or cruel as fortune took them.',
+      scene: 'home',
+      title: 'A House by the Road',
+      text: 'You grew up in a small house at the edge of the Wealdmark, where the road ran past the gate and never stopped. Travelers came through with stories. A woman who had stared down a troll. A man who sailed into a storm and came back with a name. You sat on the fence and heard every word.',
     },
     {
-      scene: 'seam',
-      title: 'The Crown',
-      text: 'Of the men who first came into that country, Eldred the Unbroken was the greatest. He went down alone into the dark places and brought up a splinter of the Welling, and of it he made the Crown. Whoever wore it was king, and the land bent to him, stone and root and beast. He reigned three hundred years and died in his sleep, and men wept, for it seemed that the one fixed star had gone out. But he had looked into the deep longer than any man should, and he feared a darker hand would take the Crown. So he broke its true name into five Seals, and hid each beneath the earth with a guardian set over it. Four hundred years the Seals have slept.',
+      scene: 'dream',
+      title: 'The Blank Part of the Map',
+      text: 'Every year you wanted it more. You swung a stick at the hedge and called it a sword. You drew the whole country from the stories, with its smoking peaks and its mist-wrapped isles in the far north, and left most of the page blank. You wanted to be the one who filled it in.',
     },
     {
-      scene: 'tower',
-      title: 'Harvest Eve',
-      text: 'Eleven nights ago, on Harvest Eve, Eadwin the Bright was poisoned and stabbed in the Crown Tower at Aldmoor, and the Crown was lifted from its stand. The guard found black ash upon the stair, and upon the floor a white mask, blank and smooth, with its eyeholes sealed. The city says that his daughter Aelwyn died with him. The city is mistaken.',
-    },
-    {
-      scene: 'masks',
-      title: 'The Wan Company',
-      text: 'No one has claimed the deed. In the lanes they whisper of the Wan Company: masked folk, mostly the lost and the grieving, who teach that fear and self are all that stand between a man and the gifts of the deep. They have a master, but none can say his face. Warden Osric Ashby, who led the guard thirty years, has buried most of those he trusted.',
+      scene: 'leaving',
+      title: 'Morning',
+      text: 'One morning you were done waiting. You packed bread, a blanket and a sword that was a little too heavy. You left a note on the table and shut the door behind you. The sun was barely up. Nobody stopped you.',
     },
     {
       scene: 'road',
       title: 'Aldmoor',
-      text: 'You come up the south road at dawn, a stranger whose name no one has troubled to learn. The city holds its breath. The Warden has no need of a hero. He has need of someone the Company has not yet noticed, and that someone is you.',
+      text: 'The south road took three days. On the fourth morning you came over the last hill and saw smoke, a market, and a tower older than the walls. Nobody in Aldmoor knew your name. That was fine. You had come to earn one.',
+    },
+    {
+      scene: 'gate',
+      title: 'The Guide',
+      text: 'A reeve named Ivy Penn met you at the gate. She looked at your boots and your sword and did not laugh. "Every hero starts here," she said, and held out a kit of tools. "Help folk. Explore. The land will notice." Somewhere far beneath your feet, something very large already had.',
     },
   ];
+
+  /** One small figure for the cutscenes. (x, y) is the point between the feet. */
+  function introPerson(ctx, x, y, o) {
+    const s = o.s || 1;
+    const px = (dx, dy, w, h, c) => {
+      ctx.fillStyle = c;
+      ctx.fillRect(Math.round(x + dx * s), Math.round(y + dy * s), Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)));
+    };
+    const step = o.step || 0;
+    px(-2, -5 + (step ? 1 : 0), 2, 5 - (step ? 1 : 0), '#2a2438');
+    px(0, -5 + (step ? 0 : 1), 2, 5 - (step ? 0 : 1), '#2a2438');
+    px(-3, -11, 6, 6, o.cloth || '#5a7ab0');
+    px(-3, -7, 6, 1, o.accent || '#c8a050');
+    px(-2, -15, 4, 4, o.skin || '#e0b08a');
+    px(-2, -16, 4, 2, o.hair || '#4a3020');
+    if (o.pack) {
+      px(-6, -12, 3, 6, '#7a5a34');
+      px(-6, -13, 3, 1, '#c9b894');
+    }
+    if (o.sword) {
+      px(4, -12, 1, 8, '#d8dce8');
+      px(3, -5, 3, 1, '#c8a050');
+    }
+    if (o.stick) {
+      const a = o.stick;
+      ctx.fillStyle = '#8a6a3c';
+      for (let i = 0; i < 9; i++) ctx.fillRect(Math.round(x + (3 + i * Math.cos(a)) * s), Math.round(y + (-9 - i * Math.sin(a)) * s), 1, 1);
+    }
+  }
+
+  function introHouse(ctx, x, y, w, h, lit, door) {
+    ctx.fillStyle = '#8c6c4a';
+    ctx.fillRect(x, y - h, w, h);
+    ctx.fillStyle = '#6a4e34';
+    ctx.fillRect(x, y - 3, w, 3);
+    for (let j = 0; j < 12; j++) {
+      const inset = (11 - j) * 2;
+      ctx.fillStyle = j % 2 ? '#a04a3a' : '#b2543f';
+      ctx.fillRect(x - 3 + inset, y - h - 12 + j, w + 6 - inset * 2, 1);
+    }
+    ctx.fillStyle = '#a04a3a';
+    ctx.fillRect(x - 3, y - h - 1, w + 6, 2);
+    ctx.fillStyle = lit ? 'rgba(255,214,120,0.95)' : '#2a3050';
+    ctx.fillRect(x + 4, y - h + 6, 6, 6);
+    ctx.fillStyle = door ? 'rgba(255,214,120,0.95)' : '#4a3424';
+    ctx.fillRect(x + w - 11, y - 14, 6, 14);
+  }
+
+  const INTRO_SKY = {
+    home: [[70, 110, 176], [246, 200, 150]],
+    dream: [[18, 14, 46], [150, 82, 104]],
+    leaving: [[44, 46, 100], [252, 176, 124]],
+    road: [[34, 28, 70], [236, 160, 112]],
+    gate: [[96, 138, 196], [250, 226, 176]],
+  };
 
   function drawIntroScene(ctx, scene, t) {
     const W = 320;
     const H = 180;
-    const dawn = scene === 'road';
-    const top = dawn ? [34, 28, 70] : [8, 7, 22];
-    const bot = dawn ? [236, 160, 112] : [38, 28, 66];
+    const sky = INTRO_SKY[scene] || INTRO_SKY.road;
+    const top = sky[0];
+    const bot = sky[1];
     for (let y = 0; y < H; y++) {
       const k = y / H;
       ctx.fillStyle = `rgb(${Math.round(top[0] + (bot[0] - top[0]) * k)},${Math.round(top[1] + (bot[1] - top[1]) * k)},${Math.round(top[2] + (bot[2] - top[2]) * k)})`;
       ctx.fillRect(0, y, W, 1);
     }
-    for (let i = 0; i < 90; i++) {
-      const sx = Math.floor(hash2(i, 1, 70) * W);
-      const sy = Math.floor(hash2(i, 2, 70) * H * 0.6);
-      const tw = 0.5 + 0.5 * Math.sin(t * 2 + i);
-      ctx.fillStyle = `rgba(255,248,224,${dawn ? 0.15 * tw : 0.35 + 0.5 * tw})`;
-      ctx.fillRect(sx, sy, 1, 1);
+    const starry = scene === 'dream' ? 1 : scene === 'leaving' || scene === 'road' ? 0.25 : 0;
+    if (starry) {
+      for (let i = 0; i < 90; i++) {
+        const sx = Math.floor(hash2(i, 1, 70) * W);
+        const sy = Math.floor(hash2(i, 2, 70) * H * 0.55);
+        const tw = 0.5 + 0.5 * Math.sin(t * 2 + i);
+        ctx.fillStyle = `rgba(255,248,224,${starry * (0.3 + 0.5 * tw)})`;
+        ctx.fillRect(sx, sy, 1, 1);
+      }
     }
-    if (!dawn) {
-      ctx.fillStyle = '#e8e4d0';
+    const sun = (cx, cy, r, color) => {
+      ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(256, 34, 12, 0, 7);
+      ctx.arc(cx, cy, r, 0, 7);
       ctx.fill();
-      ctx.fillStyle = 'rgba(8,7,22,0.35)';
-      ctx.beginPath();
-      ctx.arc(251, 31, 10, 0, 7);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = 'rgba(255,230,160,0.9)';
-      ctx.beginPath();
-      ctx.arc(70, 118, 16, 0, 7);
-      ctx.fill();
-    }
+    };
     const hills = (base, amp, freq, color, phase) => {
       ctx.fillStyle = color;
       for (let x = 0; x < W; x++) ctx.fillRect(x, Math.round(base + Math.sin(x / freq + phase) * amp + Math.sin(x / (freq * 0.37) + phase * 2) * amp * 0.3), 1, H);
     };
-    if (scene === 'seam') {
-      hills(104, 14, 22, '#1c1a3a', 0);
-      hills(128, 10, 16, '#121028', 2);
-      const pulse = 0.55 + 0.45 * Math.sin(t * 1.6);
-      for (let i = 0; i < 30; i++) {
-        const x = 150 + Math.round(Math.sin(i * 0.9) * 6);
-        ctx.fillStyle = `rgba(90,220,230,${(0.5 + 0.4 * pulse) * (1 - i / 36)})`;
-        ctx.fillRect(x, 130 + i, 2, 1);
-        ctx.fillStyle = `rgba(90,220,230,${0.08 * pulse})`;
-        ctx.fillRect(x - 6, 130 + i, 14, 1);
+    const cloud = (cx, cy, color) => {
+      ctx.fillStyle = color;
+      ctx.fillRect(cx, cy, 26, 4);
+      ctx.fillRect(cx + 5, cy - 3, 14, 3);
+    };
+
+    if (scene === 'home') {
+      sun(250, 52, 13, 'rgba(255,240,190,0.95)');
+      const drift = (t * 3) % 360;
+      cloud(((60 + drift) % 360) - 20, 34, 'rgba(255,255,255,0.7)');
+      cloud(((190 + drift) % 360) - 20, 54, 'rgba(255,255,255,0.55)');
+      hills(112, 10, 34, '#7a9a6a', 0.5);
+      hills(130, 8, 24, '#5a8452', 2);
+      ctx.fillStyle = '#4c7a46';
+      ctx.fillRect(0, 142, W, H);
+      ctx.fillStyle = '#b89a6a';
+      for (let y = 150; y < H; y++) {
+        const k = (y - 150) / (H - 150);
+        ctx.fillRect(Math.round(250 - k * 150 - (1 - k) * 20), y, Math.round(40 + k * 90), 1);
       }
-      const cy = 78 + Math.round(Math.sin(t * 1.4) * 3);
-      ctx.fillStyle = '#f4cf5c';
-      ctx.fillRect(148, cy + 6, 14, 4);
-      for (const dx of [148, 153, 160]) ctx.fillRect(dx, cy, 2, 7);
-      ctx.fillStyle = '#fff0a0';
-      ctx.fillRect(149, cy + 6, 12, 1);
-      const glow = ctx.createRadialGradient(155, cy + 5, 2, 155, cy + 5, 34);
-      glow.addColorStop(0, `rgba(244,207,92,${0.35 * pulse})`);
-      glow.addColorStop(1, 'rgba(244,207,92,0)');
+      introHouse(ctx, 196, 142, 48, 30, true, false);
+      ctx.fillStyle = '#6a4e34';
+      for (let i = 0; i < 9; i++) {
+        ctx.fillRect(40 + i * 12, 138, 2, 12);
+      }
+      ctx.fillRect(40, 142, 104, 2);
+      introPerson(ctx, 96, 140, { s: 1, cloth: '#c9774a', hair: '#6a3a20', step: 0 });
+      const tx = ((t * 16) % 380) - 40;
+      introPerson(ctx, tx, 168, { s: 1.4, cloth: '#3a5a7a', pack: true, sword: true, step: Math.floor(t * 4) % 2 });
+      introPerson(ctx, tx - 28, 172, { s: 1.4, cloth: '#7a3a4a', pack: true, step: Math.floor(t * 4 + 1) % 2 });
+    } else if (scene === 'dream') {
+      sun(70, 118, 11, 'rgba(255,224,160,0.5)');
+      // the isles in the far north: low shapes in mist
+      hills(116, 3, 12, '#2a2a52', 1);
+      for (const [ix, iw] of [[20, 40], [74, 28], [118, 34]]) {
+        ctx.fillStyle = '#1e1c40';
+        for (let j = 0; j < 8; j++) ctx.fillRect(ix + (7 - j), 118 - 8 + j, Math.max(0, iw - (7 - j) * 2), 1);
+      }
+      for (let i = 0; i < 6; i++) {
+        ctx.fillStyle = `rgba(190,200,230,${0.16 + 0.04 * Math.sin(t + i)})`;
+        ctx.fillRect(((i * 53 + t * 5) % 360) - 30, 108 + i * 3, 70, 3);
+      }
+      // the peaks: a volcano with a glow and rising embers
+      ctx.fillStyle = '#1a1230';
+      for (let j = 0; j < 62; j++) {
+        const half = Math.round((62 - j) * 0.95) + 6;
+        ctx.fillRect(226 - half, 150 - j, half * 2, 1);
+      }
+      const pulse = 0.6 + 0.4 * Math.sin(t * 1.8);
+      const glow = ctx.createRadialGradient(226, 90, 2, 226, 90, 46);
+      glow.addColorStop(0, `rgba(255,150,60,${0.55 * pulse})`);
+      glow.addColorStop(1, 'rgba(255,90,30,0)');
       ctx.fillStyle = glow;
-      ctx.fillRect(110, cy - 30, 90, 70);
-    } else if (scene === 'tower') {
-      hills(138, 5, 30, '#14122c', 1);
+      ctx.fillRect(170, 40, 110, 100);
+      ctx.fillStyle = `rgba(255,170,70,${0.7 + 0.3 * pulse})`;
+      ctx.fillRect(220, 88, 12, 2);
       for (let i = 0; i < 14; i++) {
-        const bx = 8 + i * 22;
-        const bh = 20 + Math.floor(hash2(i, 3, 71) * 26);
-        ctx.fillStyle = '#0e0c20';
-        ctx.fillRect(bx, 150 - bh, 18, bh + 30);
-        ctx.fillStyle = `rgba(244,196,96,${0.4 + 0.3 * Math.sin(t * 3 + i * 2)})`;
-        if (hash2(i, 4, 71) > 0.4) ctx.fillRect(bx + 5, 150 - bh + 8, 3, 3);
+        const age = (t * 0.5 + hash2(i, 9, 73)) % 1;
+        ctx.fillStyle = `rgba(255,${150 + Math.round(age * 60)},70,${1 - age})`;
+        ctx.fillRect(Math.round(224 + (hash2(i, 10, 73) - 0.5) * 30 * age), Math.round(86 - age * 56), 1, 1);
       }
-      ctx.fillStyle = '#0a0818';
-      ctx.fillRect(138, 40, 44, 150);
-      for (let j = 0; j < 14; j++) ctx.fillRect(146 + j, 40 - j, 28 - j * 2 > 0 ? 28 - j * 2 : 0, 1);
-      ctx.fillRect(158, 14, 4, 12);
-      for (const [wx, wy] of [[150, 60], [166, 60], [150, 90], [166, 90], [158, 120]]) {
-        ctx.fillStyle = `rgba(250,206,110,${0.55 + 0.35 * Math.sin(t * 5 + wx + wy)})`;
-        ctx.fillRect(wx, wy, 4, 8);
-      }
-      ctx.fillStyle = 'rgba(30,28,36,0.9)';
-      for (let i = 0; i < 46; i++) {
-        const ax = (hash2(i, 5, 72) * W + t * 6 * (0.5 + hash2(i, 6, 72))) % W;
-        const ay = (hash2(i, 7, 72) * H + t * 14 * (0.5 + hash2(i, 8, 72))) % H;
-        ctx.fillRect(Math.floor(ax), Math.floor(ay), 1, 1);
-      }
-    } else if (scene === 'masks') {
-      hills(140, 4, 28, '#0f0d22', 0);
-      ctx.fillStyle = 'rgba(120,110,160,0.18)';
-      for (let i = 0; i < 6; i++) ctx.fillRect(0, 128 + i * 8 + Math.round(Math.sin(t + i) * 2), W, 5);
-      const figures = [[70, 0.8], [110, 0.9], [160, 1.25], [210, 0.9], [250, 0.8]];
-      for (const [fx, sc] of figures) {
-        const sway = Math.round(Math.sin(t * 1.2 + fx) * 1.5);
-        const h = Math.round(64 * sc);
-        ctx.fillStyle = '#07060f';
-        for (let j = 0; j < h; j++) {
-          const w = Math.round((6 + j * 0.32) * sc);
-          ctx.fillRect(fx - Math.floor(w / 2) + sway * (1 - j / h), 160 - h + j, w, 1);
-        }
-        ctx.fillStyle = '#f2f0ea';
-        ctx.beginPath();
-        ctx.ellipse(fx + sway, 160 - h + 6 * sc, 4.2 * sc, 5.4 * sc, 0, 0, 7);
-        ctx.fill();
-        ctx.fillStyle = 'rgba(0,0,0,0.12)';
-        ctx.fillRect(fx + sway, 160 - h + 2 * sc, 1, Math.round(8 * sc));
-      }
-    } else {
+      hills(150, 6, 30, '#161030', 3);
+      ctx.fillStyle = '#0e0a22';
+      ctx.fillRect(0, 154, W, H);
+      introPerson(ctx, 104, 156, { s: 1.5, cloth: '#b8704a', hair: '#6a3a20', stick: 0.9 + Math.sin(t * 3) * 0.8 });
+    } else if (scene === 'leaving') {
+      sun(256, 112, 15, 'rgba(255,236,170,0.95)');
+      hills(122, 10, 36, '#6a6a94', 0);
+      hills(138, 8, 24, '#4a7a58', 1);
+      ctx.fillStyle = '#3e6c48';
+      ctx.fillRect(0, 148, W, H);
+      ctx.fillStyle = '#b89a6a';
+      ctx.fillRect(56, 158, W - 56, 18);
+      ctx.fillRect(56, 150, 14, 10);
+      introHouse(ctx, 22, 150, 50, 30, true, true);
+      ctx.fillStyle = 'rgba(255,214,120,0.18)';
+      ctx.fillRect(58, 150, 20 + Math.round(Math.sin(t * 2) * 2), 12);
+      const hx = 84 + ((t * 13) % 230);
+      introPerson(ctx, hx, 168, { s: 1.5, cloth: '#5a7ab0', pack: true, sword: true, step: Math.floor(t * 4) % 2 });
+    } else if (scene === 'road') {
+      sun(70, 118, 16, 'rgba(255,230,160,0.9)');
       hills(122, 10, 40, '#3a3a5c', 0);
       hills(140, 8, 26, '#26324a', 1);
       ctx.fillStyle = '#1a2036';
@@ -6976,13 +7145,45 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         ctx.fillRect(Math.round(cx - w / 2), y, Math.round(w), 1);
       }
       const k = (Math.sin(t * 0.5) * 0.5 + 0.5) * 0.4 + 0.45;
-      const hx = Math.round(160 + (1 - k) * 60 - k * 20);
-      const hy = Math.round(134 + k * (H - 134));
-      ctx.fillStyle = '#0c0a14';
-      ctx.fillRect(hx - 2, hy - 12, 4, 8);
-      ctx.fillRect(hx - 3, hy - 14, 6, 3);
-      ctx.fillRect(hx - 3, hy - 5 + (Math.floor(t * 4) % 2), 2, 5);
-      ctx.fillRect(hx + 1, hy - 5 + ((Math.floor(t * 4) + 1) % 2), 2, 5);
+      introPerson(ctx, Math.round(160 + (1 - k) * 60 - k * 20), Math.round(134 + k * (H - 134)), { s: 0.7 + k * 0.9, cloth: '#5a7ab0', pack: true, sword: true, step: Math.floor(t * 4) % 2 });
+    } else {
+      // the gate of Aldmoor, morning
+      sun(60, 44, 12, 'rgba(255,248,210,0.9)');
+      hills(120, 8, 40, '#8aa0b8', 0);
+      ctx.fillStyle = '#7a7a8e';
+      ctx.fillRect(196, 70, 90, 80);
+      for (let i = 0; i < 8; i++) ctx.fillRect(196 + i * 12, 64, 7, 6);
+      ctx.fillStyle = '#4a4458';
+      ctx.fillRect(226, 104, 30, 46);
+      ctx.fillRect(228, 100, 26, 6);
+      ctx.fillStyle = '#6a6a80';
+      ctx.fillRect(160, 40, 22, 110);
+      for (let j = 0; j < 11; j++) ctx.fillRect(161 + j, 40 - j, Math.max(0, 20 - j * 2), 1);
+      ctx.fillStyle = '#6a8a58';
+      ctx.fillRect(0, 148, W, H);
+      ctx.fillStyle = '#b89a6a';
+      ctx.fillRect(0, 160, W, 20);
+      const g = 0.5 + 0.5 * Math.sin(t * 0.9);
+      const earth = ctx.createRadialGradient(130, 176, 4, 130, 176, 120);
+      earth.addColorStop(0, `rgba(120,230,140,${0.3 + 0.15 * g})`);
+      earth.addColorStop(1, 'rgba(120,230,140,0)');
+      ctx.fillStyle = earth;
+      ctx.fillRect(0, 148, 300, 32);
+      introPerson(ctx, 110, 172, { s: 2, cloth: '#5a7ab0', pack: true, sword: true });
+      introPerson(ctx, 168, 172, { s: 2, cloth: '#3a7a6a', accent: '#e0c060', hair: '#b8b8c0' });
+      // the kit changing hands
+      const bob = Math.round(Math.sin(t * 2.4) * 1.5);
+      ctx.fillStyle = '#7a5a34';
+      ctx.fillRect(134, 150 + bob, 14, 10);
+      ctx.fillStyle = '#c9b894';
+      ctx.fillRect(134, 150 + bob, 14, 2);
+      ctx.fillStyle = '#d8dce8';
+      ctx.fillRect(138, 144 + bob, 2, 8);
+      ctx.fillStyle = '#8a8a96';
+      ctx.fillRect(142, 144 + bob, 4, 3);
+      ctx.fillStyle = `rgba(255,236,150,${0.4 + 0.4 * g})`;
+      ctx.fillRect(132, 148 + bob, 1, 1);
+      ctx.fillRect(149, 152 + bob, 1, 1);
     }
   }
 
@@ -6997,6 +7198,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     let last = performance.now();
     let raf = 0;
     let over = false;
+    const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     box.classList.remove('hidden');
 
     const finish = () => {
@@ -7037,9 +7239,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const tick = (now) => {
       if (over) return;
       const slide = INTRO_SLIDES[index];
-      chars = Math.min(slide.text.length, chars + ((now - last) / 1000) * 46);
+      chars = still ? slide.text.length : Math.min(slide.text.length, chars + ((now - last) / 1000) * 46);
       last = now;
-      drawIntroScene(ctx, slide.scene, now / 1000);
+      drawIntroScene(ctx, slide.scene, still ? 1 : now / 1000);
       titleEl.textContent = slide.title;
       textEl.textContent = slide.text.slice(0, Math.floor(chars));
       $('intro-hint').textContent = chars >= slide.text.length ? (index === INTRO_SLIDES.length - 1 ? 'Space to begin' : 'Space to continue') : 'Space to read faster';

@@ -791,23 +791,46 @@ button.qtrack.on { background: #2f6b3a; }
 #chattabs button.on { opacity: 1; color: var(--trim-hi); border-color: var(--hud-line); box-shadow: inset 0 -3px 0 var(--trim), inset 0 1px 0 var(--hud-bevel); }
 .grp.open .grp-btn { background: linear-gradient(180deg, #6d59a8, #43356d); }
 
-/* Orbs: glass sphere in a gold ring, number inside. */
+/* Vials: a stepped pixel gem in a gold frame, filled in hard colour bands (no smooth glass). */
 .globe {
+  --f: 1;
   width: 88px;
   height: 88px;
-  border: 4px solid var(--trim);
-  background: radial-gradient(circle at 50% 35%, #1d1430, #07040d 80%);
-  box-shadow: 0 0 0 2px var(--hud-line), inset 0 0 0 2px var(--hud-line), inset 0 -12px 18px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.55);
-  border-color: var(--trim-hi) var(--trim) var(--trim-lo) var(--trim);
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  clip-path: polygon(16% 0, 84% 0, 100% 16%, 100% 84%, 84% 100%, 16% 100%, 0 84%, 0 16%);
+  background: repeating-conic-gradient(#170f26 0 25%, #0d0818 0 50%) 0 0 / 8px 8px;
+  box-shadow: none;
 }
-.globe.hp:before { background: linear-gradient(180deg, var(--hp-hi), var(--hp-mid) 38%, var(--hp-lo)); box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.4); }
-.globe.mp:before { background: linear-gradient(180deg, var(--mp-hi), var(--mp-mid) 38%, var(--mp-lo)); box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.4); }
-.globe:after { content: ""; position: absolute; left: 14%; top: 8%; width: 46%; height: 30%; border-radius: 50%; background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)); pointer-events: none; z-index: 1; }
+.globe:before {
+  left: 7%;
+  right: 7%;
+  bottom: 7%;
+  height: calc((100% - 14%) * var(--f));
+  transition: height 180ms steps(6);
+}
+.globe.hp:before { background: linear-gradient(90deg, transparent 0 14%, rgba(255, 255, 255, 0.24) 14% 24%, transparent 24% 78%, rgba(0, 0, 0, 0.28) 78%), linear-gradient(180deg, var(--hp-hi) 0 6%, var(--hp-mid) 6% 55%, var(--hp-lo) 55%); }
+.globe.mp:before { background: linear-gradient(90deg, transparent 0 14%, rgba(255, 255, 255, 0.24) 14% 24%, transparent 24% 78%, rgba(0, 0, 0, 0.28) 78%), linear-gradient(180deg, var(--mp-hi) 0 6%, var(--mp-mid) 6% 55%, var(--mp-lo) 55%); }
+.globe:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: linear-gradient(135deg, var(--trim-hi) 0 12%, var(--trim) 12% 55%, var(--trim-lo) 55%);
+  clip-path: polygon(evenodd, 16% 0, 84% 0, 100% 16%, 100% 84%, 84% 100%, 16% 100%, 0 84%, 0 16%, 0 16%, 7% 16%, 7% 78%, 22% 93%, 78% 93%, 93% 78%, 93% 22%, 78% 7%, 22% 7%, 7% 22%, 7% 16%, 0 16%);
+}
 .globe span { z-index: 2; font-size: 14px; font-weight: bold; letter-spacing: 0.3px; text-shadow: 1px 1px 0 #000, -1px 0 0 #000, 0 -1px 0 #000, 1px 0 0 #000; }
-.globe.hp.low { border-color: #ff6a5a #d8402f #7a1f1a #d8402f; animation: orblow 900ms ease-in-out infinite; }
+.globe.hp.low:after { background: linear-gradient(135deg, #ff8a78 0 12%, #d8402f 12% 55%, #7a1f1a 55%); animation: orblow 900ms steps(4) infinite; }
 .globe.hp.low span:before { content: "\2665\00a0"; color: #ffb0a0; }
 .globe.hp.dead:before { height: 0; }
-@keyframes orblow { 0%, 100% { box-shadow: 0 0 0 2px var(--hud-line), inset 0 0 0 2px var(--hud-line), inset 0 -12px 18px rgba(0, 0, 0, 0.5), 0 0 0 rgba(255, 70, 50, 0); } 50% { box-shadow: 0 0 0 2px var(--hud-line), inset 0 0 0 2px var(--hud-line), inset 0 -12px 18px rgba(0, 0, 0, 0.5), 0 0 16px rgba(255, 70, 50, 0.8); } }
+@keyframes orblow { 0%, 100% { filter: brightness(0.9); } 50% { filter: brightness(1.5); } }
 
 /* Hotbar and quick slots: bevelled plates with a key hint, lift on hover, sink on press. */
 .bslot, .qslot, .sslot {
@@ -845,7 +868,7 @@ button.qtrack.on { background: #2f6b3a; }
 
 
 @media (prefers-reduced-motion: reduce) {
-  .globe.hp.low { animation: none; box-shadow: 0 0 0 2px var(--hud-line), inset 0 0 0 2px var(--hud-line), 0 0 0 3px #d8402f; }
+  .globe.hp.low:after { animation: none; }
   .bslot, .qslot, .sslot, #toolbar button, #rctl button { transition: none; }
   #hotcol .meter.xp.gain { animation: none; }
 }
