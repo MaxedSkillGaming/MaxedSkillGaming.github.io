@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://yards-eating-appraisal-income.trycloudflare.com",
-  "authUrl": "https://parker-rider-term-fruit.trycloudflare.com",
+  "server": "wss://garcia-counting-badge-remains.trycloudflare.com",
+  "authUrl": "https://salmon-minimize-constitutional-interview.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 365189,
-      "sha256": "84e000b11062a4084c5b47948ad3aef778a2a78008553c18e7003d8855736bae",
-      "url": "c/84e000b11062a4084c5b47948ad3aef778a2a78008553c18e7003d8855736bae"
+      "size": 369460,
+      "sha256": "4d630f542b5834adf372d251644482181aac274e9467ab2052da928d23679601",
+      "url": "c/4d630f542b5834adf372d251644482181aac274e9467ab2052da928d23679601"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 18768,
-      "sha256": "fce385f19204c8c38608c59d4afdb5e411336cdd1489c4ce917e9c2ad8b4bbaa",
-      "url": "c/fce385f19204c8c38608c59d4afdb5e411336cdd1489c4ce917e9c2ad8b4bbaa"
+      "size": 19969,
+      "sha256": "e24abdc51d09dc17ec7062964e6214a564172345a8815a6c74490f543052d09a",
+      "url": "c/e24abdc51d09dc17ec7062964e6214a564172345a8815a6c74490f543052d09a"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 54898,
-      "sha256": "54dfa5da6a752092c1fe9a9da0330f09346c7a5ecfa3b22aabf174c16b9e31c7",
-      "url": "c/54dfa5da6a752092c1fe9a9da0330f09346c7a5ecfa3b22aabf174c16b9e31c7"
+      "size": 65420,
+      "sha256": "4716b1c85d2f96db7dc933c0166f8ebe645087de9d557c459b32284e0bdda77b",
+      "url": "c/4716b1c85d2f96db7dc933c0166f8ebe645087de9d557c459b32284e0bdda77b"
     }
   ],
-  "signature": "V7AnoBG06AaZJ2VtcVh+O0oI+IimMC+Z56LgHFXRJy2LZhuDq/CHBrlhpiiLmOW42cclw8B9JnUFIiJbaohnDQ=="
+  "signature": "AZDMpy6sawQS89ebmLQgvhZTpQL+GJPvqc6YvwWi5SuArKwADO0qnQuULcQlfiiWj0zl5Qqiea1DaqenEwvoAg=="
 }
