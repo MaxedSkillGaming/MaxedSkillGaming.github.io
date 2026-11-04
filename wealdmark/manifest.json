@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://looked-holes-relationship-cardiff.trycloudflare.com",
-  "authUrl": "https://ranger-plumbing-early-duke.trycloudflare.com",
+  "server": "wss://soap-compute-painting-marie.trycloudflare.com",
+  "authUrl": "https://mai-distribution-elderly-controlled.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,27 @@
     },
     {
       "path": "ui/game.js",
-      "size": 286872,
-      "sha256": "d7f2205659ad4a06cc7b1c5e8aeea4560fad029c1ae4e87d2d7e2315c513639b",
-      "url": "c/d7f2205659ad4a06cc7b1c5e8aeea4560fad029c1ae4e87d2d7e2315c513639b"
+      "size": 287333,
+      "sha256": "3ac9fe975ce5dd8c0bcabd3d7b3859f5def12cd32f6f169de453588604981464",
+      "url": "c/3ac9fe975ce5dd8c0bcabd3d7b3859f5def12cd32f6f169de453588604981464"
+    },
+    {
+      "path": "ui/hero-layers-catalog.js",
+      "size": 2582,
+      "sha256": "50a7ffcfb51f7d6238d77faabaaa3f691099bc349fed421bab891b0029456763",
+      "url": "c/50a7ffcfb51f7d6238d77faabaaa3f691099bc349fed421bab891b0029456763"
+    },
+    {
+      "path": "ui/hero-layers.js",
+      "size": 5429,
+      "sha256": "f4c4056ded65f6974f13a3a00fe95dd1e16057a93b99f7b964f1da0355934749",
+      "url": "c/f4c4056ded65f6974f13a3a00fe95dd1e16057a93b99f7b964f1da0355934749"
+    },
+    {
+      "path": "ui/hero-layers.png",
+      "size": 11137,
+      "sha256": "771d51ca84b2c5b412027ba80c6a6b8a98bb5a983b2c58ac4f0ccf08ae4d10f2",
+      "url": "c/771d51ca84b2c5b412027ba80c6a6b8a98bb5a983b2c58ac4f0ccf08ae4d10f2"
     },
     {
       "path": "ui/icon.png",
@@ -97,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 17786,
-      "sha256": "c1896c170cfb6f3f6084202434511314f30dbc888d908c3e76a57dc0e812994a",
-      "url": "c/c1896c170cfb6f3f6084202434511314f30dbc888d908c3e76a57dc0e812994a"
+      "size": 17876,
+      "sha256": "e0afcc8ce3b346e76528ee4f32a89dc585bda912f67a5bfb2160a82b9b4bee00",
+      "url": "c/e0afcc8ce3b346e76528ee4f32a89dc585bda912f67a5bfb2160a82b9b4bee00"
     },
     {
       "path": "ui/renderer.js",
@@ -114,5 +132,5 @@
       "url": "c/e6b01b7d7fed1aa90e9d27ec8045298ac90ae9387f97335436c35ac03245345c"
     }
   ],
-  "signature": "s3NfaM3hBhGUuhiBuAIR/K3mcnY5N7vUi5aPhWYGBfm+y/aFLRu9X1M2gNnImGbQRaxxgOaoL2NJQPDXNx1tAQ=="
+  "signature": "tWu1rOa/Bxlj2k+ZegAwUwmfF3oluqzkNCf/L46shv6eKGPU7Zy/yEWQtgUrXWLxbARqXFbdVQbTlxdQ4o03AQ=="
 }
