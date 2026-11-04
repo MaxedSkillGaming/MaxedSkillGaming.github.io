@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 6,
   "minShellVersion": "0.1.0",
-  "server": "wss://lips-persian-politics-formed.trycloudflare.com",
-  "authUrl": "https://largely-rubber-blue-capable.trycloudflare.com",
+  "server": "wss://yards-eating-appraisal-income.trycloudflare.com",
+  "authUrl": "https://parker-rider-term-fruit.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 359143,
-      "sha256": "c30e38fc6259e22bbf47ae047230ce723fc292b7a82b74c694c34b7e10629c2f",
-      "url": "c/c30e38fc6259e22bbf47ae047230ce723fc292b7a82b74c694c34b7e10629c2f"
+      "size": 365189,
+      "sha256": "84e000b11062a4084c5b47948ad3aef778a2a78008553c18e7003d8855736bae",
+      "url": "c/84e000b11062a4084c5b47948ad3aef778a2a78008553c18e7003d8855736bae"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,22 +115,22 @@
     },
     {
       "path": "ui/index.html",
-      "size": 18263,
-      "sha256": "7506e901cadfffe1d09c1bb2dfa378b07dc5ff16f356bc811ddacae1da1d0a21",
-      "url": "c/7506e901cadfffe1d09c1bb2dfa378b07dc5ff16f356bc811ddacae1da1d0a21"
+      "size": 18768,
+      "sha256": "fce385f19204c8c38608c59d4afdb5e411336cdd1489c4ce917e9c2ad8b4bbaa",
+      "url": "c/fce385f19204c8c38608c59d4afdb5e411336cdd1489c4ce917e9c2ad8b4bbaa"
     },
     {
       "path": "ui/renderer.js",
-      "size": 15416,
-      "sha256": "721f9c8bdcb6b3e75e2905cbe5983316ec001e7de23b9f8dc1b6e42199863978",
-      "url": "c/721f9c8bdcb6b3e75e2905cbe5983316ec001e7de23b9f8dc1b6e42199863978"
+      "size": 15462,
+      "sha256": "24de5e13e9ec663de415b978394d05d3d536757d929fe76def4c920b7bdd58de",
+      "url": "c/24de5e13e9ec663de415b978394d05d3d536757d929fe76def4c920b7bdd58de"
     },
     {
       "path": "ui/style.css",
-      "size": 51004,
-      "sha256": "25a49c0548bbab75c83a4be814c688c0b55a6ee5a1b6118049b936f1e89a3adf",
-      "url": "c/25a49c0548bbab75c83a4be814c688c0b55a6ee5a1b6118049b936f1e89a3adf"
+      "size": 54898,
+      "sha256": "54dfa5da6a752092c1fe9a9da0330f09346c7a5ecfa3b22aabf174c16b9e31c7",
+      "url": "c/54dfa5da6a752092c1fe9a9da0330f09346c7a5ecfa3b22aabf174c16b9e31c7"
     }
   ],
-  "signature": "DoqDnF+/CmnCK9/m/XjW3iE9EEk6ssLvIW/HQC4DY7oCa3S1mpk4ogY7LovcoQkO/AC4ozf31h9SC/G6UvfGDQ=="
+  "signature": "V7AnoBG06AaZJ2VtcVh+O0oI+IimMC+Z56LgHFXRJy2LZhuDq/CHBrlhpiiLmOW42cclw8B9JnUFIiJbaohnDQ=="
 }
