@@ -285,6 +285,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       hat: (h >> 24) % 4,
       g: chosen ? chosen.g : (h >> 20) % 2 ? 'f' : 'm',
       skin: tone,
+      skinIx: SKIN_TONES.indexOf(tone),
+      hairSeed: h >>> 12,
       skinShade: tint(tone, 0.82),
       body: hsl2hex(hue, 50, 46),
       bodyShade: hsl2hex(hue, 50, 34),
@@ -340,6 +342,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
    */
   function drawFigure(ctx, x, y, s, l, step, bob, held) {
     held = held || {};
+    // The Kenney paper-doll first; it returns null for a figure it cannot dress (or while the sheet loads).
+    const kenney = window.heroLayers && window.heroLayers.paint(l, held, step);
+    if (kenney) {
+      blit(ctx, kenney, x, y, s, bob);
+      return;
+    }
     const key = ['p4', l.g, l.skin, l.body, l.hair, l.hat, step, held.wid || '', held.element || '', held.oid || '', held.hid || '', held.bid || '', held.cid || ''].join('|');
     const c = sprite(key, (r) => {
       const fem = l.g === 'f';
@@ -1049,7 +1057,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const k = def.look;
     const tone = SKIN_TONES[k.skin] || SKIN_TONES[1];
     def.figure = {
-      hat: HATS[k.hat] || 0, g: k.g, skin: tone, skinShade: tint(tone, 0.82),
+      hat: HATS[k.hat] || 0, g: k.g, skin: tone, skinIx: SKIN_TONES[k.skin] ? k.skin : 1, hairSeed: hash(String(def.id || def.name || '')) >>> 12, skinShade: tint(tone, 0.82),
       body: k.cloth, bodyShade: tint(k.cloth, 0.75), bodyLight: tint(k.cloth, 1.25), trim: k.accent,
       hair: k.hair, hairShade: tint(k.hair, 0.75), hairLight: tint(k.hair, 1.25),
     };
@@ -1313,6 +1321,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return {
       weapon: w ? w.weaponClass || 'blade' : null,
       wid: w ? g.w : '',
+      wt: w ? w.tier || 1 : 1,
       element: w && w.element ? w.element : '',
       shield: Boolean(o && o.kind === 'armor'),
       offPistol: Boolean(o && o.weaponClass === 'pistol'),
