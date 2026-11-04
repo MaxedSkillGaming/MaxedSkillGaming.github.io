@@ -20,7 +20,7 @@
   const spanOf = (rounds) => (G && G.fight && G.fight.rt ? `${Math.max(1, Math.round((rounds * RT_ROUND_MS) / 1000))} seconds` : `${rounds} rounds`);
   const spanNum = (rounds) => (G && G.fight && G.fight.rt ? Math.max(1, Math.round((rounds * RT_ROUND_MS) / 1000)) : rounds);
   const MAX_LEVEL = 100;
-  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-party', 'panel-merc', 'panel-dungeon'];
+  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-store', 'panel-belt', 'panel-party', 'panel-merc', 'panel-dungeon'];
   /** Iron bits each hero pays to enter a dungeon run. Matches the server's default. */
   const DUNGEON_FEE = 25;
   const TOWN_PANELS = ['dialog', 'panel-shop', 'panel-storage', 'panel-station', 'panel-perks', 'panel-anchor'];
@@ -216,8 +216,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const me = G.fight && G.fight.actors.get(G.selfId);
     const pen = me && me.statuses.some((s) => s.id === 'blinded') ? 0.3 : 0;
     if (g.weapon.cls === 'staff') return Math.min(1, Math.max(0.05, 1 - pen));
-    const acc = g.accuracy + (g.weapon.cls === 'bow' ? 8 : 0);
-    return Math.min(0.95, Math.max(0.05, 0.75 + (acc + lvl - foeLevel) * 0.015 - pen));
+    // g.accuracy already includes the weapon's own accuracy (the bow's +8). Passive hit chance is added after the 95% cap, like the server does.
+    const natural = Math.min(0.95, Math.max(0.05, 0.75 + (g.accuracy + lvl - foeLevel) * 0.015 - pen));
+    return Math.min(1, natural + (g.hitChance || 0));
   }
   const pctText = (v) => `${Math.round(v * 100)}%`;
   /** Plain text for a foe's standing against you: hit chance, and whether it still teaches you anything. */
@@ -2678,7 +2679,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     monster: 'Tip: click a monster to fight it. Shift-click looks at it without attacking.',
     fight: 'Tip: pick an ability, then click your target. An action ends your turn, so choose well.',
     bag: 'Tip: open the Bag to equip gear. Better weapons change your abilities.',
-    defeat: 'Tip: defeat costs a share of your iron bits that grows with your level. Your gear and skills are safe.',
+    defeat: 'Tip: defeat costs a share of your iron coins that grows with your level. Your gear and skills are safe.',
     town: 'Tip: click a person to talk, a tree or rock to gather, a furnace or anvil to craft. J opens your journal.',
   };
   function hint(key) {
@@ -3252,10 +3253,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (xp > 0) addLog(`You gain ${xp} experience.`, 'round');
     for (const lu of end.levelUps) addLog(lu.skill === 'combat' ? `You reached combat level ${lu.level}. Press K to spend your skill points.` : `Your ${pretty(lu.skill)} level has increased to ${lu.level}.`, 'levelup');
     const mates = f.mates || [];
-    if (end.loot.iron_bits > 0) addLog(mates.length ? `You take ${end.loot.iron_bits} iron bits, your share by damage dealt alongside ${mates.join(', ')}.` : `You find ${end.loot.iron_bits} iron bits.`, 'loot');
-    else if (mates.length && end.outcome === 'victory') addLog('The loot was split by damage dealt, and your share came to no iron bits.', 'loot');
+    if (end.loot.iron_bits > 0) addLog(mates.length ? `You take ${end.loot.iron_bits} iron coins, your share by damage dealt alongside ${mates.join(', ')}.` : `You find ${end.loot.iron_bits} iron coins.`, 'loot');
+    else if (mates.length && end.outcome === 'victory') addLog('The loot was split by damage dealt, and your share came to no iron coins.', 'loot');
     for (const it of end.loot.items || []) addLog(`You find ${itemName(it)}.`, `loot ${it.rarity || ''}`.trim());
-    if (end.penalty && end.penalty.iron_bits > 0) addLog(`You lose ${end.penalty.iron_bits} iron bits.`, 'bad');
+    if (end.penalty && end.penalty.iron_bits > 0) addLog(`You lose ${end.penalty.iron_bits} iron coins.`, 'bad');
     if (end.outcome === 'defeat') addLog('You wake at the bellstone, weary but whole.', 'round');
     if (end.outcome === 'fled') {
       addLog('You walk away from the fight.', 'round');
@@ -3358,7 +3359,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       else hideLoot();
     }
     if (want) G.lootWanted = null;
-    const waiting = lootCount(G.loot.fight) > 0;
+    // With autoloot the pile is taken at once; keep the menu grid from growing to 3x3 for that moment.
+    const waiting = lootCount(G.loot.fight) > 0 && !(G.autoloot && G.autoLootSent);
     $('btn-loot').classList.toggle('hidden', !waiting);
     $('menu-btn').classList.toggle('alert', waiting);
   }
@@ -3398,7 +3400,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const coin = document.createElement('button');
       coin.type = 'button';
       coin.className = 'slot';
-      coin.title = 'Iron bits';
+      coin.title = 'Iron coins';
       const cv = document.createElement('canvas');
       cv.width = cv.height = 16;
       cv.className = 'icon';
@@ -3418,7 +3420,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       q.textContent = String(pile.iron_bits);
       coin.appendChild(q);
       coin.addEventListener('click', () => take(-1));
-      body.appendChild(row(coin, `${pile.iron_bits} iron bits`, '', -1));
+      body.appendChild(row(coin, `${pile.iron_bits} iron coins`, '', -1));
     }
     pile.items.forEach((ref, i) => {
       const slot = slotButton(ref, () => take(i));
@@ -3617,11 +3619,28 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (!o.acted) {
       const pct = h.hp / h.maxHp;
       const self = autoSelf(o, h, foes);
-      if (self && pct < 0.6) return sendFight(self);
-      if (pct < 0.45 && foodSlot() >= 0) return sendFight({ t: 'eat', slot: foodSlot() });
-      if (pct < 0.2 && foodSlot() < 0) return sendFight({ t: 'flee' });
-      if (self) return sendFight(self);
       const pick = autoPick(o, h, foes);
+      // Healing every action lets two or three foes out-damage you while you never hit back. After a heal or a meal the next
+      // action is an attack (unless health is nearly gone), and with a crowd on you and little health left, run.
+      const healedLast = f.autoHealed === true;
+      const crowd = foes.filter((fo) => manhattan(fo.pos, h.pos) <= 1).length;
+      if (pct < 0.3 && (crowd >= 2 || foodSlot() < 0)) {
+        f.autoHealed = false;
+        return sendFight({ t: 'flee' });
+      }
+      const canHeal = !healedLast || pct < 0.25 || !pick;
+      if (canHeal) {
+        if (self && pct < 0.6) {
+          f.autoHealed = true;
+          return sendFight(self);
+        }
+        if (pct < 0.45 && foodSlot() >= 0) {
+          f.autoHealed = true;
+          return sendFight({ t: 'eat', slot: foodSlot() });
+        }
+      }
+      f.autoHealed = false;
+      if (self && (!pick || pct >= 0.6)) return sendFight(self);
       if (pick) return sendFight(pick);
     }
     if (o.moveLeft > 0) {
@@ -3864,6 +3883,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function uiScale() {
     return Number(getComputedStyle(document.documentElement).getPropertyValue('--ui')) || 1;
   }
+  /** The zoom an element actually has: the dock (windows and menu) on a desktop is smaller than the rest of the interface. */
+  function zOf(el) {
+    return parseFloat(getComputedStyle(el).zoom) || uiScale();
+  }
   function updateUiScale() {
     const fine = window.matchMedia('(pointer: fine)').matches;
     // Shrink with the window on a desktop so every panel stays whole; phones keep full size and scroll.
@@ -3872,6 +3895,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     document.documentElement.classList.toggle('narrow-hud', window.innerWidth / ui < 1620);
     const root = document.documentElement.style;
     root.setProperty('--ui', ui.toFixed(3));
+    // The window dock (menu and windows) is about 40% smaller than the interface, but never below 0.8 so text stays readable.
+    root.setProperty('--wz', Math.max(ui * 0.6, 0.8).toFixed(3));
+    root.setProperty('--wzr', (Math.max(ui * 0.6, 0.8) / ui).toFixed(3));
+    root.setProperty('--edge', `${Math.max(12 * ui, 10).toFixed(1)}px`);
     // vw and vh are not shrunk by the zoom, so give the layout the window size in its own (scaled) units.
     root.setProperty('--vw', `${(window.innerWidth / ui).toFixed(1)}px`);
     root.setProperty('--vh', `${(window.innerHeight / ui).toFixed(1)}px`);
@@ -3885,7 +3912,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     handle.addEventListener('pointerdown', (ev) => {
       if (ev.button !== 0) return;
       ev.preventDefault();
-      const z = uiScale();
+      const z = zOf(box);
       const parent = box.offsetParent || document.body;
       const pr = parent.getBoundingClientRect();
       const r = box.getBoundingClientRect();
@@ -4713,8 +4740,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const auto = el('button', 'sslot auto' + (G.auto ? ' on' : ''));
     auto.type = 'button';
     auto.disabled = false;
-    auto.append(el('b', '', 'AUTO'), el('span', 'st', G.auto ? 'ON' : 'OFF'), el('span', 'hk', 'X'));
-    auto.title = 'Auto combat (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. It stays on between fights until you turn it off.';
+    auto.append(el('span', 'ico swords'));
+    auto.title = `Auto fight: ${G.auto ? 'on' : 'off'} (X). Auto plays your turns: heals and buffs, eats when hurt, attacks with the strongest ability in reach, otherwise walks toward the nearest enemy. It stays on between fights until you turn it off.`;
     auto.addEventListener('click', toggleAuto);
     const left = $('side-l');
     const right = $('side-r');
@@ -4722,8 +4749,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     right.textContent = '';
     const loot = el('button', 'sslot auto' + (G.autoloot ? ' on' : ''));
     loot.type = 'button';
-    loot.append(el('b', '', 'LOOT'), el('span', 'st', G.autoloot ? 'ON' : 'OFF'));
-    loot.title = 'Autoloot. Drops go straight to your bag, with no Loot window. It stays on until you turn it off.';
+    loot.append(el('span', 'ico pack'));
+    loot.title = `Auto loot: ${G.autoloot ? 'on' : 'off'}. Drops go straight to your bag, with no Loot window. It stays on until you turn it off.`;
     loot.addEventListener('click', toggleAutoLoot);
     left.append(auto, loot);
 
@@ -4908,37 +4935,38 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     renderTrades();
   }
 
-  /** The Trades window: every gathering and crafting skill with its level and progress. */
+  /** The Trades window: a grid of skill tiles with level and progress, and the total at the end. */
+  const TRADE_COLOR = { forestry: '#7fc46a', mining: '#b0b8c8', fishing: '#5aa8e0', hunting: '#e08a5a', smithing: '#e0b84a', cooking: '#e06a6a', crafting: '#b07ae0' };
   function renderTrades() {
     const s = G.stats;
     const box = $('trades-body');
     if (!s || !box) return;
     box.textContent = '';
-    for (const id of Object.keys(SKILL_LABEL)) {
+    const grid = el('div', 'trade-grid');
+    let total = 0;
+    const ids = Object.keys(SKILL_LABEL);
+    for (const id of ids) {
       const e = s.skills[id] || { xp: 0, level: 1 };
+      total += e.level;
       const cap = e.level >= WORK_CAP;
       const cur = xpForLevel(e.level);
       const next = xpForLevel(e.level + 1);
-      const row = document.createElement('div');
-      row.className = 'trade-row';
-      const top = document.createElement('div');
-      top.className = 'top';
-      const name = document.createElement('span');
-      name.textContent = SKILL_LABEL[id];
-      const lv = document.createElement('b');
-      lv.textContent = cap ? `Level ${e.level} (max)` : `Level ${e.level}`;
-      top.append(name, lv);
-      const bar = document.createElement('div');
-      bar.className = 'trade-bar';
+      const tile = el('div', 'trade-tile');
+      tile.style.setProperty('--tc', TRADE_COLOR[id] || '#aaa');
+      const top = el('div', 'tt-top');
+      top.append(el('span', 'tt-tag', SKILL_LABEL[id].slice(0, 2)), el('b', 'tt-lv', String(e.level)));
+      const bar = el('div', 'trade-bar');
       const fill = document.createElement('div');
       fill.style.width = cap ? '100%' : `${Math.max(0, Math.min(100, ((e.xp - cur) / (next - cur)) * 100))}%`;
       bar.appendChild(fill);
-      const note = document.createElement('div');
-      note.className = 'muted';
-      note.textContent = cap ? `${e.xp} XP` : `${e.xp - cur} / ${next - cur} XP to level ${e.level + 1}`;
-      row.append(top, bar, note);
-      box.appendChild(row);
+      tile.append(top, el('div', 'tt-name', SKILL_LABEL[id]), bar);
+      tile.title = cap ? `${SKILL_LABEL[id]}, level ${e.level} (max). ${e.xp} XP.` : `${SKILL_LABEL[id]}, level ${e.level}. ${e.xp - cur} / ${next - cur} XP to level ${e.level + 1}.`;
+      grid.appendChild(tile);
     }
+    const sum = el('div', 'trade-tile total');
+    sum.append(el('div', 'tt-name', 'Total level'), el('b', 'tt-lv', `${total} / ${ids.length * WORK_CAP}`));
+    grid.appendChild(sum);
+    box.appendChild(grid);
   }
 
   /** The skill tree screen: four tabs, six rows of two skills, a point to spend on each. */
@@ -5009,7 +5037,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       }
     }
     const respec = $('respec');
-    respec.textContent = s.respecCost ? `Respec (${s.respecCost} iron bits)` : 'Respec (free)';
+    respec.textContent = s.respecCost ? `Respec (${s.respecCost} iron coins)` : 'Respec (free)';
     respec.onclick = () => {
       if (G.fight) return toast("You can't change skills in a fight.");
       window.wealdmark.send({ t: 'respec' });
@@ -5053,7 +5081,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     else {
       lines.push(`Tier ${def.tier}: needs level ${TIER_LEVELS[def.tier - 1]}`);
     }
-    if (def.value) lines.push(`Worth ${def.value} iron bits`);
+    if (def.value) lines.push(`Worth ${def.value} iron coins`);
     if (def.bossOnly) lines.push('Dropped only by dungeon bosses.');
     else if (def.dropOnly) lines.push('Monster drop only. Not sold in shops.');
     if (G.data && G.data.quests) {
@@ -5988,7 +6016,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function slotButton(ref, onClick, label, ghost) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'slot' + (ref ? '' : ' empty') + (ref && ref.rarity ? ` ${ref.rarity}` : '');
+    b.className = 'slot' + (ref ? '' : ' empty') + (ref ? ` ${ref.rarity || 'basic'}` : '');
     if (ref) {
       const def = G.data && G.data.items.get(ref.id);
       if (def) {
@@ -6040,12 +6068,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const label = (SLOT_LABELS.find((l) => l[0] === slot) || [slot, slot])[1];
       equip.appendChild(slotButton(inv.equipment[slot], () => (G.fight ? toast("You can't change gear in a fight.") : window.wealdmark.send({ t: 'unequip', slot })), label, slot));
     }
-    const belt = $('toolbelt');
+    const belt = $('belt-body');
     if (belt) {
       belt.textContent = '';
-      for (const [type, label] of [['axe', 'Axe'], ['pickaxe', 'Pickaxe'], ['rod', 'Rod'], ['snare', 'Snare']]) {
+      for (const [type, label] of [['axe', 'Woodcutting'], ['pickaxe', 'Mining'], ['rod', 'Fishing'], ['snare', 'Trapping']]) {
         const ref = inv.toolbelt ? inv.toolbelt[type] : null;
-        belt.appendChild(slotButton(ref, () => window.wealdmark.send({ t: 'unbelt', tool: type }), label));
+        const def = ref && G.data ? G.data.items.get(ref.id) : null;
+        const row = el('div', 'row-item belt-row');
+        row.title = ref ? itemTip(ref) : `No ${type} on the belt`;
+        if (def) row.appendChild(iconCanvas(def));
+        row.append(el('span', 'name', def ? def.name : 'Empty'), el('span', 'muted', def ? `${label}, tier ${def.tier}` : label));
+        belt.appendChild(row);
       }
     }
     G.gearInfo = inv.gear || null;
@@ -6148,40 +6181,27 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       el.style.maxHeight = '';
       return;
     }
-    if (el.dataset.moved) {
-      // A saved spot came from another window size: pull the window back inside, above the toolbar.
-      const tb0 = $('toolbar');
-      const keep = tb0 && tb0.offsetWidth ? (pr.bottom - tb0.getBoundingClientRect().top) / z + 8 : 8;
-      const W = pr.width / z;
-      const H = pr.height / z;
-      const left = Math.min(Math.max(0, parseFloat(el.style.left) || 0), Math.max(0, W - el.offsetWidth - Math.max(8, 12 / z)));
-      const top = Math.min(Math.max(0, parseFloat(el.style.top) || 0), Math.max(0, H - 160 - keep));
-      el.style.left = `${left}px`;
-      el.style.top = `${top}px`;
-      el.style.maxHeight = `${Math.max(160, H - top - keep)}px`;
-      return;
-    }
-    let bottom = 56;
-    for (const id of ['mapbox']) {
-      const b = $(id);
-      if (b && b.offsetWidth) bottom = Math.max(bottom, (b.getBoundingClientRect().bottom - pr.top) / z);
-    }
-    if (el.id === 'panel-trades') {
-      // Opens in the middle of the screen, like the crafting box.
-      el.style.right = 'auto';
-      el.style.left = `${Math.max(0, (pr.width / z - el.offsetWidth) / 2)}px`;
-      el.style.top = `${Math.max(8, (pr.height / z - el.offsetHeight) / 2)}px`;
-      return;
-    }
-    const slot = Math.max(0, openOrder.indexOf(el.id));
-    const top = bottom + 6 + slot * 28;
-    el.style.left = 'auto';
-    el.style.right = `${Math.max(10, 12 / z) + slot * 24}px`;
-    el.style.top = `${top}px`;
-    // Stop above the toolbar so a tall window never covers the buttons that open and close it.
+    // Every window opens in the dock: as wide as the menu, on its right edge, from under the map down to just above the
+    // menu. A later window takes the column to the left of the one before. Closing and reopening starts over from here.
+    for (const p of ['left', 'right', 'top', 'bottom', 'width', 'height', 'maxHeight']) el.style[p] = '';
+    delete el.dataset.moved;
+    const zw = zOf(el);
+    const px = (n) => `${Math.round(n * 100) / 100}px`;
     const tb = $('toolbar');
-    const reserve = tb && tb.offsetWidth ? (pr.bottom - tb.getBoundingClientRect().top) / z + 8 : 8;
-    el.style.maxHeight = `${Math.max(160, pr.height / z - top - reserve)}px`;
+    const mb = $('mapbox');
+    const tr = tb && tb.offsetWidth ? tb.getBoundingClientRect() : null;
+    const topPx = mb && mb.offsetWidth ? mb.getBoundingClientRect().bottom : pr.top + 8 * z;
+    const gap = 6 * zw;
+    const slot = Math.max(0, openOrder.indexOf(el.id));
+    const W = tr ? tr.width / zw : 264;
+    const rightPx = tr ? pr.right - tr.right : Math.max(10, 12 * z);
+    const bottomPx = tr ? tr.top - gap : pr.bottom - 56 * z;
+    el.style.left = 'auto';
+    el.style.width = px(W);
+    el.style.right = px(rightPx / zw + slot * (W + 6));
+    el.style.top = px((topPx - pr.top + gap) / zw);
+    el.style.height = px(Math.max(160, (bottomPx - topPx - gap) / zw));
+    el.style.maxHeight = 'none';
   }
 
   function raise(el) {
@@ -6249,43 +6269,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         });
         el.insertBefore(q, x.nextSibling);
       }
-      // Remember where the player put each window and how big they made it (in the window's own scaled units).
-      const wkey = `wealdmark.win2.${p}`;
-      const saveWin = () => {
-        if (el.classList.contains('hidden') || !el.offsetWidth || window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) return;
-        const z = uiScale();
-        const pr = (el.offsetParent || document.body).getBoundingClientRect();
-        const r = el.getBoundingClientRect();
-        try {
-          localStorage.setItem(wkey, JSON.stringify({ l: (r.left - pr.left) / z, t: (r.top - pr.top) / z, w: r.width / z, h: r.height / z }));
-        } catch {
-          /* blocked storage: the layout lasts until the page closes */
-        }
-      };
-      try {
-        const sv = JSON.parse(localStorage.getItem(wkey));
-        if (sv && [sv.l, sv.t, sv.w, sv.h].every(Number.isFinite)) {
-          el.style.right = 'auto';
-          el.style.left = `${Math.max(0, sv.l)}px`;
-          el.style.top = `${Math.max(0, sv.t)}px`;
-          el.style.width = `${Math.max(200, sv.w)}px`;
-          el.style.height = `${Math.max(90, sv.h)}px`;
-          el.dataset.moved = '1';
-        }
-      } catch {
-        /* no saved layout */
-      }
-      if (typeof ResizeObserver === 'function') {
-        let t = null;
-        new ResizeObserver(() => {
-          clearTimeout(t);
-          t = setTimeout(saveWin, 300);
-        }).observe(el);
-      }
+      // Windows are not remembered: each one opens in the dock again after it was closed.
       const bar = el.querySelector('h2');
       if (!bar) continue;
       bar.classList.add('grip');
-      dragBox(el, bar, saveWin);
+      dragBox(el, bar);
     }
   }
 
@@ -6378,7 +6366,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   // ---- talking, shopping, storage, crafting, and the journal
 
   const SKILL_LABEL = { forestry: 'Forestry', mining: 'Mining', fishing: 'Fishing', hunting: 'Hunting', smithing: 'Smithing', cooking: 'Cooking', crafting: 'Crafting' };
-  const CUR_NAME = { iron_bits: 'iron bits', gold_coins: 'gold coins', favor_tokens: 'favor tokens' };
+  const CUR_NAME = { iron_bits: 'iron coins', gold_coins: 'gold coins', favor_tokens: 'favor tokens' };
   const CUR_CLASS = { iron_bits: 'iron', gold_coins: 'gold', favor_tokens: 'favor' };
   // Mirrors the server: a shop pays 40% of an item's value, more for rolled gear.
   const SELL_RATE = 0.4;
@@ -6407,7 +6395,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function price(amount, cur) {
     const span = el('span', 'price');
-    span.title = { iron_bits: 'Iron bits', gold_coins: 'Gold coins', favor_tokens: 'Favor tokens (premium currency)' }[cur] || '';
+    span.title = { iron_bits: 'Iron coins: everyday money for shops, repairs and upgrades', gold_coins: 'Gold coins: 1 gold coin is worth 100 iron coins', favor_tokens: 'Favor tokens: earned only by finishing quests. They cannot be bought, sold or traded, so they are very scarce' }[cur] || '';
     span.append(el('span', `coin ${CUR_CLASS[cur]}`), document.createTextNode(String(amount)));
     return span;
   }
@@ -6574,7 +6562,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     G.buyPending = null;
   }
 
-  /** Ask before spending: "Do you want to purchase 1 Reed rod for 16 iron bits?" with Yes and No. */
+  /** Ask before spending: "Do you want to purchase 1 Reed rod for 16 iron coins?" with Yes and No. */
   function askBuy(entry, def, qty) {
     const total = entry.price * qty;
     const have = ((G.stats && G.stats.wallet) || {})[entry.cur] || 0;
@@ -6622,10 +6610,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (typeof G.storage.nextCost === 'number') {
       const cost = G.storage.nextCost;
       const gold = cost >= GOLD_RATE ? ` (${cost / GOLD_RATE} gold)` : '';
-      const up = el('button', 'act', `Add 10 places: ${cost.toLocaleString()} iron bits${gold}`);
+      const up = el('button', 'act', `Add 10 places: ${cost.toLocaleString()} iron coins${gold}`);
       up.type = 'button';
       up.disabled = w.iron_bits < cost;
-      up.title = `Upgrade ${(G.storage.tier || 0) + 1} of 5. Iron bits only; change gold coins back first if you need to.`;
+      up.title = `Upgrade ${(G.storage.tier || 0) + 1} of 5. Iron coins only; change gold coins back first if you need to.`;
       up.addEventListener('click', () => window.wealdmark.send({ t: 'storage_upgrade' }));
       box.appendChild(up);
     } else if (typeof G.storage.tier === 'number') box.appendChild(el('p', 'muted', 'Every storage upgrade is bought.'));
@@ -6643,7 +6631,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       });
     }
     box.appendChild(bag);
-    box.appendChild(el('p', 'muted', 'Click to move one. Shift-click moves the whole stack. Gold coins are lighter to carry than a purse of iron bits.'));
+    box.appendChild(el('p', 'muted', 'Click to move one. Shift-click moves the whole stack. Gold coins are lighter to carry than a purse of iron coins.'));
   }
 
   // crafting stations
@@ -6665,37 +6653,68 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const box = $('station-body');
     box.textContent = '';
     for (const line of st.text) box.appendChild(el('p', 'muted', line));
-    // Only what you can make right now.
+    // RS3 style: a tile grid of everything your level allows, one detail box, an amount, one Make button.
     const most = (r) => Math.min(20, ...r.inputs.map((i) => Math.floor(bagCount(i.item) / i.qty)));
-    const list = [...G.data.recipes.values()].filter((r) => r.station === st.id && skillLevel(r.skill) >= r.level && most(r) >= 1 && G.data.items.get(r.output.item));
+    const list = [...G.data.recipes.values()].filter((r) => r.station === st.id && skillLevel(r.skill) >= r.level && G.data.items.get(r.output.item));
+    if (!list.length) {
+      box.appendChild(el('p', 'muted', 'You have nothing to make here. Train the skill first.'));
+      return;
+    }
+    let sel = list.find((r) => r.id === G.stationSel) || list.find((r) => most(r) >= 1) || list[0];
+    G.stationSel = sel.id;
+    const grid = el('div', 'make-grid');
     for (const r of list) {
       const out = G.data.items.get(r.output.item);
-      const low = false;
-      const max = most(r);
-      const row = el('div', 'recipe');
-      const head = el('div', 'recipe-head');
-      head.append(iconCanvas(out), el('span', 'name', `${out.name}${r.output.qty > 1 ? ` x${r.output.qty}` : ''}`), el('span', 'muted', `${SKILL_LABEL[r.skill]} ${r.level}`));
-      row.appendChild(head);
-      const need = el('div', 'need');
-      for (const i of r.inputs) {
-        const have = bagCount(i.item);
-        const idef = G.data.items.get(i.item);
-        need.appendChild(el('span', have >= i.qty ? 'ok' : 'short', `${idef ? idef.name : pretty(i.item)} ${have}/${i.qty}`));
-      }
-      row.appendChild(need);
-      const btns = el('div', 'recipe-btns');
-      for (const [label, n] of [['Make 1', 1], ['Make 5', 5], [max > 5 ? `Make ${max}` : 'Make all', max]]) {
-        if (n === 5 && max < 5) continue;
-        if (label !== 'Make 1' && n === 1) continue;
-        const b = el('button', 'act', label);
-        b.type = 'button';
-        b.addEventListener('click', () => window.wealdmark.send({ t: 'craft', recipe: r.id, qty: Math.min(20, n) }));
-        btns.appendChild(b);
-      }
-      row.appendChild(btns);
-      box.appendChild(row);
+      const t = el('button', 'make-tile');
+      t.type = 'button';
+      t.title = `${out.name}${r.output.qty > 1 ? ` x${r.output.qty}` : ''}`;
+      if (r.id === sel.id) t.classList.add('sel');
+      if (most(r) < 1) t.classList.add('poor');
+      t.appendChild(iconCanvas(out));
+      t.addEventListener('click', () => {
+        G.stationSel = r.id;
+        G.stationQty = 1;
+        play('click');
+        renderStation();
+      });
+      grid.appendChild(t);
     }
-    if (!list.length) box.appendChild(el('p', 'muted', 'You have nothing to make here. Bring the materials, or train the skill.'));
+    box.appendChild(grid);
+    const out = G.data.items.get(sel.output.item);
+    const max = most(sel);
+    const qty = Math.max(1, Math.min(G.stationQty || 1, Math.max(1, max)));
+    G.stationQty = qty;
+    const det = el('div', 'make-detail');
+    const head = el('div', 'recipe-head');
+    head.append(iconCanvas(out), el('span', 'name', `${out.name}${sel.output.qty > 1 ? ` x${sel.output.qty}` : ''}`), el('span', 'muted', `${SKILL_LABEL[sel.skill]} ${sel.level}`));
+    det.appendChild(head);
+    const need = el('div', 'need');
+    for (const i of sel.inputs) {
+      const have = bagCount(i.item);
+      const idef = G.data.items.get(i.item);
+      need.appendChild(el('span', have >= i.qty ? 'ok' : 'short', `${idef ? idef.name : pretty(i.item)} ${have}/${i.qty}`));
+    }
+    det.appendChild(need);
+    box.appendChild(det);
+    const amt = el('div', 'make-amount');
+    const step = (label, fn, tip) => {
+      const b = el('button', 'act', label);
+      b.type = 'button';
+      b.title = tip;
+      b.addEventListener('click', () => {
+        G.stationQty = Math.max(1, Math.min(Math.max(1, max), fn(qty)));
+        renderStation();
+      });
+      return b;
+    };
+    const num = el('span', 'make-num', String(qty));
+    amt.append(el('span', 'muted', 'Amount'), step('-', (n) => n - 1, 'One fewer'), num, step('+', (n) => n + 1, 'One more'), step('Max', () => max, `Most you can make: ${max}`));
+    box.appendChild(amt);
+    const go = el('button', 'act make-go', max < 1 ? 'Missing materials' : `Make ${qty}`);
+    go.type = 'button';
+    go.disabled = max < 1;
+    go.addEventListener('click', () => window.wealdmark.send({ t: 'craft', recipe: sel.id, qty: Math.min(20, qty) }));
+    box.appendChild(go);
   }
 
   // the Steward of Deeds
@@ -6716,7 +6735,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const box = $('perks-body');
     box.textContent = '';
     box.appendChild(walletLine());
-    box.appendChild(el('p', 'muted', 'Favor tokens come from finishing jobs for the people of the Reach. They buy what gold cannot.'));
+    box.appendChild(el('p', 'muted', 'Favor tokens are earned only by finishing quests. They cannot be bought, sold or traded, so spend them with care.'));
     if (!svc) return;
     const w = (G.stats && G.stats.wallet) || { favor_tokens: 0 };
     for (const perk of svc.perks) {
@@ -6948,14 +6967,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const party = G.party;
     const p = document.createElement('p');
     const bits = (G.stats && G.stats.wallet && G.stats.wallet.iron_bits) || 0;
-    p.textContent = party ? `Entering takes your party of ${party.members.length}. Each hero pays ${DUNGEON_FEE} iron bits.` : `Entering alone costs ${DUNGEON_FEE} iron bits.`;
+    p.textContent = party ? `Entering takes your party of ${party.members.length}. Each hero pays ${DUNGEON_FEE} iron coins.` : `Entering alone costs ${DUNGEON_FEE} iron coins.`;
     const have = document.createElement('p');
     have.className = bits < DUNGEON_FEE ? 'bad' : 'muted';
-    have.textContent = `You carry ${bits} iron bits.`;
+    have.textContent = `You carry ${bits} iron coins.`;
     const enter = document.createElement('button');
     enter.type = 'button';
     enter.className = 'act';
-    enter.textContent = `Enter (${DUNGEON_FEE} iron bits each)`;
+    enter.textContent = `Enter (${DUNGEON_FEE} iron coins each)`;
     enter.addEventListener('click', () => window.wealdmark.send({ t: 'dungeon', op: 'enter' }));
     const leave = document.createElement('button');
     leave.type = 'button';
@@ -7009,6 +7028,48 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       box.appendChild(el('h3', 'muted', 'Finished'));
       for (const q of done) box.appendChild(el('p', 'muted', q.name));
     }
+    renderPinned(tracked, states);
+  }
+
+  /** The pinned journal: tracked jobs on the left of the screen. It can be minimized, and Open shows the full journal. */
+  const qtMin = () => {
+    try {
+      return localStorage.getItem('wealdmark.qtmin') === '1';
+    } catch {
+      return false;
+    }
+  };
+  function placePinned() {
+    const t = $('qtrack');
+    const h = $('hud');
+    if (!t || !t.offsetParent || !h || !h.offsetWidth) return;
+    const z = zOf(t);
+    const pr = t.offsetParent.getBoundingClientRect();
+    const hr = h.getBoundingClientRect();
+    t.style.top = `${Math.round((hr.bottom - pr.top) / z + 6)}px`;
+    t.style.left = `${Math.round((hr.left - pr.left) / z)}px`;
+  }
+  function renderPinned(tracked, states) {
+    const t = $('qtrack');
+    if (!t) return;
+    t.classList.toggle('hidden', !tracked.length);
+    t.classList.toggle('min', qtMin());
+    $('qt-min').textContent = qtMin() ? '+' : '−';
+    const body = $('qt-body');
+    body.textContent = '';
+    for (const q of tracked) {
+      const st = states.get(q.id);
+      const step = q.steps[st.step];
+      const ready = needMet(step.need, st);
+      const giver = G.data.npcs.get(step.npc);
+      const d = el('div', 'tq');
+      d.appendChild(el('b', '', q.name));
+      d.appendChild(el('div', '', ready && giver ? `Report to ${giver.name}.` : step.todo));
+      const prog = progressText(step.need, st);
+      if (prog) d.appendChild(el('div', ready ? 'ok' : 'short', prog));
+      body.appendChild(d);
+    }
+    placePinned();
   }
 
   function onQuests(msg) {
@@ -7337,10 +7398,20 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       cam.x = Math.max(0, Math.min(map.width - 1, cam.x + G.look.x));
       cam.y = Math.max(0, Math.min(map.height - 1, cam.y + G.look.y));
     }
-    const rc = $('recenter');
-    if (rc) rc.classList.toggle('hidden', !G.look);
     const offX = Math.round(w / 2 - (cam.x * TILE + TILE / 2) * s);
     const offY = Math.round(h / 2 - (cam.y * TILE + TILE / 2) * s);
+    // The button only shows once the hero has left the screen.
+    const rc = $('recenter');
+    if (rc) {
+      let away = false;
+      if (G.look) {
+        const hp0 = G.fight && hero() ? actorPos(hero(), now) : worldPos(G.self(), now);
+        const hx = offX + (hp0.x * TILE + TILE / 2) * s;
+        const hy = offY + (hp0.y * TILE + TILE / 2) * s;
+        away = hx < 0 || hy < 0 || hx > w || hy > h;
+      }
+      rc.classList.toggle('hidden', !away);
+    }
     G.off = { x: offX, y: offY };
 
     const x0 = Math.max(0, Math.floor(-offX / px));
@@ -8937,6 +9008,21 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (!ev.target.closest('#toolbar')) $('menu-list').classList.add('hidden');
     });
     on($('btn-trades'), 'click', () => togglePanel('panel-trades'));
+    on($('btn-store'), 'click', () => togglePanel('panel-store'));
+    on($('btn-belt'), 'click', () => togglePanel('panel-belt'));
+    on($('qt-min'), 'click', () => {
+      try {
+        localStorage.setItem('wealdmark.qtmin', qtMin() ? '0' : '1');
+      } catch {
+        /* storage blocked: the pane stays as it is */
+      }
+      renderJournal();
+    });
+    on($('qt-open'), 'click', () => {
+      if ($('panel-journal').classList.contains('hidden')) togglePanel('panel-journal');
+      renderJournal();
+    });
+    window.addEventListener('resize', () => requestAnimationFrame(placePinned));
     setupBar();
     on($('bc-no'), 'click', closeBuyConfirm);
     on($('bc-yes'), 'click', () => {
