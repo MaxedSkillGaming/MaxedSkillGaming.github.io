@@ -209,7 +209,7 @@ footer { margin-top: 16px; text-align: right; }
 .fbox { position: absolute; display: flex; flex-direction: column; min-width: 90px; min-height: 60px; overflow: hidden; resize: both; background: rgba(20, 16, 28, 0.9); border: 3px solid var(--edge); z-index: 5; }
 .fbox.off, .fbox.hidden { display: none; }
 .fgrip { flex: none; padding: 0 6px; font-size: 11px; line-height: 16px; color: var(--gold); background: #2a2040; cursor: move; user-select: none; touch-action: none; }
-#mapbox { top: 84px; right: 10px; width: 150px; height: 175px; }
+#mapbox { top: 84px; right: 10px; width: 150px; height: 209px; }
 #minimap { flex: 1; min-height: 0; width: 100%; object-fit: contain; border: 0; opacity: 1; }
 #tracker { flex: 1; min-height: 0; overflow-y: auto; width: auto; border: 0; background: transparent; }
 #rctl button { margin: 0; padding: 1px 6px; min-width: 22px; font-size: 11px; line-height: 16px; }
@@ -635,7 +635,7 @@ button.link:hover { opacity: 1; }
   #hotcol { order: -1; flex: 1 1 100%; }
   #bar-picker { left: 6px; bottom: 156px; }
   #rctl { top: 52px; right: 6px; }
-  #mapbox { top: 80px; right: 6px; width: 110px; height: 130px; }
+  #mapbox { top: 80px; right: 6px; width: 110px; height: 164px; }
   #tracker { font-size: 11px; }
   #toast { top: 100px; max-width: calc(calc(var(--vw, 100vw) * 1.0) - 24px); }
   #chat { left: 6px; bottom: 156px; width: calc(calc(var(--vw, 100vw) * 1.0) - 80px); height: auto; min-height: 0; }
@@ -1191,3 +1191,10 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
 /* Coordinates: a strip under the map, inside the map box so it has the same edges. */
 #mapinfo { flex: none; display: flex; justify-content: space-between; gap: 8px; padding: 4px 8px; font-size: 11px; line-height: 16px; color: var(--trim-hi); background: #17112a; border-top: 2px solid var(--hud-line); white-space: nowrap; }
 #mapinfo span:last-child { color: #a898d0; }
+/* Where you are: two lines, centered, between the map and the coordinates. */
+#mapplace { flex: none; display: flex; flex-direction: column; align-items: center; padding: 4px 8px; font-size: 11px; line-height: 16px; background: #17112a; border-top: 2px solid var(--hud-line); text-align: center; overflow: hidden; }
+#mapplace span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#mp-zone { color: var(--trim-hi); }
+#mp-map { color: #a898d0; }
+/* The pinned journal takes the spot the location tag used to hold, top left under the vitals. */
+#qtrack { top: calc((max(10px, calc(8px / var(--ui, 1))) + 84px) / var(--wz, 1)); left: calc(max(10px, calc(8px / var(--ui, 1))) / var(--wz, 1)); }

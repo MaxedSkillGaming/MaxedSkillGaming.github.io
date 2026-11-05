@@ -3978,7 +3978,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const pr = (box.offsetParent || document.body).getBoundingClientRect();
       const r = box.getBoundingClientRect();
       try {
-        localStorage.setItem(store, JSON.stringify({ l: (r.left - pr.left) / z, t: (r.top - pr.top) / z, w: r.width / z, h: r.height / z }));
+        localStorage.setItem(store, JSON.stringify({ l: (r.left - pr.left) / z, t: (r.top - pr.top) / z, w: r.width / z, h: r.height / z, n: 1 }));
       } catch {
         /* blocked storage */
       }
@@ -3986,6 +3986,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     try {
       const v = JSON.parse(localStorage.getItem(store));
       if (v && [v.l, v.t, v.w, v.h].every(Number.isFinite)) {
+        // The map gained a location row (35px): a size saved before that gets the row added, so the map itself keeps its size.
+        if (key === 'map' && !v.n) v.h += 35;
         box.style.right = 'auto';
         box.style.left = `${Math.max(0, v.l)}px`;
         box.style.top = `${Math.max(0, v.t)}px`;
@@ -7107,16 +7109,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       return false;
     }
   };
-  function placePinned() {
-    const t = $('qtrack');
-    const h = $('hud');
-    if (!t || !t.offsetParent || !h || !h.offsetWidth) return;
-    const z = zOf(t);
-    const pr = t.offsetParent.getBoundingClientRect();
-    const hr = h.getBoundingClientRect();
-    t.style.top = `${Math.round((hr.bottom - pr.top) / z + 6)}px`;
-    t.style.left = `${Math.round((hr.left - pr.left) / z)}px`;
-  }
   function renderPinned(tracked, states) {
     const t = $('qtrack');
     if (!t) return;
@@ -7137,7 +7129,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (prog) d.appendChild(el('div', ready ? 'ok' : 'short', prog));
       body.appendChild(d);
     }
-    placePinned();
   }
 
   function onQuests(msg) {
@@ -7836,8 +7827,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const z = zoneAt(map, me.x, me.y);
       if (window.wealdmarkAudio) window.wealdmarkAudio.music(G.fight ? 'fight' : z && z.kind === 'safe' ? 'town' : 'wilds');
       const others = [...G.entities.values()].filter((e) => e.kind === 'player' && e.id !== G.selfId).length;
-      const place = z ? (z.name === map.name ? `${map.name} (${KIND_LABEL[z.kind]})` : `${map.name} - ${z.name} (${KIND_LABEL[z.kind]})`) : map.name;
-      $('hud').textContent = place;
+      // Under the map: the zone name on top, then the map name and what kind of ground it is.
+      $('mp-zone').textContent = z && z.name !== map.name ? z.name : map.name;
+      $('mp-map').textContent = z ? (z.name === map.name ? `(${KIND_LABEL[z.kind]})` : `${map.name} (${KIND_LABEL[z.kind]})`) : '';
       $('mi-pos').textContent = `${me.x}, ${me.y}`;
       $('mi-near').textContent = `Nearby ${others}`;
       const hh = G.fight && hero();
@@ -9099,7 +9091,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if ($('panel-journal').classList.contains('hidden')) togglePanel('panel-journal');
       renderJournal();
     });
-    window.addEventListener('resize', () => requestAnimationFrame(placePinned));
     setupBar();
     on($('bc-no'), 'click', closeBuyConfirm);
     on($('bc-yes'), 'click', () => {
