@@ -116,19 +116,21 @@
 
     <div id="vitals">
       <div class="frow"><span id="pf-name"></span><span id="pf-lv"></span></div>
+      <div class="pbar vhp"><div id="pf-hp" class="meter-fill"></div><span id="pf-hp-t"></span></div>
+      <div class="pbar vmp"><div id="pf-mp" class="meter-fill"></div><span id="pf-mp-t"></span></div>
       <div class="meter pxp"><div id="pf-xp" class="meter-fill"></div></div>
     </div>
     <div id="tframe" class="hidden">
       <div class="frow"><span id="tf-name"></span><span id="tf-lv"></span></div>
-      <div class="meter thp"><div id="tf-fill" class="meter-fill"></div><span id="tf-text"></span></div>
+      <div class="pbar vhp"><div id="tf-fill" class="meter-fill"></div><span id="tf-text"></span></div>
+      <div class="frow tfinfo"><span id="tf-hit"></span><span id="tf-buffs"></span></div>
     </div>
 
     <div id="bhud">
       <div id="hotcol">
         <div id="buffs"></div>
         <div class="meter xp"><div id="xp-fill" class="meter-fill"></div><span id="xp-text"></span></div>
-        <div class="meter hp"><div id="hp-fill" class="meter-fill"></div><span id="hp-text"></span></div>
-        <div class="meter mp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div>
+        <div class="pbar vit"><div class="half vhp"><div id="hp-fill" class="meter-fill"></div><span id="hp-text"></span></div><div class="half vmp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div></div>
         <div id="hotrow">
           <div id="hl">
             <div id="side-l" class="qcol"></div>

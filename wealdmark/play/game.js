@@ -2771,12 +2771,24 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         renderLook();
         if (G.merc) renderMerc();
         return;
-      case 'inventory':
+      case 'inventory': {
+        // Flash the Bag button when a stack grows or a new item arrives (not on the first load, and not when things leave).
+        const before = G.inv && G.inv.items;
+        if (before && msg.items) {
+          const count = (list) => {
+            const m = new Map();
+            for (const i of list) if (i) m.set(i.id, (m.get(i.id) || 0) + (i.qty || 1));
+            return m;
+          };
+          const was = count(before);
+          for (const [id, n] of count(msg.items)) if (n > (was.get(id) || 0)) flashButton('btn-bag');
+        }
         G.inv = msg;
         if (msg.items && msg.items.some((i) => i && i.rarity)) hint('bag');
         renderBag();
         renderJournal();
         return refreshTown();
+      }
       case 'fight.start':
         hint('fight');
         return startFight(msg, now);
@@ -3807,7 +3819,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     box.textContent = '';
     const h = G.fight && hero();
     if (!h) return;
-    for (const st of h.statuses) {
+    fillBuffIcons(box, h.statuses);
+  }
+
+  /** Status icons with the rounds left, shared by the hero strip and the monster frame. */
+  function fillBuffIcons(box, statuses) {
+    for (const st of statuses) {
       const b = el('span', 'buff ' + (DEBUFFS.has(st.id) ? 'debuff' : 'good'));
       const img = new Image();
       img.src = statusIcon(st.id);
@@ -3816,6 +3833,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       b.append(img, el('span', 'n', String(spanNum(st.rounds))));
       box.appendChild(b);
     }
+  }
+
+  /** The foe's chance to land a hit on you, from its level against your Defense (the same curve the server uses, minus the foe's own accuracy trait). */
+  function foeHitChance(foe) {
+    const me = G.fight && G.fight.actors.get(G.selfId);
+    const pen = me && me.statuses.some((s) => s.id === 'blinded') ? 0.3 : 0;
+    return Math.min(0.95, Math.max(0.05, 0.6 + (foe.level - skillLevel('defense')) * 0.015 - pen));
   }
 
   /** Thin experience bar under mana. */
@@ -4084,6 +4108,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const me = G.self();
     $('pf-name').textContent = (me && me.name) || '';
     $('pf-lv').textContent = G.stats ? `Lv ${G.stats.combatLevel}` : '';
+    $('pf-hp').style.width = `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`;
+    $('pf-mp').style.width = `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`;
+    $('pf-hp-t').textContent = `HP ${hp}/${maxHp}`;
+    $('pf-mp-t').textContent = `MP ${mp}/${maxMp}`;
     const s = G.stats;
     if (s) {
       const xp = (s.skills.combat && s.skills.combat.xp) || 0;
@@ -4111,7 +4139,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       $('tf-name').textContent = foe.name || 'Enemy';
       $('tf-lv').textContent = `Lv ${foe.level}`;
       $('tf-fill').style.width = `${Math.max(0, Math.min(100, (foe.hp / foe.maxHp) * 100))}%`;
-      $('tf-text').textContent = `${foe.hp}/${foe.maxHp}`;
+      $('tf-text').textContent = `HP ${foe.hp}/${foe.maxHp}`;
+      $('tf-hit').textContent = `Hit chance ${pctText(foeHitChance(foe))}`;
+      const tb = $('tf-buffs');
+      tb.textContent = '';
+      fillBuffIcons(tb, foe.statuses || []);
     }
   }
 
@@ -6229,6 +6261,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   function raise(el) {
+    // Windows stack from 21 up. The toolbar (and its Hero and World menus) sits at 150, so squeeze the order back down before a window can climb past it.
+    if (zTop >= 140) {
+      const open = [...document.querySelectorAll('.side')].filter((p) => p.style.zIndex).sort((a, b) => Number(a.style.zIndex) - Number(b.style.zIndex));
+      zTop = 20;
+      for (const p of open) p.style.zIndex = String(++zTop);
+    }
     el.style.zIndex = String(++zTop);
   }
 
@@ -7132,8 +7170,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   function onQuests(msg) {
+    if (G.quests && JSON.stringify(G.quests) !== JSON.stringify(msg.list)) flashButton('btn-journal');
     G.quests = msg.list;
     renderJournal();
+  }
+
+  /** Pulse a toolbar button gold three times so the player notices a change behind it. */
+  function flashButton(id) {
+    const b = $(id);
+    if (!b) return;
+    b.classList.remove('flash');
+    void b.offsetWidth;
+    b.classList.add('flash');
+    setTimeout(() => b.classList.remove('flash'), 1600);
   }
 
   // ---- drawing
@@ -7840,7 +7889,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       $('hp-fill').style.width = `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`;
       $('mp-fill').style.width = `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`;
       $('hp-text').textContent = `HP ${hp}/${maxHp}`;
-      $('mp-text').textContent = `Mana ${mp}/${maxMp}`;
+      $('mp-text').textContent = `MP ${mp}/${maxMp}`;
       renderXpBar();
       updateFrames(hp, maxHp, mp, maxMp);
       renderBar();

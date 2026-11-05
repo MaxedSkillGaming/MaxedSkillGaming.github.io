@@ -171,7 +171,7 @@ footer { margin-top: 16px; text-align: right; }
   font: inherit;
   font-size: 13px;
 }
-#toolbar { position: absolute; top: 10px; right: 10px; z-index: 20; }
+#toolbar { position: absolute; top: 10px; right: 10px; z-index: 150; }
 /* Desktop: the usual row of buttons. The Menu button is for touch screens and small windows. */
 #menu-btn { display: none; }
 #menu-list, #menu-list.hidden { display: flex; gap: 6px; }
@@ -305,8 +305,8 @@ button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
   position: absolute;
   top: 56px;
   right: 10px;
-  width: 240px;
-  min-width: 200px;
+  width: 272px;
+  min-width: 220px;
   min-height: 90px;
   max-height: calc(var(--vh, 100vh) - 70px);
   max-width: calc(var(--vw, 100vw) - 20px);
@@ -315,13 +315,16 @@ button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
   overflow-x: hidden;
   overflow-wrap: anywhere;
   user-select: none;
-  padding: 10px 12px;
+  padding: 12px 16px;
   background: rgba(20, 16, 28, 0.94);
   border: 3px solid var(--edge);
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 .side.hidden { display: none; }
-.side h2 { margin: 0 0 6px; color: var(--gold); font-size: 15px; }
+.side h2 { margin: 0 0 8px; color: var(--gold); font-size: 17px; }
+/* Plain buttons inside windows get taller rows; slots, close buttons and the tab strips keep their own size. */
+.side button:not(.slot):not(.xbtn):not(.tab) { min-height: 28px; font-size: 14px; }
 .side h2.grip { cursor: move; user-select: none; }
 .side input, .side textarea { user-select: text; }
 .side label { display: block; margin: 8px 0; }
@@ -538,11 +541,11 @@ button.slot i { position: absolute; right: 3px; bottom: 1px; font-style: normal;
   border: 3px solid var(--edge);
 }
 #dialog.hidden { display: none; }
-#dialog h3 { margin: 0; color: var(--gold); font-size: 14px; }
-#dlg-role { margin: 0 0 6px; font-size: 12px; }
-#dlg-lines p { margin: 4px 0; line-height: 1.4; }
+#dialog h3 { margin: 0; color: var(--gold); font-size: 17px; }
+#dlg-role { margin: 0 0 8px; font-size: 13px; }
+#dlg-lines p { margin: 4px 0; line-height: 1.4; font-size: 15px; }
 #dlg-options { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
-#dlg-options button.opt { margin: 0; padding: 5px 10px; text-align: left; font-size: 13px; }
+#dlg-options button.opt { margin: 0; padding: 6px 10px; text-align: left; font-size: 15px; }
 
 #busy {
   position: absolute;
@@ -645,7 +648,7 @@ button.link:hover { opacity: 1; }
   #panel-shop, #panel-station { transform: none; max-height: calc(var(--vh, 100vh) - 146px / var(--ui, 1)); }
   .side h2.grip { cursor: default; }
   .modal-box { min-width: 0; max-width: calc(calc(var(--vw, 100vw) * 1.0) - 16px); }
-  #dialog { left: 6px !important; right: 6px !important; width: auto !important; max-width: none; }
+  #dialog { left: 6px !important; right: 6px !important; top: 50% !important; bottom: auto !important; transform: translateY(-50%); width: auto !important; max-width: none; max-height: calc(100% - 16px); overflow: auto; }
 }
 
 #party-body .party-member { display: grid; grid-template-columns: 1fr auto; gap: 4px; align-items: center; margin: 6px 0; }
@@ -1053,14 +1056,26 @@ button.qtrack.on { background: #2f6b3a; }
   pointer-events: none;
   z-index: 5;
 }
-#vitals { left: max(10px, calc(8px / var(--ui, 1))); width: 176px; }
-#tframe { left: calc(max(10px, calc(8px / var(--ui, 1))) + 176px + 8px); width: 152px; }
+#vitals, #tframe { width: 224px; height: 96px; justify-content: space-between; }
+#vitals { left: max(10px, calc(8px / var(--ui, 1))); }
+#tframe { left: calc(max(10px, calc(8px / var(--ui, 1))) + 224px + 8px); }
 #tframe.hidden { display: none; }
-#vitals .meter.hp, #vitals .meter.mp, #vitals .meter.pxp, #tframe .meter.thp { display: block; margin: 0; height: 12px; }
-#vitals .meter.hp .meter-fill, #tframe .meter.thp .meter-fill { background: #b83a3a; }
-#vitals .meter.pxp { height: 4px; border-width: 1px; }
+#vitals .meter.pxp { display: block; margin: 0; height: 4px; border-width: 1px; }
 #vitals .meter.pxp .meter-fill { background: #d8b040; }
-#vitals .meter span, #tframe .meter span { line-height: 8px; font-size: 11px; }
+/* HP and MP read the same everywhere: top frame, monster frame and the hotbar plate. Same labels, colors and number style. */
+.pbar { position: relative; flex: none; display: flex; align-items: center; justify-content: center; height: 16px; border: 1px solid #000; background: #120d22; overflow: hidden; }
+.pbar .meter-fill, .half .meter-fill { position: absolute; left: 0; top: 0; bottom: 0; height: auto; }
+.vhp .meter-fill { background: #b83a3a; }
+.vmp .meter-fill { background: #3f6fd0; }
+.pbar span, .half span { position: relative; z-index: 1; font-size: 13px; line-height: 14px; font-weight: 700; color: #fff; text-shadow: -1px 0 #000, 1px 0 #000, 0 -1px #000, 0 1px #000, 1px 1px #000; white-space: nowrap; }
+.tfinfo { align-items: center; height: 20px; }
+.tfinfo > span:first-child { color: var(--ink); overflow: visible; }
+#tf-buffs { display: flex; gap: 4px; }
+#tf-buffs .buff { position: relative; width: 20px; height: 20px; border: 1px solid #000; background: #17112a; box-sizing: border-box; }
+#tf-buffs .buff.good { border-color: #2f6b3a; }
+#tf-buffs .buff.debuff { border-color: #8a2f2f; }
+#tf-buffs .buff img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+#tf-buffs .buff .n { position: absolute; right: -2px; bottom: -3px; font-size: 11px; line-height: 11px; padding: 0 2px; background: #000; color: #fff; }
 .frow { display: flex; justify-content: space-between; gap: 8px; white-space: nowrap; overflow: hidden; }
 .frow span:first-child { color: var(--gold); overflow: hidden; text-overflow: ellipsis; }
 #hud { top: calc(max(10px, calc(8px / var(--ui, 1))) + 84px); }
@@ -1072,11 +1087,18 @@ button.qtrack.on { background: #2f6b3a; }
 .ui-off #toolbar, .ui-off #mapbox, .ui-off #recenter, .ui-off #hud, .ui-off .side, .ui-off #r-map, .ui-off #r-world { display: none !important; }
 @media (pointer: coarse), (max-width: 760px) {
   /* the phone scales the HUD to half: keep the two frames at full size so text stays at 11px */
-  #gameview > #vitals, #gameview > #tframe { zoom: 1; top: 8px; padding: 4px 6px; }
-  #gameview > #vitals { left: 8px; width: 148px; }
-  #gameview > #tframe { left: 164px; width: 120px; }
+  #gameview > #vitals, #gameview > #tframe { zoom: 1; top: 8px; padding: 4px 6px; width: 170px; height: 92px; }
+  #gameview > #vitals { left: 8px; }
+  #gameview > #tframe { left: 186px; }
   #gameview > #hud { top: calc(82px / var(--ui, 1)); }
 }
+/* Bag and Journal flash gold three times when something lands in them. */
+@keyframes tb-flash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 217, 138, 0); background: inherit; border-color: inherit; }
+  50% { box-shadow: 0 0 0 4px rgba(245, 217, 138, 0.55), 0 0 12px 2px rgba(245, 217, 138, 0.6); background: #5a4a1e; border-color: #f5d98a; }
+}
+#btn-bag.flash, #btn-journal.flash { animation: tb-flash 0.5s ease-in-out 3; }
+@media (prefers-reduced-motion: reduce) { #btn-bag.flash, #btn-journal.flash { animation-duration: 1.5s; animation-iteration-count: 1; } }
 #mapbox, #rctl, #toolbar { right: max(12px, calc(10px / var(--ui, 1))); }
 .wide-hud #toolbar { bottom: max(12px, calc(10px / var(--ui, 1))); }
 
@@ -1085,10 +1107,8 @@ button.qtrack.on { background: #2f6b3a; }
   #gameview > .side, #gameview > #toolbar { zoom: var(--wz, 1); }
   .wide-hud #toolbar { left: auto; right: calc(var(--edge, 12px) / var(--wz, 1)); bottom: calc(var(--edge, 12px) / var(--wz, 1)); width: 264px; }
   /* Dialogs: the NPC talk box sits above the hotbar at the window scale; confirm boxes shrink inside their overlay (the overlay itself already carries the interface zoom). */
-  #gameview > #dialog { zoom: var(--wz, 1); left: 50%; right: auto; bottom: calc((88px * var(--ui, 1) + 12px) / var(--wz, 1)); width: 360px; max-width: calc(var(--vw, 100vw) / var(--wz, 1) - 16px); transform: translateX(-50%); box-sizing: border-box; }
+  #gameview > #dialog { zoom: var(--wz, 1); left: 50%; right: auto; top: 50%; bottom: auto; width: 440px; max-width: calc(var(--vw, 100vw) / var(--wz, 1) - 16px); max-height: calc(var(--vh, 100vh) / var(--wz, 1) - 16px); overflow: auto; transform: translate(-50%, -50%); box-sizing: border-box; }
   #gameview > #panel-shop, #gameview > #panel-station { max-height: calc(var(--vh, 100vh) / var(--wzr, 1) - 24px); }
-  #dialog h3 { font-size: 13px; }
-  #dlg-options button.opt { padding: 3px 8px; font-size: 12px; }
   .modal-box, #signout-confirm .box, #buy-confirm .box { zoom: var(--wzr, 1); }
 }
 
@@ -1154,10 +1174,10 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
    auto, loot, health potion, mana potion, bar number, slots, bar number, weapon swap. No flasks. */
 #bhud { --slot: 40px; left: calc(min(380px, calc(var(--vw, 100vw) * 0.34)) + 24px); right: calc(374px + max(10px, calc(8px / var(--ui, 1)))); max-width: none; justify-content: center; }
 #hotcol { flex: 0 1 auto; min-width: 0; }
-#hotcol .meter.hp, #hotcol .meter.mp { display: block; height: 12px; margin: 0; border: 2px solid var(--hud-line); border-bottom-width: 0; background: #0c0912; }
-#hotcol .meter.hp .meter-fill { background: #b83a3a; }
-#hotcol .meter.mp .meter-fill { background: #3f6fd0; }
-#hotcol .meter.hp span, #hotcol .meter.mp span { line-height: 8px; font-size: 11px; z-index: 1; }
+/* One bar, split in two equal halves: HP on the left, MP on the right, each number centered in its half. */
+#hotcol .pbar.vit { display: flex; height: 20px; margin: 0; border: 2px solid var(--hud-line); border-bottom-width: 0; background: #0c0912; }
+.vit .half { position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.vit .half + .half { border-left: 2px solid #000; }
 #hotcol .meter.xp { height: 12px; margin: 0 0 4px; }
 #hotcol .meter.xp span { line-height: 8px; }
 #hotrow { display: flex; align-items: center; gap: 8px; padding: 8px; border-top-width: 2px; }
