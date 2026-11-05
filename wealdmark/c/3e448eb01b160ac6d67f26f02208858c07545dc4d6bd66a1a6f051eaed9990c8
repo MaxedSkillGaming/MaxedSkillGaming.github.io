@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Heroes of the Wealdmark. Copyright (c) 2026 Maxed Skill Gaming. All rights reserved. -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:" />
+  <title>Heroes of the Wealdmark</title>
+  <meta name="description" content="Heroes of the Wealdmark: a free online turn-based RPG you play in your browser." />
+  <link rel="icon" href="icon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="frame">
+    <header>
+      <img id="logo" src="icon.png" alt="" width="96" height="96" />
+      <h1>Heroes of the Wealdmark</h1>
+      <p class="tag">The realm is waiting.</p>
+    </header>
+
+    <section id="patch" class="panel">
+      <p id="patch-status" aria-live="polite">Checking for updates...</p>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="bar-fill" class="fill"></div>
+      </div>
+      <p id="patch-detail" class="muted"></p>
+      <button id="retry" class="hidden" type="button">Try again</button>
+    </section>
+
+    <section id="login" class="panel hidden">
+      <div class="tabs" role="tablist">
+        <button id="tab-login" role="tab" aria-selected="true" type="button">Sign in</button>
+        <button id="tab-register" role="tab" aria-selected="false" type="button">New account</button>
+      </div>
+      <form id="auth-form" autocomplete="off">
+        <label>Username
+          <input id="username" name="username" maxlength="32" required autocomplete="username" />
+        </label>
+        <label>Password
+          <input id="password" name="password" type="password" maxlength="128" required autocomplete="current-password" />
+        </label>
+        <ul id="auth-hints" class="hints hidden" aria-live="polite">
+          <li id="hint-user">Username: 3 to 12 letters and numbers, starting with a letter. No spaces or symbols.</li>
+          <li id="hint-pass">Password: at least 10 characters with letters and numbers, or 16 or more of anything. Nothing common, and not your username.</li>
+        </ul>
+        <label class="check"><input id="show-password" type="checkbox" /> Show password</label>
+        <label class="check"><input id="remember" type="checkbox" checked /> Keep me signed in on this computer</label>
+        <fieldset class="hidden" id="gender-row">
+          <legend>Body shape (cannot be changed later)</legend>
+          <label class="check"><input type="radio" name="gender" value="m" /> Male</label>
+          <label class="check"><input type="radio" name="gender" value="f" /> Female</label>
+        </fieldset>
+        <label class="check hidden" id="age-row"><input id="age" type="checkbox" /> I am 13 years old or older</label>
+        <button id="submit" type="submit">Sign in</button>
+        <p id="auth-error" class="error" role="alert"></p>
+        <button id="forgot" class="link" type="button">Forgot password?</button>
+      </form>
+      <form id="reset-form" class="hidden" autocomplete="off">
+        <p class="muted">Enter the recovery key you were shown when you made your account. Lost it too? Ask the game's operator for a one-hour code.</p>
+        <label>Username
+          <input id="reset-username" maxlength="32" required autocomplete="username" />
+        </label>
+        <label>Recovery key or code
+          <input id="reset-code" maxlength="32" required autocomplete="off" />
+        </label>
+        <label>New password
+          <input id="reset-password" type="password" maxlength="128" required autocomplete="new-password" />
+        </label>
+        <label class="check"><input id="show-reset-password" type="checkbox" /> Show password</label>
+        <button id="reset-submit" type="submit">Set new password</button>
+        <button id="reset-google" type="button">Reset with Google instead</button>
+        <button id="reset-back" class="link" type="button">Back to sign in</button>
+        <p id="reset-message" class="error" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="recovery" class="panel hidden">
+      <h2>Your recovery key</h2>
+      <p>If you ever forget your password, this key is the only way to get your character back. Write it down or save it somewhere safe. It is shown once.</p>
+      <p><code id="recovery-key" class="recovery-key"></code></p>
+      <button id="recovery-copy" type="button">Copy</button>
+      <label class="check"><input id="recovery-saved" type="checkbox" /> I have saved my recovery key</label>
+      <button id="recovery-continue" type="button" disabled>Continue</button>
+    </section>
+
+    <section id="home" class="panel hidden">
+      <p id="welcome"></p>
+      <p id="home-note" class="muted">Mossgate Reach is open. Click a tile to walk there, or use the arrow keys or WASD. Click a monster to fight it, or Shift-click to look at it. Mouse wheel or + and - zoom; M shows the whole map.</p>
+      <p id="home-error" class="error" role="alert"></p>
+      <details id="recovery-tools">
+        <summary>Recovery key</summary>
+        <p class="muted">Make a new recovery key. The old one stops working.</p>
+        <label>Your password
+          <input id="recovery-password" type="password" maxlength="128" autocomplete="current-password" />
+        </label>
+        <button id="recovery-make" type="button">Make a new key</button>
+        <button id="google-link" type="button">Link my Google account</button>
+        <p class="muted">A linked Google account can reset your password if you lose it.</p>
+        <p id="recovery-error" class="error" role="alert"></p>
+      </details>
+      <button id="play" type="button">Play</button>
+      <button id="logout" type="button">Sign out</button>
+    </section>
+
+    <footer><span id="version" class="muted"></span><br /><span class="muted">&copy; 2026 Maxed Skill Gaming. All rights reserved.</span></footer>
+  </main>
+
+  <section id="gameview" class="hidden">
+    <canvas id="stage" aria-label="Game world"></canvas>
+
+
+    <div id="qtrack" class="hidden">
+      <div class="qt-head"><span class="qt-title">Journal</span><button id="qt-open" type="button" title="Open the journal for the full details">Open</button><button id="qt-min" type="button" title="Minimize or restore" aria-label="Minimize journal">&minus;</button></div>
+      <div id="qt-body"></div>
+    </div>
+
+    <div id="vitals">
+      <div class="frow"><span id="pf-name"></span><span id="pf-lv"></span></div>
+      <div class="pbar vhp"><div id="pf-hp" class="meter-fill"></div><span id="pf-hp-t"></span></div>
+      <div class="pbar vmp"><div id="pf-mp" class="meter-fill"></div><span id="pf-mp-t"></span></div>
+      <div class="meter pxp"><div id="pf-xp" class="meter-fill"></div></div>
+    </div>
+    <div id="tframe" class="hidden">
+      <div class="frow"><span id="tf-name"></span><span id="tf-lv"></span></div>
+      <div class="pbar vhp"><div id="tf-fill" class="meter-fill"></div><span id="tf-text"></span></div>
+      <div class="frow tfinfo"><span id="tf-hit"></span><span id="tf-buffs"></span></div>
+    </div>
+
+    <div id="bhud">
+      <div id="hotcol">
+        <div id="buffs"></div>
+        <div class="meter xp"><div id="xp-fill" class="meter-fill"></div><span id="xp-text"></span></div>
+        <div class="pbar vit"><div class="half vhp"><div id="hp-fill" class="meter-fill"></div><span id="hp-text"></span></div><div class="half vmp"><div id="mp-fill" class="meter-fill"></div><span id="mp-text"></span></div></div>
+        <div id="hotrow">
+          <div id="hl">
+            <div id="side-l" class="qcol"></div>
+            <div id="qpots" class="qcol">
+              <button class="qslot" data-q="hp" type="button"></button>
+              <button class="qslot" data-q="mp" type="button"></button>
+            </div>
+          </div>
+          <div id="hmid">
+            <div id="bar-l"></div>
+            <div id="hotmid"><div id="hotbar"></div></div>
+            <div id="bar-r"></div>
+          </div>
+          <div id="side-r" class="qcol"></div>
+        </div>
+      </div>
+    </div>
+    <div id="bar-picker" class="hidden"></div>
+
+    <div id="rctl">
+      <button id="r-map" type="button" title="Show or hide the map">Map</button>
+      <button id="r-hide" type="button" title="Hide or show the windows and menus (F11)">Hide UI</button>
+      <button id="r-world" type="button" title="The whole world: shops, workshops, gathering spots and jobs" aria-label="World map">&#127760;</button>
+    </div>
+    <button id="recenter" class="hidden" type="button" title="Bring the view back to your hero">Back to hero</button>
+    <div id="mapbox" class="fbox">
+      <div class="fgrip" title="Drag to move. Drag the corner to resize.">Map</div>
+      <canvas id="minimap" width="123" height="123" aria-hidden="true"></canvas>
+      <div id="mapplace"><span id="mp-zone"></span><span id="mp-map"></span></div>
+      <div id="mapinfo"><span id="mi-pos"></span><span id="mi-near"></span></div>
+    </div>
+
+    <div id="toolbar">
+      <button id="menu-btn" type="button" aria-haspopup="true">Menu</button>
+      <div id="menu-list" class="hidden">
+      <button id="btn-loot" class="hidden" type="button">Loot</button>
+      <button id="btn-bag" type="button">Bag (I)</button>
+      <button id="btn-journal" type="button">Journal (J)</button>
+      <div class="grp"><button class="grp-btn" type="button" aria-haspopup="true">Hero</button><div class="grp-pop">
+        <button id="btn-skills" type="button">Skills (K)</button>
+        <button id="btn-trades" type="button">Trades (V)</button>
+        <button id="btn-stats" type="button">Stats (C)</button>
+        <button id="btn-equip" type="button">Gear (E)</button>
+        <button id="btn-look" type="button">Look (L)</button>
+      </div></div>
+      <div class="grp"><button class="grp-btn" type="button" aria-haspopup="true">World</button><div class="grp-pop">
+        <button id="btn-party" type="button">Party (P)</button>
+        <button id="btn-merc" type="button">Hire (H)</button>
+        <button id="btn-dungeon" type="button">Dungeon (O)</button>
+        <button id="btn-town" type="button">Town (T)</button>
+        <button id="btn-store" type="button">Store</button>
+      </div></div>
+      <button id="btn-sound" type="button">Settings</button>
+      <button id="leave" type="button">Log Out</button>
+      </div>
+    </div>
+
+    <div id="mbar" aria-label="Touch controls">
+      <button id="mb-zin" type="button" aria-label="Zoom in">+</button>
+      <button id="mb-zout" type="button" aria-label="Zoom out">&minus;</button>
+      <button id="mb-map" type="button">Map</button>
+      <button id="mb-chat" type="button">Chat</button>
+    </div>
+
+    <div id="toast" role="status"></div>
+
+
+    <div id="panel-skills" class="side wide hidden">
+      <h2>Skills</h2>
+      <p id="combat-level" class="muted"></p>
+      <div class="skill-bar" id="level-bar"><div></div></div>
+      <p id="skill-points"></p>
+      <div id="aff-bar"></div>
+      <div id="tree-tabs"></div>
+      <div id="tree-grid"></div>
+      <div id="tree-detail"></div>
+      <button id="respec" type="button">Respec</button>
+      <p class="muted">Level points go into affinities. Each rank of a skill needs a character level, points in its affinity, and iron bits and bars. Respec gives the affinity points back; the iron stays spent.</p>
+    </div>
+
+    <div id="panel-bag" class="side hidden">
+      <h2>Inventory</h2>
+      <div id="wallet" title="Your money: iron coins, gold coins, favor tokens">
+        <span class="coin iron" title="Iron coins: everyday money for shops, repairs and upgrades"></span><span id="w-iron">0</span>
+        <span class="coin gold" title="Gold coins: 1 gold coin is worth 100 iron coins"></span><span id="w-gold">0</span>
+        <span class="coin favor" title="Favor tokens: earned only by finishing quests. They cannot be bought, sold or traded, so they are very scarce"></span><span id="w-favor">0</span>
+      </div>
+      <div id="bag-grid"></div>
+      <button id="btn-belt" type="button" class="act belt-btn" title="Your gathering tools. They stay on the belt; you can only add a higher tier."><span class="ico belt"></span>Tool belt</button>
+      <p class="muted">Click food to eat it, or gear to wear it. Shift-click a weapon to put it in the swap slot. Hover for details.</p>
+    </div>
+
+    <div id="panel-trades" class="side hidden">
+      <h2>Trades</h2>
+      <div id="trades-body"></div>
+      <p class="muted">Gathering and crafting skills. Each goes to level 30.</p>
+    </div>
+
+    <div id="panel-store" class="side hidden">
+      <h2>Store</h2>
+      <div class="store-soon"><b>Coming soon</b><p class="muted">Skins, pets and other cosmetics. Nothing in the store changes how strong you are.</p></div>
+      <div class="store-cats"><span>Skins</span><span>Pets</span><span>Effects</span></div>
+      <p class="muted">Favor tokens are not used here. They come only from quests.</p>
+    </div>
+
+    <div id="panel-belt" class="side hidden">
+      <h2>Tool belt</h2>
+      <div id="belt-body"></div>
+      <p class="muted">Tools stay on the belt. Click a higher tier tool in your bag to add it; it replaces the one before.</p>
+    </div>
+
+    <div id="panel-equip" class="side hidden">
+      <h2>Equipment</h2>
+      <div id="equip"></div>
+      <p class="muted">Click worn gear to take it off. The weapon you hold decides your style. Hover for details.</p>
+    </div>
+
+    <div id="panel-stats" class="side hidden">
+      <h2>Hero stats</h2>
+      <div id="stats-vitals"></div>
+      <div id="gear-stats"></div>
+    </div>
+
+    <div id="panel-look" class="side hidden">
+      <h2>Appearance</h2>
+      <canvas id="look-preview" width="80" height="80"></canvas>
+      <p id="look-gender" class="muted"></p>
+      <div id="look-skin" class="row"></div>
+      <h3>Companion</h3>
+      <div id="look-pet" class="row"></div>
+    </div>
+
+    <div id="panel-sound" class="side hidden">
+      <h2>Sound</h2>
+      <label>Master <input id="vol-master" type="range" min="0" max="1" step="0.05" /></label>
+      <label>Effects <input id="vol-sfx" type="range" min="0" max="1" step="0.05" /></label>
+      <label>Music <input id="vol-music" type="range" min="0" max="1" step="0.05" /></label>
+      <label class="check"><input id="mute" type="checkbox" /> Mute everything</label>
+      <label class="check"><input id="hide-others" type="checkbox" /> Hide other players</label>
+      <label class="check"><input id="hide-roofs" type="checkbox" /> Hide building roofs</label>
+    </div>
+
+    <div id="panel-party" class="side hidden">
+      <h2>Party</h2>
+      <div id="party-body"></div>
+      <div class="row"><input id="party-name" type="text" maxlength="32" placeholder="Hero name" autocomplete="off" /><button id="party-invite" class="act" type="button">Invite</button></div>
+      <p class="muted">A party holds up to four heroes. When one of you starts a fight, partners within eight tiles join it, and iron coins are shared by damage dealt.</p>
+    </div>
+
+    <div id="panel-merc" class="side wide hidden">
+      <h2>Mercenaries</h2>
+      <div id="merc-body"></div>
+      <p class="muted">Hire one in a town for gold coins. It fights beside you for five fights and counts as half a hero when monsters scale. If it is knocked out, it leaves. You earn XP only from your own damage.</p>
+    </div>
+
+    <div id="panel-dungeon" class="side hidden">
+      <h2>Dungeon</h2>
+      <div id="dungeon-body"></div>
+      <p class="muted">Stand near a dungeon gate. Each hero pays the fee once per run, and the run is a private copy of the dungeon. Walking out keeps what you found.</p>
+    </div>
+
+    <div id="panel-loot" class="side hidden">
+      <h2 id="loot-title">Loot</h2>
+      <div id="loot-body"></div>
+      <button id="loot-all" class="act" type="button">Take all</button>
+      <p id="loot-note" class="muted"></p>
+    </div>
+
+    <div id="panel-journal" class="side hidden">
+      <h2>Journal</h2>
+      <div id="journal-body"></div>
+    </div>
+
+    <div id="panel-world" class="side wide hidden">
+      <h2>World</h2>
+      <p class="muted">Click a legend entry to hide or show it. The gold dot is you.</p>
+      <div id="world-legend"></div>
+      <div id="world-scroll"><canvas id="worldmap" aria-label="Map of the whole world"></canvas></div>
+    </div>
+
+    <div id="panel-shop" class="side wide hidden">
+      <h2 id="shop-title">Shop</h2>
+      <div id="shop-body"></div>
+      <button id="shop-close" type="button">Done</button>
+    </div>
+
+    <div id="panel-storage" class="side wide hidden">
+      <h2>Storage</h2>
+      <div id="storage-body"></div>
+      <button id="storage-close" type="button">Done</button>
+    </div>
+
+    <div id="panel-station" class="side wide hidden">
+      <h2 id="station-title">Station</h2>
+      <div id="station-body"></div>
+      <button id="station-close" type="button">Done</button>
+    </div>
+
+    <div id="panel-perks" class="side wide hidden">
+      <h2 id="perks-title">Steward</h2>
+      <div id="perks-body"></div>
+      <button id="perks-close" type="button">Done</button>
+    </div>
+
+    <div id="panel-anchor" class="side wide hidden">
+      <h2 id="anchor-title">Teleport Stone</h2>
+      <div id="anchor-body"></div>
+      <button id="anchor-close" type="button">Done</button>
+    </div>
+
+    <div id="intro" class="hidden" role="dialog" aria-label="Introduction">
+      <canvas id="intro-canvas" width="320" height="180"></canvas>
+      <div id="intro-card">
+        <h2 id="intro-title"></h2>
+        <p id="intro-text"></p>
+        <div id="intro-foot"><span id="intro-hint"></span><button id="intro-skip" type="button">Skip</button></div>
+      </div>
+    </div>
+
+    <div id="signout-confirm" class="hidden" role="alertdialog" aria-labelledby="so-title">
+      <div class="box">
+        <h3 id="so-title">Sign out?</h3>
+        <p id="so-text">Your progress is saved. If you are in a fight, you leave it.</p>
+        <div class="row">
+          <button id="so-yes" type="button">Sign out</button>
+          <button id="so-no" type="button">Stay</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="buy-confirm" class="hidden" role="alertdialog" aria-labelledby="bc-text">
+      <div class="box">
+        <p id="bc-text"></p>
+        <p id="bc-note" class="muted"></p>
+        <div class="row">
+          <button id="bc-yes" type="button">Yes</button>
+          <button id="bc-no" type="button">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="loading" class="hidden" role="status"><div class="box"><div class="swirl"></div><p id="loading-text">Passing through the portal...</p></div></div>
+
+    <div id="busy" class="hidden"><div id="busy-fill"></div><span id="busy-text"></span></div>
+
+    <div id="dialog" class="hidden">
+      <h3 id="dlg-name"></h3>
+      <p id="dlg-role" class="muted"></p>
+      <div id="dlg-lines"></div>
+      <div id="dlg-options"></div>
+    </div>
+
+    <div id="chat">
+      <div id="chat-grip" title="Drag to resize the chat"></div>
+      <div id="chattabs"><button type="button" data-tab="chat" class="on">Chat</button><button type="button" data-tab="combat">Combat</button></div>
+      <div id="chatnav"><button id="chat-clear" type="button" title="Clear the chat">Clear</button></div>
+      <ul id="chatlog"></ul>
+      <form id="chatform" autocomplete="off">
+        <input id="chatinput" maxlength="120" placeholder="Press Enter to chat" aria-label="Chat message" />
+      </form>
+    </div>
+  </section>
+
+  <script src="audio.js"></script>
+  <script src="hero-layers-catalog.js"></script>
+  <script src="hero-layers.js"></script>
+  <script src="game.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
