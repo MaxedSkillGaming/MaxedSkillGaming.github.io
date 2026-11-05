@@ -3948,10 +3948,31 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   /** A box the player can move and resize, remembered between visits. */
+  /** The hotbar plate stops short of the map and the toolbar, wherever the map was dragged to. */
+  function fitHud() {
+    const hud = $('bhud');
+    if (!hud) return;
+    if (window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) {
+      hud.style.right = '';
+      return;
+    }
+    const z = uiScale();
+    const band = hud.getBoundingClientRect();
+    let rail = 0;
+    for (const id of ['mapbox', 'toolbar']) {
+      const e = $(id);
+      if (!e || e.classList.contains('hidden') || e.classList.contains('off') || !e.offsetWidth) continue;
+      const r = e.getBoundingClientRect();
+      if (r.bottom > band.top && r.top < band.bottom) rail = Math.max(rail, window.innerWidth - r.left);
+    }
+    if (rail) hud.style.right = `${Math.ceil(rail / z) + 8}px`;
+  }
+
   function floatBox(id, key) {
     const box = $(id);
     const store = `wealdmark.float.${key}`;
     const save = () => {
+      requestAnimationFrame(fitHud);
       if (box.classList.contains('off') || box.classList.contains('hidden') || !box.offsetWidth) return;
       const z = uiScale();
       const pr = (box.offsetParent || document.body).getBoundingClientRect();
@@ -3994,14 +4015,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     };
     keepInside();
     window.addEventListener('resize', keepInside);
+    window.addEventListener('resize', () => requestAnimationFrame(fitHud));
     dragBox(box, box.querySelector('.fgrip'), save);
     if (typeof ResizeObserver === 'function') {
       let t = null;
       new ResizeObserver(() => {
         clearTimeout(t);
         t = setTimeout(save, 300);
+        requestAnimationFrame(fitHud);
       }).observe(box);
     }
+    requestAnimationFrame(fitHud);
   }
 
   /** The map and quest list: show or hide each, drag by the title, resize from the corner. */
@@ -4363,7 +4387,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     renderJournal();
   }
 
-  // ---- bottom bar: globes, action bar, quick slots
+  // ---- bottom bar: docked plate with the action bar and quick slots
 
   const BAR_SLOTS = 8;
   const STYLES = ['melee', 'range', 'magic'];
@@ -4374,7 +4398,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     range: ['shot', 'multi_shot', 'aimed_shot', 'poison_arrow', 'snare', 'explosive_shot', 'rain_of_arrows', 'backstep', 'deadeye'],
     magic: ['fireball', 'ice_storm', 'mana_shield', 'chain_lightning', 'frost_nova', 'heal', 'arcane_surge', 'second_wind'],
   })) for (const id of ids) ABILITY_STYLE[id] = style;
-  /** Quick slots beside the globes. `item` is the default item; 'any' means the first food in the bag. */
+  /** Quick slots left of the action bar.`item` is the default item; 'any' means the first food in the bag. */
   const QUICK = [
     { id: 'hp', key: 'h', label: 'Health potion or food', item: 'minor_health_potion', match: (d) => (d.kind === 'potion' && d.heal && !d.mana) || d.kind === 'food' },
     { id: 'food', key: 'u', label: 'Food', item: 'any', match: (d) => d.kind === 'food' },
@@ -4787,7 +4811,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       guard.addEventListener('click', () => (isMyTurn() ? sendFight({ t: 'guard' }) : toast(NOT_READY)));
       right.append(guard);
     }
-    right.append(swap, barSwitcher(style));
+    $('bar-l').replaceChildren(barSwitcher(style));
+    $('bar-r').replaceChildren(barSwitcher(style));
+    right.append(swap);
 
     for (const q of QUICK) {
       const slot = document.querySelector(`.qslot[data-q="${q.id}"]`);
@@ -4827,83 +4853,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const p = $('bar-picker');
       if (p && !p.classList.contains('hidden') && !p.contains(ev.target) && !ev.target.closest('.bslot, .qslot')) closeBarPicker();
     });
-  }
-
-  /** Potion flask on a 16x16 grid. '#' outline, 'c' cork, '.' glass that the fill rises through. */
-  const FLASK = [
-    '      cccc      ',
-    '      #cc#      ',
-    '      #..#      ',
-    '      #..#      ',
-    '     ##..##     ',
-    '    #......#    ',
-    '   #........#   ',
-    '  #..........#  ',
-    '  #..........#  ',
-    '  #..........#  ',
-    '  #..........#  ',
-    '  #..........#  ',
-    '   #........#   ',
-    '    #......#    ',
-    '     ######     ',
-    '                ',
-  ];
-  const FLASK_COLORS = {
-    hp: { hi: '#ff8a78', mid: '#c2413f', lo: '#6e1a22' },
-    mp: { hi: '#86b6ff', mid: '#3f6fd0', lo: '#1c3678' },
-  };
-  /** Redraw one flask when its fill (in 12 steps) or look changed. */
-  function drawFlask(box, kind, frac, low) {
-    let cv = box.querySelector('canvas');
-    if (!cv) {
-      cv = document.createElement('canvas');
-      cv.width = 16;
-      cv.height = 16;
-      cv.setAttribute('aria-hidden', 'true');
-      box.prepend(cv);
-    }
-    const steps = Math.round(Math.max(0, Math.min(1, frac)) * 12);
-    const sig = `${steps}|${low ? 1 : 0}`;
-    if (cv.dataset.sig === sig) return;
-    cv.dataset.sig = sig;
-    const c = cv.getContext('2d');
-    const col = FLASK_COLORS[kind];
-    c.clearRect(0, 0, 16, 16);
-    // Glass rows run from y=2 (top) to y=13 (bottom); the fill covers the lowest `steps` of them.
-    for (let y = 0; y < 16; y++) {
-      for (let x = 0; x < 16; x++) {
-        const ch = FLASK[y][x];
-        if (ch === ' ') continue;
-        let color = '#0c0814';
-        if (ch === '#') color = low && kind === 'hp' ? '#ff6a58' : '#e0b24a';
-        else if (ch === 'c') color = '#8a5a2a';
-        else if (13 - y < steps) {
-          const top = 13 - y === steps - 1;
-          color = top ? col.hi : y >= 10 ? col.lo : col.mid;
-          if (x === 4 && y >= 7 && y <= 10 && !top) color = col.hi;
-        }
-        c.fillStyle = color;
-        c.fillRect(x, y, 1, 1);
-      }
-    }
-  }
-
-  function renderGlobes(hp, maxHp, mp, maxMp) {
-    drawFlask($('globe-hp'), 'hp', hp / maxHp, hp > 0 && hp / maxHp < 0.3);
-    drawFlask($('globe-mp'), 'mp', mp / maxMp, false);
-    $('globe-hp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`);
-    $('globe-mp').style.setProperty('--fill', `${Math.max(0, Math.min(100, (mp / maxMp) * 100))}%`);
-    $('globe-hp').style.setProperty('--f', String(Math.max(0, Math.min(1, hp / maxHp))));
-    $('globe-mp').style.setProperty('--f', String(Math.max(0, Math.min(1, mp / maxMp))));
-    $('globe-hp-text').textContent = `${hp}/${maxHp}`;
-    const hpBox = $('globe-hp');
-    hpBox.classList.toggle('low', hp > 0 && hp / maxHp < 0.3);
-    hpBox.classList.toggle('dead', hp <= 0);
-    hpBox.setAttribute('role', 'img');
-    hpBox.setAttribute('aria-label', `Health ${hp} of ${maxHp}`);
-    $('globe-mp').setAttribute('role', 'img');
-    $('globe-mp').setAttribute('aria-label', `Mana ${mp} of ${maxMp}`);
-    $('globe-mp-text').textContent = `${mp}/${maxMp}`;
   }
 
   function renderStats() {
@@ -6265,7 +6214,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const slot = Math.max(0, openOrder.indexOf(el.id));
     const W = tr ? tr.width / zw : 264;
     const rightPx = tr ? pr.right - tr.right : Math.max(10, 12 * z);
-    const bottomPx = tr ? tr.top - gap : pr.bottom - 56 * z;
+    let bottomPx = tr ? tr.top - gap : pr.bottom - 56 * z;
+    // Windows to the left of the menu column stop above the hotbar plate instead of covering its bars.
+    const plate = $('bhud');
+    if (slot > 0 && plate && plate.offsetWidth) bottomPx = Math.min(bottomPx, plate.getBoundingClientRect().top - gap);
     el.style.left = 'auto';
     el.style.width = px(W);
     el.style.right = px(rightPx / zw + slot * (W + 6));
@@ -6892,11 +6844,57 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   // busy bar
 
+  /** The node being gathered: the one the player asked for, else the nearest within two tiles. */
+  function gatherTargetId() {
+    if (!G.busy || G.busy.total) return null;
+    const want = G.workId && G.entities.get(G.workId);
+    if (want && want.kind === 'node') return want.id;
+    const me = G.entities.get(G.selfId);
+    if (!me) return null;
+    let best = null;
+    let bestD = 2.5;
+    for (const e of G.entities.values()) {
+      if (e.kind !== 'node') continue;
+      const d = Math.hypot(e.x - me.x, e.y - me.y);
+      if (d < bestD) {
+        best = e.id;
+        bestD = d;
+      }
+    }
+    return best;
+  }
+
+  /** A progress bar whose bottom edge sits at y, centred on the node's tile: fills over one swing, so it restarts on every yield. */
+  function drawGatherBar(ctx, def, x, y, px, s) {
+    const b = G.busy;
+    const frac = Math.min(1, (b.done + Math.min(1, (performance.now() - G.busyAt) / G.tickMs)) / b.of);
+    const w = Math.round(px * 1.5);
+    const h = 16;
+    const bx = Math.round(x + (px - w) / 2);
+    const by = Math.round(y - h);
+    ctx.fillStyle = '#0c0912';
+    ctx.fillRect(bx - 2, by - 2, w + 4, h + 4);
+    ctx.fillStyle = '#6a9a4a';
+    ctx.fillRect(bx, by, Math.round(w * frac), h);
+    // The name sits inside the bar so the whole thing is one rectangle that fits under any roof line.
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(def.name, bx + w / 2, by + h / 2 + 1);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(def.name, bx + w / 2, by + h / 2 + 1);
+  }
+
   function onBusy(msg) {
     const was = G.busy;
     G.busy = msg.of > 0 ? msg : null;
+    G.busyAt = performance.now();
+    if (!G.busy) G.workId = null;
     const bar = $('busy');
-    bar.classList.toggle('hidden', !G.busy);
+    // Gathering shows its bar above the node; the screen bar stays for crafting batches.
+    bar.classList.toggle('hidden', !G.busy || !G.busy.total);
     const atStation = G.town && G.town.kind === 'station';
     if (!G.busy) {
       // A batch is over: the one-time box is not coming back, so let the station go.
@@ -7582,7 +7580,15 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         }
         if (r.kind === 'node' || r.kind === 'station') {
           const def = G.data && (r.kind === 'node' ? G.data.nodes : G.data.stations).get(r.ref);
-          if (def && r.kind === 'node') drawNode(ctx, def, r.depleted, offX + r.x * px, offY + r.y * px, s, now);
+          if (def && r.kind === 'node') {
+            drawNode(ctx, def, r.depleted, offX + r.x * px, offY + r.y * px, s, now);
+            if (r.id === gatherTargetId()) {
+              // Sit above whichever of tree and hero stands higher, clear of the hero's name tag.
+              const who = list.find((o) => o.self);
+              const high = who && who.y < r.y;
+              drawGatherBar(ctx, def, offX + r.x * px, offY + (high ? who.y * px - 22 : r.y * px - Math.round(px * 0.5) - 8), px, s);
+            }
+          }
           else if (def) drawStation(ctx, r.ref, offX + r.x * px, offY + r.y * px, s, now);
           ctx.globalAlpha = 1;
           continue;
@@ -7831,8 +7837,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (window.wealdmarkAudio) window.wealdmarkAudio.music(G.fight ? 'fight' : z && z.kind === 'safe' ? 'town' : 'wilds');
       const others = [...G.entities.values()].filter((e) => e.kind === 'player' && e.id !== G.selfId).length;
       const place = z ? (z.name === map.name ? `${map.name} (${KIND_LABEL[z.kind]})` : `${map.name} - ${z.name} (${KIND_LABEL[z.kind]})`) : map.name;
-      $('hud').textContent = `${place}\n` +
-        `Position: ${me.x}, ${me.y}   Nearby: ${others}`;
+      $('hud').textContent = place;
+      $('mi-pos').textContent = `${me.x}, ${me.y}`;
+      $('mi-near').textContent = `Nearby ${others}`;
       const hh = G.fight && hero();
       const hp = hh ? hh.hp : G.stats ? G.stats.hp : 0;
       const maxHp = hh ? hh.maxHp : G.stats ? G.stats.maxHp : 1;
@@ -7844,7 +7851,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       $('mp-text').textContent = `Mana ${mp}/${maxMp}`;
       renderXpBar();
       updateFrames(hp, maxHp, mp, maxMp);
-      renderGlobes(hp, maxHp, mp, maxMp);
       renderBar();
       renderTracker();
       for (const id of ['rctl', 'mapbox']) $(id).classList.toggle('hidden', Boolean(G.fight));
@@ -8047,6 +8053,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const verb = node.kind === 'station' ? 'use' : def && def.verb ? def.verb : 'gather';
     add(`${verb[0].toUpperCase()}${verb.slice(1)} ${stationName(node)}`, () => {
       G.dest = null;
+      G.workId = node.id;
       window.wealdmark.send({ t: 'interact', target: node.id });
     });
     add('Walk here', () => requestMove(Math.round(node.x), Math.round(node.y)));
@@ -9135,7 +9142,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     });
     for (const id of ['shop-close', 'storage-close', 'station-close', 'perks-close', 'anchor-close']) on($(id), 'click', () => closeTown(true));
     on($('btn-town'), 'click', goToTown);
-    on($('q-town'), 'click', goToTown);
     on($('btn-look'), 'click', () => {
       togglePanel('panel-look');
       renderLook();
