@@ -1,9 +1,9 @@
 {
   "version": "0.1.0",
-  "protocol": 6,
+  "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://garcia-counting-badge-remains.trycloudflare.com",
-  "authUrl": "https://salmon-minimize-constitutional-interview.trycloudflare.com",
+  "server": "wss://screening-involvement-transport-bathrooms.trycloudflare.com",
+  "authUrl": "https://receptor-grammar-forestry-len.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 369460,
-      "sha256": "4d630f542b5834adf372d251644482181aac274e9467ab2052da928d23679601",
-      "url": "c/4d630f542b5834adf372d251644482181aac274e9467ab2052da928d23679601"
+      "size": 364346,
+      "sha256": "1fabc1a1138c3f0f90086abe97dc88700eba1c915f3da452b256bc48f82d8988",
+      "url": "c/1fabc1a1138c3f0f90086abe97dc88700eba1c915f3da452b256bc48f82d8988"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 19969,
-      "sha256": "e24abdc51d09dc17ec7062964e6214a564172345a8815a6c74490f543052d09a",
-      "url": "c/e24abdc51d09dc17ec7062964e6214a564172345a8815a6c74490f543052d09a"
+      "size": 19647,
+      "sha256": "f01df67c17949e8f352af624f2d4d43ad18edb10f2c9264d4edfd58537509437",
+      "url": "c/f01df67c17949e8f352af624f2d4d43ad18edb10f2c9264d4edfd58537509437"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 65420,
-      "sha256": "4716b1c85d2f96db7dc933c0166f8ebe645087de9d557c459b32284e0bdda77b",
-      "url": "c/4716b1c85d2f96db7dc933c0166f8ebe645087de9d557c459b32284e0bdda77b"
+      "size": 65710,
+      "sha256": "e4fe8b41f6dee580327e0c1552fd5e35ee2f0bf7dac6ba173eca68d9aa14fa6d",
+      "url": "c/e4fe8b41f6dee580327e0c1552fd5e35ee2f0bf7dac6ba173eca68d9aa14fa6d"
     }
   ],
-  "signature": "AZDMpy6sawQS89ebmLQgvhZTpQL+GJPvqc6YvwWi5SuArKwADO0qnQuULcQlfiiWj0zl5Qqiea1DaqenEwvoAg=="
+  "signature": "WmOX0Oq5brjh3QLq6h8ar2BTz1PnadaylPhxfPybgYxLIqFahT6rdF81DkNaAfH5cCzkKkarrKeSCTP+j1xnDQ=="
 }
