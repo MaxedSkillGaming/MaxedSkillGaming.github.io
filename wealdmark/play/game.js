@@ -25,7 +25,9 @@
   const DUNGEON_FEE = 25;
   const TOWN_PANELS = ['dialog', 'panel-shop', 'panel-storage', 'panel-station', 'panel-perks', 'panel-anchor'];
   const ROW_LEVELS = [1, 8, 16, 24, 32, 40];
-  const TREE_NAMES = ['melee', 'range', 'magic', 'defense'];
+  const TREE_NAMES = ['melee', 'range', 'magic', 'passives'];
+  const AFFINITIES = [['might', 'Might', 'Opens Melee and strength skills.'], ['agility', 'Agility', 'Opens Range and speed skills.'], ['intellect', 'Intellect', 'Opens Magic skills.'], ['vitality', 'Vitality', '+6 max health a point. Opens toughness skills.'], ['spirit', 'Spirit', '+3 max mana a point. Opens focus skills.']];
+  let treeSel = null;
   let treeTab = 'melee';
   const SKILLS = ['melee', 'defense', 'range', 'magic', 'mining', 'forestry', 'fishing', 'hunting', 'smithing', 'cooking', 'crafting'];
   /** Name and one-line description for every hero ability (docs/combat-and-gear-draft.md, section 3). */
@@ -69,6 +71,9 @@
     extra_shot: ['Extra shot', 'A second arrow from a lucky bow, at the same target.'],
     execute_shot: ['Execute shot', 'A pistol shot that finishes a wounded enemy.'],
     unbreakable: ['Unbreakable', 'For 2 rounds take 50% less damage, and you cannot drop below 1 health in the first.'],
+    ground_slam: ['Ground Slam', '90% damage to every enemy on the 8 tiles around a target within 2 tiles, and they cannot move on their next turn. Needs a shield.'],
+    explosive_shot: ['Explosive Shot', '110% damage to up to 5 enemies in a 3 by 3 area within 6 tiles.'],
+    frost_nova: ['Frost Nova', '80% damage to every enemy in a 3 by 3 area within 4 tiles; they move 2 fewer tiles for 2 turns.'],
   };
   const ABILITY_NAMES = Object.fromEntries(Object.entries(ABILITY_INFO).map(([k, v]) => [k, v[0]]));
   /** The attack every hero has for their weapon, used when nothing else is selected. */
@@ -108,6 +113,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     fireball: ['flame', '#ff9a4a'], ice_storm: ['snow', '#8ae0ff'], heal: ['cross', '#7bd88f'], mana_shield: ['shield', '#6a9ef0'], chain_lightning: ['bolt', '#ffe36a'],
     arcane_surge: ['bolt', '#c08aff'], shield_bash: ['shield', '#cfd6e4'], fortify: ['shield', '#7ab0f0'], second_wind: ['cross', '#9ae8c0'], parry: ['shield', '#f0c860'],
     stoneskin: ['shield', '#a8a8b8'], retaliate: ['burst', '#ff9a4a'], unbreakable: ['shield', '#f0c860'], summon_familiar: ['burst', '#c08aff'],
+    ground_slam: ['burst', '#d8b070'], explosive_shot: ['burst', '#ff9a4a'], frost_nova: ['snow', '#8ae0ff'],
   };
   const STATUS_ICON = {
     stagger: ['down', '#e0b48c'], slow: ['down', '#9ad8e8'], bleed: ['drop', '#e05a5a'], poison: ['drop', '#7bd88f'], burn: ['flame', '#ff9a4a'], sunder: ['shield', '#e05a5a'],
@@ -4364,10 +4370,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** Which skill tree each ability belongs to, for filling and filtering the three bars. */
   const ABILITY_STYLE = {};
   for (const [style, ids] of Object.entries({
-    melee: ['punch', 'slash', 'multi_strike', 'power_strike', 'rend', 'sunder_strike', 'war_cry', 'whirlwind', 'execute'],
-    range: ['shot', 'multi_shot', 'aimed_shot', 'poison_arrow', 'snare', 'rain_of_arrows', 'backstep', 'deadeye'],
-    magic: ['fireball', 'ice_storm', 'mana_shield', 'chain_lightning', 'arcane_surge'],
-    defense: ['shield_bash', 'fortify', 'second_wind', 'parry', 'stoneskin', 'retaliate', 'unbreakable', 'heal'],
+    melee: ['punch', 'slash', 'multi_strike', 'power_strike', 'rend', 'sunder_strike', 'war_cry', 'whirlwind', 'execute', 'shield_bash', 'fortify', 'parry', 'ground_slam', 'stoneskin', 'retaliate', 'unbreakable'],
+    range: ['shot', 'multi_shot', 'aimed_shot', 'poison_arrow', 'snare', 'explosive_shot', 'rain_of_arrows', 'backstep', 'deadeye'],
+    magic: ['fireball', 'ice_storm', 'mana_shield', 'chain_lightning', 'frost_nova', 'heal', 'arcane_surge', 'second_wind'],
   })) for (const id of ids) ABILITY_STYLE[id] = style;
   /** Quick slots beside the globes. `item` is the default item; 'any' means the first food in the bag. */
   const QUICK = [
@@ -4921,7 +4926,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       ['Experience', String(xp)],
       ['Health', `${s.hp} / ${s.maxHp}`],
       ['Mana', `${s.mana} / ${s.maxMana}`],
-      ['Skill points', String(s.points)],
+      ['Affinity points', String(s.points)],
     ]) {
       const dt = document.createElement('dt');
       dt.textContent = k;
@@ -4969,14 +4974,41 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     box.appendChild(grid);
   }
 
-  /** The skill tree screen: four tabs, six rows of two skills, a point to spend on each. */
+  /** Mirrors levelNeeded, affinityNeeded and rankCost in the shared trees module. */
+  const rankLevel = (sk, r) => ROW_LEVELS[sk.row] + 2 * (r - 1);
+  const rankAffinity = (sk, r) => 2 * sk.row + 2 + 2 * (r - 1);
+  const rankPrice = (sk, r) => ({ bits: 30 * r * (sk.row + 1), bars: r + sk.row });
+
+  /** The skill screen: five affinities to put points in, four tabs, a three-wide grid and the details of the skill picked. */
   function renderTree() {
     const s = G.stats;
     if (!s || !G.data) return;
     const trees = G.data.trees || [];
     const ranks = s.ranks || {};
+    const aff = s.affinity || {};
     const byId = new Map(trees.map((t) => [t.id, t]));
-    $('skill-points').textContent = `${s.points} skill point${s.points === 1 ? '' : 's'} to spend`;
+    const bits = (s.wallet && s.wallet.iron_bits) || 0;
+    const bars = ((G.inv && G.inv.items) || []).reduce((n, it) => (it && it.id === 'iron_bar' ? n + it.qty : n), 0);
+    $('skill-points').textContent = `${s.points} affinity point${s.points === 1 ? '' : 's'} to spend`;
+
+    const bar = $('aff-bar');
+    bar.textContent = '';
+    for (const [id, label, blurb] of AFFINITIES) {
+      const cell = el('div', 'aff');
+      cell.title = `${label}: ${blurb}`;
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.textContent = '+';
+      add.disabled = s.points <= 0;
+      add.setAttribute('aria-label', `Add a point of ${label}`);
+      add.onclick = () => {
+        if (G.fight) return toast("You can't change skills in a fight.");
+        window.wealdmark.send({ t: 'affinity', stat: id });
+      };
+      cell.append(el('span', 'aff-name', label), el('b', 'aff-val', String(aff[id] || 0)), add);
+      bar.appendChild(cell);
+    }
+
     const tabs = $('tree-tabs');
     tabs.textContent = '';
     for (const name of TREE_NAMES) {
@@ -4986,58 +5018,96 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       b.className = name === treeTab ? 'on' : '';
       b.onclick = () => {
         treeTab = name;
+        treeSel = null;
         renderTree();
       };
       tabs.appendChild(b);
     }
+
+    /** What the next rank of a skill asks for, and the first reason it cannot be bought (null when it can). */
+    const check = (sk) => {
+      const rank = ranks[sk.id] || 0;
+      const next = rank + 1;
+      const missing = sk.needs.filter((n) => !(ranks[n] > 0));
+      const lines = [];
+      for (const n of sk.needs) lines.push({ ok: ranks[n] > 0, text: `A rank in ${(byId.get(n) || { name: n }).name}` });
+      const lv = rankLevel(sk, next);
+      const af = rankAffinity(sk, next);
+      const price = rankPrice(sk, next);
+      lines.push({ ok: s.combatLevel >= lv, text: `Level ${lv}` });
+      lines.push({ ok: (aff[sk.aff] || 0) >= af, text: `${pretty(sk.aff)} ${af}` });
+      lines.push({ ok: bits >= price.bits, text: `${price.bits} iron bits (you have ${bits})` });
+      lines.push({ ok: bars >= price.bars, text: `${price.bars} iron bars (you have ${bars})` });
+      let fail = null;
+      if (sk.planned) fail = 'This skill is coming in a future update.';
+      else if (rank >= 10) fail = 'This skill is already at its maximum rank.';
+      else if (missing.length) fail = `Raise ${missing.map((n) => (byId.get(n) || { name: n }).name).join(' and ')} first.`;
+      else if (s.combatLevel < lv) fail = `Reach level ${lv} for this rank.`;
+      else if ((aff[sk.aff] || 0) < af) fail = `Put points into ${pretty(sk.aff)} (${af} needed).`;
+      else if (bits < price.bits) fail = `You need ${price.bits} iron bits.`;
+      else if (bars < price.bars) fail = `You need ${price.bars} iron bars.`;
+      return { rank, next, lines, fail, missing };
+    };
+
     const grid = $('tree-grid');
     grid.textContent = '';
     for (let row = 0; row < 6; row++) {
-      const lv = document.createElement('span');
-      lv.className = 'lv';
-      lv.textContent = `Lv ${ROW_LEVELS[row]}`;
-      grid.appendChild(lv);
-      for (let col = 0; col < 2; col++) {
+      for (let col = 0; col < 3; col++) {
         const sk = trees.find((t) => t.tree === treeTab && t.row === row && t.col === col);
         if (!sk) {
-          const gap = document.createElement('span');
-          gap.className = 'spacer';
-          grid.appendChild(gap);
+          grid.appendChild(el('span', 'spacer'));
           continue;
         }
-        const rank = ranks[sk.id] || 0;
-        const rowLocked = s.combatLevel < ROW_LEVELS[row];
-        const missing = sk.needs.filter((n) => !(ranks[n] > 0)).map((n) => (byId.get(n) || { name: n }).name);
-        const locked = sk.planned || rowLocked || missing.length > 0;
-        const canSpend = !locked && s.points > 0 && rank < 10;
+        const c = check(sk);
+        const blocked = sk.planned || c.missing.length > 0 || s.combatLevel < ROW_LEVELS[row];
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'node' + (sk.passive ? ' passive' : '') + (rank > 0 ? ' ranked' : '') + (canSpend ? ' ready' : '') + (locked ? ' locked' : '');
-        const name = document.createElement('span');
-        name.textContent = sk.name;
-        const r = document.createElement('b');
-        r.textContent = sk.planned ? 'soon' : `${rank}/10`;
-        b.append(name, r);
-        const tip = [sk.name + (sk.passive ? ' (passive)' : ''), sk.blurb];
-        if (sk.needs.length) tip.push(`Needs: ${sk.needs.map((n) => (byId.get(n) || { name: n }).name).join(', ')}`);
-        if (rowLocked) tip.push(`Opens at level ${ROW_LEVELS[row]}`);
-        else if (missing.length) tip.push(`Raise first: ${missing.join(', ')}`);
-        if (!sk.passive && !sk.planned) tip.push('Each rank adds 6% damage and 3% mana cost. Ranks 5 and 10 shorten the cooldown.');
-        b.title = tip.join('\n');
+        b.className = 'node' + (sk.passive ? ' passive' : '') + (c.rank > 0 ? ' ranked' : '') + (!c.fail ? ' ready' : '') + (blocked ? ' locked' : '') + (treeSel === sk.id ? ' sel' : '');
+        b.append(el('span', '', sk.name), el('b', '', sk.planned ? 'soon' : `${c.rank}/10`));
+        b.title = `${sk.name}${sk.passive ? ' (passive)' : ''}\n${sk.blurb}`;
         b.onclick = () => {
-          if (G.fight) return toast("You can't change skills in a fight.");
-          if (canSpend) window.wealdmark.send({ t: 'spend', skill: sk.id });
-          else if (sk.planned) toast('This skill is coming in a future update.');
-          else if (rank >= 10) toast('This skill is already at its maximum rank.');
-          else if (rowLocked) toast(`Opens at level ${ROW_LEVELS[row]}.`);
-          else if (missing.length) toast(`Raise ${missing.join(' and ')} before unlocking this skill.`);
-          else toast('You have no skill points to spend.');
+          treeSel = sk.id;
+          renderTree();
+          $('tree-detail').scrollIntoView({ block: 'nearest' });
         };
         grid.appendChild(b);
       }
     }
+
+    const box = $('tree-detail');
+    box.textContent = '';
+    const pick = treeSel ? byId.get(treeSel) : null;
+    if (!pick || pick.tree !== treeTab) {
+      box.appendChild(el('p', 'muted', 'Pick a skill to see what its next rank needs.'));
+    } else {
+      const c = check(pick);
+      const head = el('div', 'td-head');
+      head.append(el('b', '', pick.name), el('span', 'muted', pick.passive ? 'Passive' : 'Skill'), el('span', 'td-rank', `Rank ${c.rank}/10`));
+      box.append(head, el('p', 'td-text', (ABILITY_INFO[pick.id] && ABILITY_INFO[pick.id][1]) || pick.blurb));
+      if (!pick.passive && !pick.planned) box.appendChild(el('p', 'muted', 'Each rank adds 6% damage and 3% mana cost. Ranks 5 and 10 shorten the cooldown. Each rank in a skill it needs adds 3% damage.'));
+      if (c.rank < 10 && !pick.planned) {
+        box.appendChild(el('p', 'td-title', `Rank ${c.next} needs`));
+        const ul = el('ul', 'td-req');
+        for (const line of c.lines) ul.appendChild(el('li', line.ok ? 'ok' : 'bad', line.text));
+        box.appendChild(ul);
+      }
+      const go = document.createElement('button');
+      go.type = 'button';
+      go.className = 'td-go';
+      go.textContent = c.rank >= 10 ? 'Max rank' : pick.planned ? 'Coming soon' : `Raise to rank ${c.next}`;
+      go.disabled = !!c.fail;
+      go.title = c.fail || '';
+      go.onclick = () => {
+        if (G.fight) return toast("You can't change skills in a fight.");
+        if (c.fail) return toast(c.fail);
+        window.wealdmark.send({ t: 'spend', skill: pick.id });
+      };
+      box.appendChild(go);
+      if (c.fail && !pick.planned && c.rank < 10) box.appendChild(el('p', 'td-why', c.fail));
+    }
+
     const respec = $('respec');
-    respec.textContent = s.respecCost ? `Respec (${s.respecCost} iron coins)` : 'Respec (free)';
+    respec.textContent = s.respecCost ? `Respec (${s.respecCost} iron bits)` : 'Respec (free)';
     respec.onclick = () => {
       if (G.fight) return toast("You can't change skills in a fight.");
       window.wealdmark.send({ t: 'respec' });
@@ -6864,7 +6934,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       case 'skill':
         return skillLevel(need.skill) >= need.level;
       case 'spent':
-        return G.stats ? Object.values(G.stats.ranks).reduce((a, b) => a + b, 0) - 4 >= need.points : false;
+        return G.stats ? Object.values(G.stats.affinity || {}).reduce((a, b) => a + b, 0) >= need.points : false;
       default:
         return false;
     }
