@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://screening-involvement-transport-bathrooms.trycloudflare.com",
-  "authUrl": "https://receptor-grammar-forestry-len.trycloudflare.com",
+  "server": "wss://shift-copy-strength-yen.trycloudflare.com",
+  "authUrl": "https://introduced-promising-foundation-excuse.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 364346,
-      "sha256": "1fabc1a1138c3f0f90086abe97dc88700eba1c915f3da452b256bc48f82d8988",
-      "url": "c/1fabc1a1138c3f0f90086abe97dc88700eba1c915f3da452b256bc48f82d8988"
+      "size": 364882,
+      "sha256": "c9657320e4fa0f697b4c1ec1967d213815dcba9eec6654ab1671fa9f9e26d6ac",
+      "url": "c/c9657320e4fa0f697b4c1ec1967d213815dcba9eec6654ab1671fa9f9e26d6ac"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 19647,
-      "sha256": "f01df67c17949e8f352af624f2d4d43ad18edb10f2c9264d4edfd58537509437",
-      "url": "c/f01df67c17949e8f352af624f2d4d43ad18edb10f2c9264d4edfd58537509437"
+      "size": 19501,
+      "sha256": "6d52612b993e1831f8ca7ba0d203ce6d6246cb6791f312728784d2252ea5ae6c",
+      "url": "c/6d52612b993e1831f8ca7ba0d203ce6d6246cb6791f312728784d2252ea5ae6c"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 65710,
-      "sha256": "e4fe8b41f6dee580327e0c1552fd5e35ee2f0bf7dac6ba173eca68d9aa14fa6d",
-      "url": "c/e4fe8b41f6dee580327e0c1552fd5e35ee2f0bf7dac6ba173eca68d9aa14fa6d"
+      "size": 68604,
+      "sha256": "c52e3b7e093407332170258c06ea5e44eb2fc5645cdbd0f1fd5fe2e8ab418a92",
+      "url": "c/c52e3b7e093407332170258c06ea5e44eb2fc5645cdbd0f1fd5fe2e8ab418a92"
     }
   ],
-  "signature": "WmOX0Oq5brjh3QLq6h8ar2BTz1PnadaylPhxfPybgYxLIqFahT6rdF81DkNaAfH5cCzkKkarrKeSCTP+j1xnDQ=="
+  "signature": "6AUaY6Rqk/okwCKOwGX/ePTSwmiXOepnRAX8bfLASrny+Oy2IbSC78/iukCb0FjiCg5fiyMmFWELIIS+2stWBw=="
 }
