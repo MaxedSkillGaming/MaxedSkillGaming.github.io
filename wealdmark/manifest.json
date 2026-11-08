@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://phase-olive-baths-milan.trycloudflare.com",
-  "authUrl": "https://selected-them-celebrities-thursday.trycloudflare.com",
+  "server": "wss://advertise-soldiers-cluster-commodities.trycloudflare.com",
+  "authUrl": "https://blessed-explicitly-dee-sponsored.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 374565,
-      "sha256": "9f11a203c132019e35a761cc66759d2345a39386891f1c4515f1e58abae268c6",
-      "url": "c/9f11a203c132019e35a761cc66759d2345a39386891f1c4515f1e58abae268c6"
+      "size": 385576,
+      "sha256": "d446a4b908baf9dfe16c5207e7440fae5c85e1aac93f4f806839ab6f07cbd590",
+      "url": "c/d446a4b908baf9dfe16c5207e7440fae5c85e1aac93f4f806839ab6f07cbd590"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 20084,
-      "sha256": "b88049daecec3f3ced9447cfd9b75c688d04fd8e7e83ccb5d2bd8eb5aefd5479",
-      "url": "c/b88049daecec3f3ced9447cfd9b75c688d04fd8e7e83ccb5d2bd8eb5aefd5479"
+      "size": 20730,
+      "sha256": "b6378763514a88dd7a22fd56239162bf81b598f100e554c7cca46b70473d6c34",
+      "url": "c/b6378763514a88dd7a22fd56239162bf81b598f100e554c7cca46b70473d6c34"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 76673,
-      "sha256": "0e2222e28e4aa360f397ff656e3d87e9537f38fdd3afafe7354fee4abd2176a3",
-      "url": "c/0e2222e28e4aa360f397ff656e3d87e9537f38fdd3afafe7354fee4abd2176a3"
+      "size": 78042,
+      "sha256": "00c1d3eb4573d699306b6bc66c4ce105c97b41292dd438c8937c0de7b6f68c7e",
+      "url": "c/00c1d3eb4573d699306b6bc66c4ce105c97b41292dd438c8937c0de7b6f68c7e"
     }
   ],
-  "signature": "x2uO1+woUdj0+gMUXvVLIHtayKufGKXW4KVHIVl83+sXZIhcbH/p+IZwyfppwSbyaNIUskdw3KXvMq6jY1lHAw=="
+  "signature": "KQO/41Iv3H2CqB/8Js2rIgwuEpg9rOPoGfyOId7A1Zbycihy8QafqsgDDU3fDWeHBYLniW2m4royYxMHwmsgDw=="
 }
