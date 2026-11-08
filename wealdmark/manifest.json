@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://assistance-connectivity-nokia-schemes.trycloudflare.com",
-  "authUrl": "https://cream-cross-carolina-food.trycloudflare.com",
+  "server": "wss://phase-olive-baths-milan.trycloudflare.com",
+  "authUrl": "https://selected-them-celebrities-thursday.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 367121,
-      "sha256": "90635804e178d5ef7b0ea46007220b2d0ac8d0fc8675dd6a47dd29d0e3d97ec4",
-      "url": "c/90635804e178d5ef7b0ea46007220b2d0ac8d0fc8675dd6a47dd29d0e3d97ec4"
+      "size": 374565,
+      "sha256": "9f11a203c132019e35a761cc66759d2345a39386891f1c4515f1e58abae268c6",
+      "url": "c/9f11a203c132019e35a761cc66759d2345a39386891f1c4515f1e58abae268c6"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 19855,
-      "sha256": "3e448eb01b160ac6d67f26f02208858c07545dc4d6bd66a1a6f051eaed9990c8",
-      "url": "c/3e448eb01b160ac6d67f26f02208858c07545dc4d6bd66a1a6f051eaed9990c8"
+      "size": 20084,
+      "sha256": "b88049daecec3f3ced9447cfd9b75c688d04fd8e7e83ccb5d2bd8eb5aefd5479",
+      "url": "c/b88049daecec3f3ced9447cfd9b75c688d04fd8e7e83ccb5d2bd8eb5aefd5479"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 71415,
-      "sha256": "67046c00a4dcaf7aa2ce4ab08ea14a276b01d110bd5d3e2c209a6298ec771354",
-      "url": "c/67046c00a4dcaf7aa2ce4ab08ea14a276b01d110bd5d3e2c209a6298ec771354"
+      "size": 76673,
+      "sha256": "0e2222e28e4aa360f397ff656e3d87e9537f38fdd3afafe7354fee4abd2176a3",
+      "url": "c/0e2222e28e4aa360f397ff656e3d87e9537f38fdd3afafe7354fee4abd2176a3"
     }
   ],
-  "signature": "h/Ro3OV/D7t3sGpnPkoboGcOzzhP6YCjHm8zXnEHRWIW4XI2E0ncXYdwHt4nkutYBRAgqUqSKaZ/GQKTnMY1BQ=="
+  "signature": "x2uO1+woUdj0+gMUXvVLIHtayKufGKXW4KVHIVl83+sXZIhcbH/p+IZwyfppwSbyaNIUskdw3KXvMq6jY1lHAw=="
 }
