@@ -390,10 +390,12 @@
     <div id="busy" class="hidden"><div id="busy-fill"></div><span id="busy-text"></span></div>
 
     <div id="dialog" class="hidden">
-      <h3 id="dlg-name"></h3>
-      <p id="dlg-role" class="muted"></p>
-      <div id="dlg-lines"></div>
-      <div id="dlg-options"></div>
+      <canvas id="dlg-portrait" width="80" height="80" aria-hidden="true"></canvas>
+      <div id="dlg-main">
+        <div id="dlg-head"><h3 id="dlg-name"></h3><span id="dlg-role" class="muted"></span></div>
+        <div id="dlg-lines"></div>
+        <div id="dlg-options"></div>
+      </div>
     </div>
 
     <div id="chat">

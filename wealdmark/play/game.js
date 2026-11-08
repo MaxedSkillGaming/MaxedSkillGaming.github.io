@@ -2441,6 +2441,15 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     { id: 'wisp', name: 'Lantern wisp' },
     { id: 'drake', name: 'Ember drake' },
   ];
+  // What each companion does. Mirrors PET_PASSIVES in packages/shared/src/game.ts; pets.test.ts checks the two agree.
+  const PET_PASSIVE_TEXT = {
+    fox: 'Forager: 1 in 12 gathers gives one extra item.',
+    cat: 'Purr: win a fight and heal 2 HP.',
+    owl: 'Sharp eyes: +2% chance to hit.',
+    slime: 'Scavenger: +1 iron coin from each kill.',
+    wisp: 'Glow: win a fight and regain 2 mana.',
+    drake: 'Ember: +2% damage.',
+  };
 
   function paintPet(r, id, step) {
     const up = (n) => (step === n ? 1 : 0);
@@ -6627,14 +6636,15 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     for (const pet of [{ id: '', name: 'No companion' }, ...PETS]) {
       const b = document.createElement('button');
       b.type = 'button';
-      b.textContent = pet.name;
+      b.className = 'pet-card';
       b.dataset.pet = pet.id;
       const lockedBy = pet.id && G && G.locks && G.locks.pets[pet.id];
+      const sub = !pet.id ? 'Travel light.' : lockedBy ? `Locked. Finish "${lockedBy}".` : PET_PASSIVE_TEXT[pet.id];
+      b.append(el('span', 'pet-name', lockedBy ? `${pet.name} (locked)` : pet.name), el('span', 'pet-sub', sub));
       if (lockedBy) {
         b.disabled = true;
-        b.textContent = `${pet.name} (locked)`;
         b.title = `Finish the quest "${lockedBy}" to unlock.`;
-      }
+      } else if (pet.id) b.title = PET_PASSIVE_TEXT[pet.id];
       b.addEventListener('click', () => {
         const me = G && G.self();
         if (me) me.pet = pet.id || undefined;
@@ -6955,6 +6965,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const st = G.data.stations.get(msg.npc);
     $('dlg-name').textContent = npc ? npc.name : st ? st.name : pretty(msg.npc);
     $('dlg-role').textContent = npc ? npc.role : '';
+    const portrait = $('dlg-portrait');
+    portrait.classList.toggle('none', !npc);
+    if (npc) {
+      const pc = portrait.getContext('2d');
+      pc.clearRect(0, 0, portrait.width, portrait.height);
+      drawFigure(pc, 0, 0, 5, npcLook(npc), 0, 0, npcGear(npc));
+    }
     const lines = $('dlg-lines');
     lines.textContent = '';
     for (const l of msg.lines) lines.appendChild(el('p', '', l));
@@ -6979,6 +6996,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function onShop(msg) {
     G.town = { kind: 'shop', shop: msg.shop };
     G.shopTab = 'buy';
+    G.shopSel = null;
     showTown('panel-shop');
     renderShop();
   }
@@ -7000,76 +7018,97 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       t.addEventListener('click', () => {
         if (G.shopTab === key) return;
         G.shopTab = key;
+        G.shopSel = null;
         play('click');
         renderShop();
       });
       tabs.appendChild(t);
     }
     box.appendChild(tabs);
-    if (G.shopTab === 'sell') return renderShopSell(box);
+    const sell = G.shopTab === 'sell';
     const w = (G.stats && G.stats.wallet) || {};
-    for (const e of shop.stock) {
-      const def = G.data.items.get(e.item);
-      if (!def) continue;
-      const row = el('button', 'row-item');
-      row.type = 'button';
-      row.title = itemTip({ id: e.item, qty: 1 });
-      if ((w[e.cur] || 0) < e.price) row.classList.add('poor');
-      row.append(iconCanvas(def), el('span', 'name', def.name), price(e.price, e.cur));
-      const qk = `buy:${e.item}`;
-      const line = qtyLine(row, qk, 99);
-      row.addEventListener('click', () => askBuy(e, def, qtyOf(qk, 99)));
-      box.appendChild(line);
+    // Every row is one grid cell: { key, def, ref, badge, poor }. Buy rows come from the shop, sell rows from the bag.
+    const cells = [];
+    if (sell) {
+      if (G.inv) {
+        G.inv.items.forEach((ref, i) => {
+          const def = ref && G.data.items.get(ref.id);
+          if (def && sellPrice(ref) > 0) cells.push({ key: i, def, ref, badge: ref.qty > 1 ? ref.qty : 0 });
+        });
+      }
+    } else {
+      for (const e of shop.stock) {
+        const def = G.data.items.get(e.item);
+        if (def) cells.push({ key: e.item, def, entry: e, ref: { id: e.item, qty: 1 }, poor: (w[e.cur] || 0) < e.price });
+      }
     }
-    box.appendChild(el('p', 'muted', 'Pick an amount with - and +, then click the item to buy it.'));
-  }
-
-  /** Per-row amounts for the shop windows. */
-  function qtyOf(key, max) {
-    G.shopQty = G.shopQty || new Map();
-    return Math.max(1, Math.min(max, G.shopQty.get(key) || 1));
-  }
-
-  /** Wraps an item row with a - amount + stepper beside it. */
-  function qtyLine(row, key, max) {
-    const line = el('div', 'shop-line');
-    const amt = el('span', 'qty-n', String(qtyOf(key, max)));
-    const step = (d, label) => {
-      const b = el('button', 'qty-b', label);
+    if (!cells.some((c) => c.key === G.shopSel)) G.shopSel = cells.length ? cells[0].key : null;
+    const wrap = el('div', 'shop-wrap');
+    const grid = el('div', 'shop-grid');
+    grid.setAttribute('role', 'listbox');
+    for (const c of cells) {
+      const b = el('button', 'shop-slot');
       b.type = 'button';
-      b.setAttribute('aria-label', d < 0 ? 'Decrease amount' : 'Increase amount');
+      b.setAttribute('role', 'option');
+      b.setAttribute('aria-label', itemName(c.ref));
+      b.setAttribute('aria-selected', String(c.key === G.shopSel));
+      b.title = itemTip(c.ref);
+      if (c.key === G.shopSel) b.classList.add('sel');
+      if (c.poor) b.classList.add('poor');
+      b.append(iconCanvas(c.def));
+      if (c.badge) b.append(el('span', 'shop-qty', String(c.badge)));
       b.addEventListener('click', () => {
-        G.shopQty.set(key, Math.max(1, Math.min(max, qtyOf(key, max) + d)));
-        amt.textContent = String(qtyOf(key, max));
+        G.shopSel = c.key;
         play('click');
+        renderShop();
       });
-      return b;
-    };
-    line.append(row, step(-1, '-'), amt, step(1, '+'));
-    return line;
-  }
-
-  function renderShopSell(box) {
-    let any = false;
-    if (G.inv) {
-      G.inv.items.forEach((ref, i) => {
-        if (!ref) return;
-        const each = sellPrice(ref);
-        const def = G.data.items.get(ref.id);
-        if (!def || each <= 0) return;
-        any = true;
-        const row = el('button', 'row-item');
-        row.type = 'button';
-        row.title = itemTip(ref);
-        row.append(iconCanvas(def), el('span', 'name', `${itemName(ref)}${ref.qty > 1 ? ` x${ref.qty}` : ''}`), price(each, 'iron_bits'));
-        const qk = `sell:${ref.id}:${i}`;
-        const line = qtyLine(row, qk, ref.qty);
-        row.addEventListener('click', (ev) => window.wealdmark.send({ t: 'sell', slot: i, qty: ev.shiftKey ? ref.qty : qtyOf(qk, ref.qty) }));
-        box.appendChild(line);
-      });
+      grid.appendChild(b);
     }
-    if (!any) box.appendChild(el('p', 'muted', 'Nothing in your bag sells here.'));
-    box.appendChild(el('p', 'muted', 'Pick an amount with - and +, then click the item to sell. Shift-click sells the whole stack.'));
+    wrap.appendChild(grid);
+    const side = el('div', 'shop-detail');
+    const cur = cells.find((c) => c.key === G.shopSel);
+    if (!cur) {
+      side.appendChild(el('p', 'muted', sell ? 'Nothing in your bag sells here.' : 'This shop has nothing for sale.'));
+    } else {
+      side.appendChild(el('div', 'shop-dname', itemName(cur.ref)));
+      const each = sell ? sellPrice(cur.ref) : cur.entry.price;
+      const eachCur = sell ? 'iron_bits' : cur.entry.cur;
+      const pr = el('div', 'shop-dprice');
+      pr.append(price(each, eachCur), document.createTextNode(' each'));
+      side.appendChild(pr);
+      side.appendChild(el('p', 'shop-dtext', itemTip(cur.ref).split('\n').slice(1).join(' ')));
+      const max = sell ? cur.ref.qty : 99;
+      const act = (n) => (sell ? window.wealdmark.send({ t: 'sell', slot: cur.key, qty: Math.min(n, max) }) : askBuy(cur.entry, cur.def, Math.min(n, max)));
+      const row = el('div', 'shop-btns');
+      const amounts = sell ? [1, 5, 10, max] : [1, 5, 10];
+      amounts.forEach((n, i) => {
+        if (sell && i > 0 && (n > max || (i === 3 && max <= 10))) return;
+        const bt = el('button', 'shop-b', `${sell ? 'Sell' : 'Buy'} ${sell && i === 3 ? `all (${max})` : n}`);
+        bt.type = 'button';
+        bt.addEventListener('click', () => act(n));
+        row.appendChild(bt);
+      });
+      side.appendChild(row);
+      const xr = el('div', 'shop-btns');
+      const inp = el('input', 'shop-x');
+      inp.type = 'number';
+      inp.min = '1';
+      inp.max = String(max);
+      inp.value = '1';
+      inp.setAttribute('aria-label', 'Amount');
+      const xb = el('button', 'shop-b', sell ? 'Sell X' : 'Buy X');
+      xb.type = 'button';
+      xb.addEventListener('click', () => {
+        const n = Math.floor(Number(inp.value));
+        if (!(n >= 1)) return toast('Enter an amount of 1 or more.');
+        act(n);
+      });
+      xr.append(inp, xb);
+      side.appendChild(xr);
+    }
+    wrap.appendChild(side);
+    box.appendChild(wrap);
+    box.appendChild(el('p', 'muted', sell ? 'Pick an item, then choose how many to sell.' : 'Pick an item, then choose how many to buy.'));
   }
 
   function closeBuyConfirm() {
