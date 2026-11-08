@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://advertise-soldiers-cluster-commodities.trycloudflare.com",
-  "authUrl": "https://blessed-explicitly-dee-sponsored.trycloudflare.com",
+  "server": "wss://speeds-bug-sept-spyware.trycloudflare.com",
+  "authUrl": "https://livestock-schemes-terminal-honolulu.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 385576,
-      "sha256": "d446a4b908baf9dfe16c5207e7440fae5c85e1aac93f4f806839ab6f07cbd590",
-      "url": "c/d446a4b908baf9dfe16c5207e7440fae5c85e1aac93f4f806839ab6f07cbd590"
+      "size": 397385,
+      "sha256": "09f4507d4a92408af61fc1ccd218191842703809e1109245a1b90a7e1ca6ba19",
+      "url": "c/09f4507d4a92408af61fc1ccd218191842703809e1109245a1b90a7e1ca6ba19"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 20730,
-      "sha256": "b6378763514a88dd7a22fd56239162bf81b598f100e554c7cca46b70473d6c34",
-      "url": "c/b6378763514a88dd7a22fd56239162bf81b598f100e554c7cca46b70473d6c34"
+      "size": 20883,
+      "sha256": "afc4ac95cf6e502e194b39757b481d6096cddbb798b504d29c6f988b59adeb3c",
+      "url": "c/afc4ac95cf6e502e194b39757b481d6096cddbb798b504d29c6f988b59adeb3c"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 78042,
-      "sha256": "00c1d3eb4573d699306b6bc66c4ce105c97b41292dd438c8937c0de7b6f68c7e",
-      "url": "c/00c1d3eb4573d699306b6bc66c4ce105c97b41292dd438c8937c0de7b6f68c7e"
+      "size": 81720,
+      "sha256": "49c4df53f4ce92b9d472a95a5dd5b2e9d5b3aa8cdbffefb52ad451e8d6ec6248",
+      "url": "c/49c4df53f4ce92b9d472a95a5dd5b2e9d5b3aa8cdbffefb52ad451e8d6ec6248"
     }
   ],
-  "signature": "KQO/41Iv3H2CqB/8Js2rIgwuEpg9rOPoGfyOId7A1Zbycihy8QafqsgDDU3fDWeHBYLniW2m4royYxMHwmsgDw=="
+  "signature": "Tzg3NpPGe2afbFgdyY3wcKPfhU5jAOgUkPOKSJ93h4ZMramGag8+1LFt33NPDzZGbFk5j6zH+yeHT6iL3d2DBA=="
 }
