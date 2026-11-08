@@ -308,9 +308,20 @@
 
     <div id="panel-world" class="side wide hidden">
       <h2>World</h2>
-      <p class="muted">Click a legend entry to hide or show it. The gold dot is you.</p>
+      <div id="world-bar">
+        <button id="wv-out" type="button" aria-label="Zoom out">&minus;</button>
+        <button id="wv-in" type="button" aria-label="Zoom in">+</button>
+        <button id="wv-fit" type="button">Fit</button>
+        <button id="wv-me" type="button">Find me</button>
+        <input id="wv-q" type="text" placeholder="Search a place" aria-label="Search a place" autocomplete="off" maxlength="40">
+        <span id="wv-zoom"></span>
+      </div>
+      <div id="world-main">
+        <div id="world-scroll"><canvas id="worldmap" aria-label="Map of the whole world"></canvas></div>
+        <div id="world-regions" aria-label="Jump to a region"></div>
+      </div>
       <div id="world-legend"></div>
-      <div id="world-scroll"><canvas id="worldmap" aria-label="Map of the whole world"></canvas></div>
+      <p class="muted">Wheel or pinch to zoom, drag to move, double-click to zoom in. Click a legend entry to hide or show it. The gold dot is you.</p>
     </div>
 
     <div id="panel-shop" class="side wide hidden">

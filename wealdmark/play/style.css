@@ -733,8 +733,26 @@ button.qtrack.on { background: #2f6b3a; }
 .wl { display: flex; align-items: center; gap: 4px; margin: 0; padding: 1px 6px 1px 2px; font-size: 11px; }
 .wl.off { opacity: 0.45; }
 .wsw { display: inline-block; min-width: 14px; height: 14px; line-height: 14px; text-align: center; color: #17112a; font-weight: bold; font-size: 10px; border: 1px solid #000; }
-#world-scroll { max-height: 520px; overflow: auto; border: 2px solid #000; background: #0c0912; }
-#worldmap { display: block; image-rendering: pixelated; }
+#world-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; }
+#world-bar input { width: 140px; min-height: 28px; box-sizing: border-box; user-select: text; }
+#wv-zoom { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
+#panel-world { --wv-h: min(440px, calc(var(--vh, 100vh) - 300px)); }
+#world-main { display: flex; align-items: flex-start; gap: 8px; }
+#world-scroll { flex: 1; min-width: 0; height: var(--wv-h); min-height: 200px; overflow: hidden; border: 2px solid #000; background: #0c0912; touch-action: none; cursor: grab; }
+#world-scroll.drag { cursor: grabbing; }
+#worldmap { display: block; width: 100%; height: 100%; }
+#world-regions { flex: none; width: 140px; max-height: var(--wv-h); display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+#world-regions button { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+#world-regions button.on { outline: 2px solid #ffd86a; }
+@media (pointer: fine) and (min-width: 761px) {
+  #panel-world { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 640px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); resize: none; }
+}
+@media (max-width: 760px) {
+  #world-main { flex-direction: column; }
+  #panel-world { --wv-h: min(360px, calc(var(--vh, 100vh) - 330px)); }
+  #world-regions { width: auto; flex-direction: row; flex-wrap: wrap; max-height: 76px; }
+  #world-regions button { max-width: 45%; }
+}
 #panel-world.side { user-select: none; }
 
 /* Shop, crafting, storage and dialogue boxes stay above the Bag and other windows. */

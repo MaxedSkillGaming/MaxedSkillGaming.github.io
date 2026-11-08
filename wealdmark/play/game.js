@@ -4169,7 +4169,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('r-world'), 'click', () => {
       togglePanel('panel-world');
       G.worldKey = null;
-      renderWorld(true);
+      renderWorld(true, true);
     });
     floatBox('mapbox', 'map');
     apply();
@@ -4276,95 +4276,407 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     return pts;
   }
 
-  /** The whole map on one canvas, with places of interest and the hero. Redrawn when something it shows changes. */
-  function renderWorld(force) {
+  /** View state of the world map: scale is pixels per tile, ox/oy the pixel position of tile 0,0. */
+  const WV = { s: 3, ox: 0, oy: 0, w: 0, h: 0, dpr: 1, hl: null, q: '', hover: null, base: null, baseMap: null, pts: null, ready: false, raf: 0, placed: false };
+  const WV_MAX = 12;
+
+  function wvMinScale() {
+    return Math.min(WV.w / G.map.width, WV.h / G.map.height);
+  }
+  function wvClamp() {
+    const map = G.map;
+    WV.s = Math.max(wvMinScale(), Math.min(WV_MAX, WV.s));
+    const vw = map.width * WV.s;
+    const vh = map.height * WV.s;
+    WV.ox = vw <= WV.w ? (WV.w - vw) / 2 : Math.min(0, Math.max(WV.w - vw, WV.ox));
+    WV.oy = vh <= WV.h ? (WV.h - vh) / 2 : Math.min(0, Math.max(WV.h - vh, WV.oy));
+  }
+  function wvZoomAt(px, py, f) {
+    const wx = (px - WV.ox) / WV.s;
+    const wy = (py - WV.oy) / WV.s;
+    WV.s *= f;
+    wvClamp();
+    WV.ox = px - wx * WV.s;
+    WV.oy = py - wy * WV.s;
+    wvClamp();
+  }
+  function wvCenter(x, y, s) {
+    if (s) WV.s = s;
+    wvClamp();
+    WV.ox = WV.w / 2 - x * WV.s;
+    WV.oy = WV.h / 2 - y * WV.s;
+    wvClamp();
+  }
+  function wvRequest() {
+    if (!WV.raf) WV.raf = requestAnimationFrame(wvDraw);
+  }
+  function wvSize(cv) {
+    const w = cv.clientWidth;
+    const h = cv.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    if (!w || !h) return false;
+    if (w !== WV.w || h !== WV.h || dpr !== WV.dpr) {
+      WV.w = w;
+      WV.h = h;
+      WV.dpr = dpr;
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+      wvClamp();
+    }
+    return true;
+  }
+  function wvBuildBase(map) {
+    const b = document.createElement('canvas');
+    b.width = map.width;
+    b.height = map.height;
+    const c = b.getContext('2d');
+    c.fillStyle = '#0c0912';
+    c.fillRect(0, 0, b.width, b.height);
+    for (let y = 0; y < map.height; y++) {
+      for (let x = 0; x < map.width; x++) {
+        const gid = map.layers.ground[y * map.width + x];
+        c.fillStyle = gid === 4 ? '#2c5a8a' : map.blocked[y][x] === '1' ? '#2a2236' : '#4d7a52';
+        c.fillRect(x, y, 1, 1);
+      }
+    }
+    for (const z of map.zones) {
+      c.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.22)' : z.kind === 'dungeon' ? 'rgba(224,90,90,0.16)' : 'rgba(224,90,90,0.10)';
+      c.fillRect(z.x, z.y, z.w, z.h);
+    }
+    WV.base = b;
+    WV.baseMap = map;
+  }
+  function wvLabel(c, t, x, y, size, col) {
+    c.font = `bold ${size}px Tahoma, Verdana, sans-serif`;
+    c.textAlign = 'center';
+    c.lineWidth = 3;
+    c.strokeStyle = '#000';
+    c.strokeText(t, x, y);
+    c.fillStyle = col;
+    c.fillText(t, x, y);
+  }
+
+  function wvDraw() {
+    WV.raf = 0;
+    const map = G && G.map;
+    const cv = $('worldmap');
+    if (!map || !WV.base || !WV.w || !cv) return;
+    const c = cv.getContext('2d');
+    const { s, ox, oy, w, h } = WV;
+    c.setTransform(WV.dpr, 0, 0, WV.dpr, 0, 0);
+    c.fillStyle = '#0c0912';
+    c.fillRect(0, 0, w, h);
+    c.imageSmoothingEnabled = false;
+    const x0 = Math.max(0, Math.floor(-ox / s));
+    const y0 = Math.max(0, Math.floor(-oy / s));
+    const x1 = Math.min(map.width, Math.ceil((w - ox) / s));
+    const y1 = Math.min(map.height, Math.ceil((h - oy) / s));
+    if (x1 > x0 && y1 > y0) c.drawImage(WV.base, x0, y0, x1 - x0, y1 - y0, ox + x0 * s, oy + y0 * s, (x1 - x0) * s, (y1 - y0) * s);
+    const q = WV.q;
+    const kinds = new Map(WORLD_KINDS.map((k) => [k.id, k]));
+    const inView = (px, py, m) => px > -m && py > -m && px < w + m && py < h + m;
+
+    if (!WV.pts) WV.pts = worldPoints();
+    const natural = new Set(['tree', 'rock', 'fish', 'warren']);
+    const hits = [];
+    for (const p of WV.pts) {
+      if (worldHidden.has(p.k)) continue;
+      const px = ox + (p.x + 0.5) * s;
+      const py = oy + (p.y + 0.5) * s;
+      if (!inView(px, py, 12)) continue;
+      const k = kinds.get(p.k);
+      const hit = q && p.name.toLowerCase().includes(q);
+      if (hit) hits.push({ p, px, py });
+      if (natural.has(p.k)) {
+        if (s < 1.2 && !hit) continue;
+        const r = Math.max(2, Math.min(5, s * 0.8));
+        c.fillStyle = '#000';
+        c.fillRect(Math.round(px - r - 1), Math.round(py - r - 1), Math.round(2 * r + 2), Math.round(2 * r + 2));
+        c.fillStyle = k.color;
+        c.fillRect(Math.round(px - r), Math.round(py - r), Math.round(2 * r), Math.round(2 * r));
+      } else {
+        const r = s < 1.4 ? 4 : s < 4 ? 6 : 8;
+        c.fillStyle = '#000';
+        c.fillRect(Math.round(px - r - 1), Math.round(py - r - 1), 2 * r + 2, 2 * r + 2);
+        c.fillStyle = k.color;
+        c.fillRect(Math.round(px - r), Math.round(py - r), 2 * r, 2 * r);
+        if (r >= 6) {
+          c.fillStyle = '#17112a';
+          c.font = `bold ${r + 3}px Tahoma, Verdana, sans-serif`;
+          c.textAlign = 'center';
+          c.fillText(p.k === 'quest' ? p.mark : k.badge, px, py + r * 0.45);
+        }
+      }
+    }
+
+    // Place names, biggest first, and skip any that would sit on top of one already placed.
+    const items = [];
+    for (const z of map.zones) {
+      if (!z.name || z.kind === 'road') continue;
+      const area = z.w * z.h;
+      let ok;
+      let pri;
+      if (z.kind === 'safe') {
+        ok = area >= 600 ? s >= 0.25 : area >= 100 ? s >= 1.5 : s >= 3.5;
+        pri = area >= 600 ? 0 : 1;
+      } else if (z.kind === 'dungeon') {
+        ok = s >= 0.25;
+        pri = 2;
+      } else {
+        ok = area >= 5000 ? s < 1.6 : area >= 1500 ? s >= 0.6 && s < 3 : s >= 1.2 && s < 5;
+        pri = 3;
+      }
+      const hit = q && z.name.toLowerCase().includes(q);
+      if (ok || hit) items.push({ z, pri: hit ? -1 : pri, hit });
+    }
+    items.sort((a, b) => a.pri - b.pri);
+    const placed = [];
+    const place = (t, x, y, size, col) => {
+      c.font = `bold ${size}px Tahoma, Verdana, sans-serif`;
+      const tw = c.measureText(t).width + 6;
+      const r = { x: x - tw / 2, y: y - size, w: tw, h: size + 4 };
+      if (r.x + r.w < 0 || r.y + r.h < 0 || r.x > w || r.y > h) return;
+      for (const o of placed) if (r.x < o.x + o.w && r.x + r.w > o.x && r.y < o.y + o.h && r.y + r.h > o.y) return;
+      placed.push(r);
+      wvLabel(c, t, x, y, size, col);
+    };
+    for (const it of items) {
+      const z = it.z;
+      const cx = ox + (z.x + z.w / 2) * s;
+      const cy = oy + (z.y + z.h / 2) * s;
+      const col = it.hit ? '#ffffff' : z.kind === 'safe' ? '#f0d890' : z.kind === 'dungeon' ? '#ff9a9a' : '#cfe8c8';
+      place(z.name, cx, cy + 4, z.kind === 'safe' || it.hit ? 12 : 11, col);
+    }
+    let n = 0;
+    for (const hh of hits) {
+      if (n++ >= 40) break;
+      place(hh.p.name, hh.px, hh.py - 12, 11, '#ffffff');
+    }
+
+    if (WV.hl) {
+      c.strokeStyle = '#ffffff';
+      c.lineWidth = 2;
+      c.strokeRect(Math.round(ox + WV.hl.x * s), Math.round(oy + WV.hl.y * s), Math.round(WV.hl.w * s), Math.round(WV.hl.h * s));
+    }
+    const me = G.self();
+    if (me) {
+      const mx = ox + (Math.round(me.x) + 0.5) * s;
+      const my = oy + (Math.round(me.y) + 0.5) * s;
+      c.fillStyle = '#000';
+      c.beginPath();
+      c.arc(mx, my, 7, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#e6b34a';
+      c.beginPath();
+      c.arc(mx, my, 5, 0, Math.PI * 2);
+      c.fill();
+    }
+    if (WV.hover) {
+      const t = `${WV.hover.p.name} (${kinds.get(WV.hover.p.k).label})`;
+      c.font = '12px Tahoma, Verdana, sans-serif';
+      const tw = c.measureText(t).width + 10;
+      const bx = Math.max(4, Math.min(w - tw - 4, WV.hover.px + 12));
+      const by = Math.max(4, Math.min(h - 24, WV.hover.py - 28));
+      c.fillStyle = '#17112a';
+      c.fillRect(bx, by, tw, 20);
+      c.strokeStyle = '#4a3a78';
+      c.lineWidth = 1;
+      c.strokeRect(bx + 0.5, by + 0.5, tw - 1, 19);
+      c.fillStyle = '#e8dcc0';
+      c.textAlign = 'left';
+      c.fillText(t, bx + 5, by + 14);
+    }
+    // Scale bar: ten tiles.
+    c.fillStyle = 'rgba(23,17,42,0.85)';
+    c.fillRect(8, h - 24, 96, 16);
+    c.fillStyle = '#ffffff';
+    c.fillRect(12, h - 14, Math.max(4, Math.round(10 * s)), 3);
+    c.fillStyle = '#e8dcc0';
+    c.font = '11px Tahoma, Verdana, sans-serif';
+    c.textAlign = 'left';
+    c.fillText('10 tiles', 16 + Math.max(4, Math.round(10 * s)), h - 11);
+    $('wv-zoom').textContent = `Zoom ${s.toFixed(1)}x`;
+  }
+
+  function wvJump(it) {
+    if (it.z) {
+      WV.hl = it.z;
+      wvCenter(it.z.x + it.z.w / 2, it.z.y + it.z.h / 2, Math.min(WV.w / it.z.w, WV.h / it.z.h) * 0.85);
+    } else {
+      WV.hl = null;
+      wvCenter(it.p.x + 0.5, it.p.y + 0.5, Math.max(WV.s, 5));
+    }
+    wvRequest();
+  }
+
+  function wvInit() {
+    if (WV.ready) return;
+    WV.ready = true;
+    const cv = $('worldmap');
+    const box = $('world-scroll');
+    const rect = () => cv.getBoundingClientRect();
+    // The window is scaled with CSS zoom, so pointer pixels and canvas pixels differ by this factor.
+    const kk = () => cv.getBoundingClientRect().width / (cv.clientWidth || 1) || 1;
+    const ptr = new Map();
+    let pinch = 0;
+    const pinchDist = () => {
+      const [a, b] = [...ptr.values()];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    };
+    cv.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const r = rect();
+      const k = kk();
+      wvZoomAt((e.clientX - r.left) / k, (e.clientY - r.top) / k, e.deltaY < 0 ? 1.25 : 0.8);
+      WV.hl = null;
+      wvRequest();
+    }, { passive: false });
+    cv.addEventListener('pointerdown', (e) => {
+      ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      cv.setPointerCapture(e.pointerId);
+      box.classList.add('drag');
+      WV.hover = null;
+      if (ptr.size === 2) pinch = pinchDist();
+    });
+    cv.addEventListener('pointermove', (e) => {
+      const p = ptr.get(e.pointerId);
+      if (!p) {
+        if (e.pointerType !== 'mouse') return;
+        const r = rect();
+        const k = kk();
+        const mx = (e.clientX - r.left) / k;
+        const my = (e.clientY - r.top) / k;
+        let best = null;
+        let bd = 100;
+        for (const q of WV.pts || []) {
+          if (worldHidden.has(q.k)) continue;
+          const px = WV.ox + (q.x + 0.5) * WV.s;
+          const py = WV.oy + (q.y + 0.5) * WV.s;
+          const d = (px - mx) ** 2 + (py - my) ** 2;
+          if (d < bd) {
+            bd = d;
+            best = { p: q, px, py };
+          }
+        }
+        const prev = WV.hover && WV.hover.p;
+        WV.hover = best;
+        if ((best && best.p) !== prev) wvRequest();
+        return;
+      }
+      const k = kk();
+      const dx = (e.clientX - p.x) / k;
+      const dy = (e.clientY - p.y) / k;
+      p.x = e.clientX;
+      p.y = e.clientY;
+      if (ptr.size === 1) {
+        WV.ox += dx;
+        WV.oy += dy;
+        wvClamp();
+      } else if (ptr.size === 2) {
+        const d = pinchDist();
+        const [a, b] = [...ptr.values()];
+        const r = rect();
+        if (pinch) wvZoomAt(((a.x + b.x) / 2 - r.left) / k, ((a.y + b.y) / 2 - r.top) / k, d / pinch);
+        pinch = d;
+      }
+      wvRequest();
+    });
+    const up = (e) => {
+      ptr.delete(e.pointerId);
+      pinch = 0;
+      if (!ptr.size) box.classList.remove('drag');
+    };
+    cv.addEventListener('pointerup', up);
+    cv.addEventListener('pointercancel', up);
+    cv.addEventListener('pointerleave', () => {
+      if (WV.hover) {
+        WV.hover = null;
+        wvRequest();
+      }
+    });
+    cv.addEventListener('dblclick', (e) => {
+      const r = rect();
+      const k = kk();
+      wvZoomAt((e.clientX - r.left) / k, (e.clientY - r.top) / k, 2);
+      wvRequest();
+    });
+    $('wv-in').addEventListener('click', () => { wvZoomAt(WV.w / 2, WV.h / 2, 1.5); wvRequest(); });
+    $('wv-out').addEventListener('click', () => { wvZoomAt(WV.w / 2, WV.h / 2, 1 / 1.5); wvRequest(); });
+    $('wv-fit').addEventListener('click', () => {
+      WV.hl = null;
+      WV.s = wvMinScale();
+      wvClamp();
+      wvRequest();
+    });
+    $('wv-me').addEventListener('click', () => {
+      const me = G.self();
+      if (!me) return;
+      WV.hl = null;
+      wvCenter(me.x + 0.5, me.y + 0.5, Math.max(WV.s, 3));
+      wvRequest();
+    });
+    $('wv-q').addEventListener('input', () => {
+      WV.q = $('wv-q').value.trim().toLowerCase();
+      WV.hl = null;
+      const q = WV.q;
+      if (q.length >= 2) {
+        const p = (WV.pts || []).find((o) => o.name.toLowerCase().includes(q));
+        const z = G.map.zones.find((o) => o.name && o.kind !== 'road' && o.name.toLowerCase().includes(q));
+        if (p) wvJump({ p });
+        else if (z) wvJump({ z });
+      }
+      wvRequest();
+    });
+    window.addEventListener('resize', () => {
+      if (!$('panel-world').classList.contains('hidden')) renderWorld(true);
+    });
+  }
+
+  function wvRegions() {
+    const box = $('world-regions');
+    if (box.childElementCount) return;
+    const list = G.map.zones
+      .filter((z) => z.name && ((z.kind === 'safe' && z.w * z.h >= 500) || (z.kind === 'dungeon' && z.w * z.h >= 1000) || (z.kind === 'wilds' && z.w * z.h >= 5000)))
+      .sort((a, b) => a.y - b.y || a.x - b.x);
+    for (const z of list) {
+      const b = el('button', null, z.name);
+      b.type = 'button';
+      b.title = z.name;
+      b.addEventListener('click', () => {
+        for (const o of box.children) o.classList.toggle('on', o === b);
+        wvJump({ z });
+      });
+      box.appendChild(b);
+    }
+  }
+
+  /** The whole map on one zoomable canvas, with places of interest and the hero. Redrawn when something it shows changes. */
+  function renderWorld(force, reset) {
     const panel = $('panel-world');
     if (!panel || panel.classList.contains('hidden') || !G || !G.map || !G.data) return;
     const me = G.self();
     const marks = JSON.stringify([(G.map.npcs || []).map((n) => questMark(n.npc) || ''), [...worldHidden], me ? [Math.round(me.x / 2), Math.round(me.y / 2)] : 0]);
     if (!force && marks === G.worldKey) return;
+    if (marks !== G.worldKey) WV.pts = null;
     G.worldKey = marks;
-    const map = G.map;
-    const px = 3;
+    wvInit();
     const cv = $('worldmap');
-    if (cv.width !== map.width * px) {
-      cv.width = map.width * px;
-      cv.height = map.height * px;
-      G.worldBase = null;
+    if (!wvSize(cv)) return;
+    if (WV.baseMap !== G.map) {
+      wvBuildBase(G.map);
+      WV.placed = false;
     }
-    if (!G.worldBase) {
-      const b = document.createElement('canvas');
-      b.width = cv.width;
-      b.height = cv.height;
-      const c = b.getContext('2d');
-      c.fillStyle = '#0c0912';
-      c.fillRect(0, 0, b.width, b.height);
-      for (let y = 0; y < map.height; y++) {
-        for (let x = 0; x < map.width; x++) {
-          const gid = map.layers.ground[y * map.width + x];
-          c.fillStyle = gid === 4 ? '#2c5a8a' : map.blocked[y][x] === '1' ? '#2a2236' : '#4d7a52';
-          c.fillRect(x * px, y * px, px, px);
-        }
-      }
-      for (const z of map.zones) {
-        c.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.22)' : 'rgba(224,90,90,0.10)';
-        c.fillRect(z.x * px, z.y * px, z.w * px, z.h * px);
-      }
-      c.textAlign = 'center';
-      c.font = 'bold 11px Tahoma, Verdana, sans-serif';
-      for (const z of map.zones) {
-        if (z.kind !== 'safe') continue;
-        const tx = (z.x + z.w / 2) * px;
-        const ty = z.y * px - 3;
-        c.lineWidth = 3;
-        c.strokeStyle = '#000';
-        c.strokeText(z.name, tx, ty);
-        c.fillStyle = '#f0d890';
-        c.fillText(z.name, tx, ty);
-      }
-      G.worldBase = b;
-    }
-    const ctx = cv.getContext('2d');
-    ctx.drawImage(G.worldBase, 0, 0);
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 8px Tahoma, Verdana, sans-serif';
-    const kinds = new Map(WORLD_KINDS.map((k) => [k.id, k]));
-    for (const p of worldPoints()) {
-      if (worldHidden.has(p.k)) continue;
-      const k = kinds.get(p.k);
-      const cx = p.x * px + px / 2;
-      const cy = p.y * px + px / 2;
-      const natural = p.k === 'tree' || p.k === 'rock' || p.k === 'fish' || p.k === 'warren';
-      if (natural) {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(cx - 3, cy - 3, 6, 6);
-        ctx.fillStyle = k.color;
-        ctx.fillRect(cx - 2, cy - 2, 4, 4);
-      } else {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(cx - 5, cy - 5, 10, 10);
-        ctx.fillStyle = k.color;
-        ctx.fillRect(cx - 4, cy - 4, 8, 8);
-        ctx.fillStyle = '#17112a';
-        ctx.fillText(p.k === 'quest' ? p.mark : k.badge, cx, cy + 3);
+    if (reset || !WV.placed) {
+      WV.placed = true;
+      WV.hl = null;
+      if (me) wvCenter(me.x + 0.5, me.y + 0.5, Math.max(3, WV.w / G.map.width));
+      else {
+        WV.s = wvMinScale();
+        wvClamp();
       }
     }
-    if (me) {
-      const cx = Math.round(me.x) * px + px / 2;
-      const cy = Math.round(me.y) * px + px / 2;
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#e6b34a';
-      ctx.beginPath();
-      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-      ctx.fill();
-      if (force) {
-        const sc = $('world-scroll');
-        sc.scrollTop = Math.max(0, cy - sc.clientHeight / 2);
-      }
-    }
+    wvRegions();
+    wvDraw();
     const legend = $('world-legend');
     if (!legend.childElementCount) {
       for (const k of WORLD_KINDS) {
@@ -4377,6 +4689,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           if (worldHidden.has(k.id)) worldHidden.delete(k.id);
           else worldHidden.add(k.id);
           b.classList.toggle('off', worldHidden.has(k.id));
+          WV.hover = null;
           renderWorld(true);
         });
         legend.appendChild(b);
@@ -6369,7 +6682,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       el.style.maxHeight = '';
       return;
     }
-    if (el.id === 'panel-journal' || el.id === 'panel-skills' || el.id === 'panel-trades') {
+    if (el.id === 'panel-journal' || el.id === 'panel-skills' || el.id === 'panel-trades' || el.id === 'panel-world') {
       // The journal always sits in the middle of the screen (CSS), never docked, moved or resized.
       for (const p of ['left', 'right', 'top', 'bottom', 'width', 'height', 'maxHeight']) el.style[p] = '';
       return;
@@ -6479,7 +6792,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       // Windows are not remembered: each one opens in the dock again after it was closed.
       const bar = el.querySelector('h2');
       if (!bar) continue;
-      if (p === 'panel-journal' || p === 'panel-shop' || p === 'panel-skills' || p === 'panel-trades') continue; // fixed in the middle of the screen
+      if (p === 'panel-journal' || p === 'panel-shop' || p === 'panel-skills' || p === 'panel-trades' || p === 'panel-world') continue; // fixed in the middle of the screen
       bar.classList.add('grip');
       dragBox(el, bar);
     }
