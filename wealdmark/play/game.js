@@ -4923,6 +4923,72 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     renderTrades();
   }
 
+  /** Line icons, 24x24, drawn in the current colour. Used by the Trades, Skills and affinity screens. */
+  const ICON_PATHS = {
+    bolt: 'M13 3v7h6l-8 11v-7H5z',
+    shield: 'M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z',
+    shieldcheck: 'M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6zM9 12l2 2 4-4',
+    sword: 'M14.5 17.5L3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2',
+    diamond: 'M12 3l8 9-8 9-8-9z',
+    back: 'M9 14L4 9l5-5M4 9h11a5 5 0 010 10h-3',
+    eye: 'M2 12c3-6 17-6 20 0-3 6-17 6-20 0zM12 10a2 2 0 100 4 2 2 0 000-4z',
+    flame: 'M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z',
+    heart: 'M12 20s-8-5-8-11a4.5 4.5 0 018-2 4.5 4.5 0 018 2c0 6-8 11-8 11z',
+    brain: 'M9 5a3 3 0 00-3 3 3 3 0 00-2 3 3 3 0 002 3 3 3 0 003 4 3 3 0 003-2V7a3 3 0 00-3-2zM15 5a3 3 0 013 3 3 3 0 012 3 3 3 0 01-2 3 3 3 0 01-3 4 3 3 0 01-3-2',
+    boot: 'M8 4v9l-4 4v3h14v-3l-6-2V4z',
+    star: 'M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z',
+    barbell: 'M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12',
+    tree: 'M12 3l6 8h-4l5 7H5l5-7H6zM12 18v3',
+    pick: 'M4 20l9-9M6 8c4-4 10-4 14 0-5-1-8 0-10 3z',
+    fish: 'M3 12c4-6 11-6 15 0-4 6-11 6-15 0zM18 12l3-3v6z',
+    bow: 'M5 4c8 2 8 14 0 16M5 4v16M5 12h15M17 9l3 3-3 3',
+    pot: 'M5 10h14v8a2 2 0 01-2 2H7a2 2 0 01-2-2zM3 10h18M9 5c0 1 1 1 1 3M14 5c0 1 1 1 1 3',
+    needle: 'M4 20L19 5M16 4l4 4M6 18l-2 2',
+    anvil: 'M4 8h16l-3 4h-4v4h4v3H7v-3h4v-4H7z',
+  };
+  function icon(name, size) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const s = document.createElementNS(ns, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', String(size || 24));
+    s.setAttribute('height', String(size || 24));
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '2');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', ICON_PATHS[name] || ICON_PATHS.star);
+    s.appendChild(p);
+    return s;
+  }
+  const TRADE_ICON = { forestry: 'tree', mining: 'pick', fishing: 'fish', hunting: 'bow', smithing: 'anvil', cooking: 'pot', crafting: 'needle' };
+  const AFF_ICON = { might: 'barbell', agility: 'boot', intellect: 'brain', vitality: 'heart', spirit: 'star' };
+  const AFF_COLOR = { might: '#e66', agility: '#6c6', intellect: '#5ae', vitality: '#e94', spirit: '#b7e' };
+  /** Passives have no hotbar icon, so they get a line icon; every other skill reuses its hotbar icon. */
+  const PASSIVE_ICON = { weapon_mastery: 'sword', marksman: 'eye', arcane_mind: 'brain', toughness: 'heart', regeneration: 'heart', meditation: 'star', battle_hardened: 'diamond', quickness: 'bolt', focus: 'eye', fleet_footed: 'boot', resistance: 'shield', spell_mastery: 'star', thorns: 'back', shield_mastery: 'shieldcheck', elemental_attunement: 'flame' };
+  function skillIcon(id, size) {
+    if (ABILITY_ICON[id]) {
+      const img = document.createElement('img');
+      img.src = abilityIcon(id);
+      img.width = size;
+      img.height = size;
+      img.alt = '';
+      return img;
+    }
+    return icon(PASSIVE_ICON[id] || 'star', size);
+  }
+  let tradeSel = null;
+
+  /** What a trade unlocks, level by level: gathering nodes for the four gathering trades, recipes for the three crafts. */
+  function tradeGuide(id) {
+    const rows = [];
+    const name = (i) => (G.data.items.get(i) || { name: pretty(i) }).name;
+    for (const n of G.data.nodes.values()) if (n.skill === id) rows.push([n.level, n.name, name(n.yields)]);
+    for (const r of G.data.recipes.values()) if (r.skill === id) rows.push([r.level, name(r.output.item), (G.data.stations.get(r.station) || { name: '' }).name]);
+    return rows.sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1]));
+  }
+
   /** The Trades window: a grid of skill tiles with level and progress, and the total at the end. */
   const TRADE_COLOR = { forestry: '#7fc46a', mining: '#b0b8c8', fishing: '#5aa8e0', hunting: '#e08a5a', smithing: '#e0b84a', cooking: '#e06a6a', crafting: '#b07ae0' };
   function renderTrades() {
@@ -4942,12 +5008,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const tile = el('div', 'trade-tile');
       tile.style.setProperty('--tc', TRADE_COLOR[id] || '#aaa');
       const top = el('div', 'tt-top');
-      top.append(el('span', 'tt-tag', SKILL_LABEL[id].slice(0, 2)), el('b', 'tt-lv', String(e.level)));
+      const ic = el('span', 'tt-ic');
+      ic.appendChild(icon(TRADE_ICON[id], 28));
+      top.append(ic, el('b', 'tt-lv', String(e.level)));
       const bar = el('div', 'trade-bar');
       const fill = document.createElement('div');
       fill.style.width = cap ? '100%' : `${Math.max(0, Math.min(100, ((e.xp - cur) / (next - cur)) * 100))}%`;
       bar.appendChild(fill);
       tile.append(top, el('div', 'tt-name', SKILL_LABEL[id]), bar);
+      tile.classList.toggle('sel', tradeSel === id);
+      tile.onclick = () => {
+        tradeSel = id;
+        renderTrades();
+      };
       tile.title = cap ? `${SKILL_LABEL[id]}, level ${e.level} (max). ${e.xp} XP.` : `${SKILL_LABEL[id]}, level ${e.level}. ${e.xp - cur} / ${next - cur} XP to level ${e.level + 1}.`;
       grid.appendChild(tile);
     }
@@ -4955,12 +5028,65 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     sum.append(el('div', 'tt-name', 'Total level'), el('b', 'tt-lv', `${total} / ${ids.length * WORK_CAP}`));
     grid.appendChild(sum);
     box.appendChild(grid);
+    const gd = $('trades-guide');
+    gd.textContent = '';
+    const pickT = tradeSel && SKILL_LABEL[tradeSel] ? tradeSel : null;
+    if (!pickT) gd.appendChild(el('p', 'muted', 'Pick a trade to see what each level unlocks.'));
+    else {
+      const lvl = (s.skills[pickT] || { level: 1 }).level;
+      gd.appendChild(el('div', 'tg-head', `${SKILL_LABEL[pickT]} guide`));
+      for (const [lv, name, extra] of tradeGuide(pickT)) {
+        const row = el('div', 'tg-row' + (lvl >= lv ? ' ok' : ''));
+        row.append(el('b', 'tg-lv', `Lv ${lv}`), el('span', 'tg-name', name), el('span', 'tg-extra', extra));
+        gd.appendChild(row);
+      }
+    }
   }
 
   /** Mirrors levelNeeded, affinityNeeded and rankCost in the shared trees module. */
   const rankLevel = (sk, r) => ROW_LEVELS[sk.row] + 2 * (r - 1);
   const rankAffinity = (sk, r) => 2 * sk.row + 2 + 2 * (r - 1);
   const rankPrice = (sk, r) => ({ bits: 30 * r * (sk.row + 1), bars: r + sk.row });
+
+  /** Lines from each skill up to the skills that need it, so the grid reads as branches growing from the bottom. */
+  function drawBranches(grid, nodeEls) {
+    const draw = () => {
+      const old = grid.querySelector('svg.branches');
+      if (old) old.remove();
+      const gr = grid.getBoundingClientRect();
+      if (!gr.width || !grid.offsetWidth) return;
+      const z = gr.width / grid.offsetWidth;
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('class', 'branches');
+      svg.setAttribute('width', String(grid.offsetWidth));
+      svg.setAttribute('height', String(grid.offsetHeight));
+      for (const { b, sk } of nodeEls.values()) {
+        for (const need of sk.needs) {
+          const p = nodeEls.get(need);
+          if (!p) continue;
+          const a = p.b.getBoundingClientRect();
+          const c = b.getBoundingClientRect();
+          const x1 = (a.left + a.width / 2 - gr.left) / z;
+          const y1 = (a.top - gr.top) / z;
+          const x2 = (c.left + c.width / 2 - gr.left) / z;
+          const y2 = (c.bottom - gr.top) / z;
+          const my = (y1 + y2) / 2;
+          const path = document.createElementNS(ns, 'path');
+          path.setAttribute('d', `M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}`);
+          path.setAttribute('class', p.ranked ? 'on' : '');
+          svg.appendChild(path);
+        }
+      }
+      grid.prepend(svg);
+    };
+    grid._redraw = draw;
+    if (!grid._ro) {
+      grid._ro = new ResizeObserver(() => grid._redraw && grid._redraw());
+      grid._ro.observe(grid);
+    }
+    requestAnimationFrame(draw);
+  }
 
   /** The skill screen: five affinities to put points in, four tabs, a three-wide grid and the details of the skill picked. */
   function renderTree() {
@@ -4988,7 +5114,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (G.fight) return toast("You can't change skills in a fight.");
         window.wealdmark.send({ t: 'affinity', stat: id });
       };
-      cell.append(el('span', 'aff-name', label), el('b', 'aff-val', String(aff[id] || 0)), add);
+      const aic = el('span', 'aff-ic');
+      aic.style.color = AFF_COLOR[id] || '#ddd';
+      aic.appendChild(icon(AFF_ICON[id], 24));
+      cell.append(aic, el('span', 'aff-name', label), el('b', 'aff-val', String(aff[id] || 0)), add);
       bar.appendChild(cell);
     }
 
@@ -5034,7 +5163,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
     const grid = $('tree-grid');
     grid.textContent = '';
-    for (let row = 0; row < 6; row++) {
+    const nodeEls = new Map();
+    for (let row = 5; row >= 0; row--) {
       for (let col = 0; col < 3; col++) {
         const sk = trees.find((t) => t.tree === treeTab && t.row === row && t.col === col);
         if (!sk) {
@@ -5046,7 +5176,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'node' + (sk.passive ? ' passive' : '') + (c.rank > 0 ? ' ranked' : '') + (!c.fail ? ' ready' : '') + (blocked ? ' locked' : '') + (treeSel === sk.id ? ' sel' : '');
-        b.append(el('span', '', sk.name), el('b', '', sk.planned ? 'soon' : `${c.rank}/10`));
+        const nic = el('span', 'node-ic');
+        nic.appendChild(skillIcon(sk.id, 28));
+        b.append(nic, el('span', 'node-name', sk.name), el('b', '', sk.planned ? 'soon' : `${c.rank}/10`));
+        nodeEls.set(sk.id, { b, ranked: c.rank > 0, sk });
         b.title = `${sk.name}${sk.passive ? ' (passive)' : ''}\n${sk.blurb}`;
         b.onclick = () => {
           treeSel = sk.id;
@@ -5056,6 +5189,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         grid.appendChild(b);
       }
     }
+
+    drawBranches(grid, nodeEls);
 
     const box = $('tree-detail');
     box.textContent = '';
@@ -6234,6 +6369,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       el.style.maxHeight = '';
       return;
     }
+    if (el.id === 'panel-journal' || el.id === 'panel-skills' || el.id === 'panel-trades') {
+      // The journal always sits in the middle of the screen (CSS), never docked, moved or resized.
+      for (const p of ['left', 'right', 'top', 'bottom', 'width', 'height', 'maxHeight']) el.style[p] = '';
+      return;
+    }
     // Every window opens in the dock: as wide as the menu, on its right edge, from under the map down to just above the
     // menu. A later window takes the column to the left of the one before. Closing and reopening starts over from here.
     for (const p of ['left', 'right', 'top', 'bottom', 'width', 'height', 'maxHeight']) el.style[p] = '';
@@ -6258,6 +6398,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     el.style.top = px((topPx - pr.top + gap) / zw);
     el.style.height = px(Math.max(160, (bottomPx - topPx - gap) / zw));
     el.style.maxHeight = 'none';
+    // The bag is only as tall as its grid, so no empty space sits under the tool belt.
+    if (el.id === 'panel-bag') {
+      el.style.height = 'auto';
+      el.style.maxHeight = px(Math.max(160, (bottomPx - topPx - gap) / zw));
+    }
   }
 
   function raise(el) {
@@ -6334,6 +6479,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       // Windows are not remembered: each one opens in the dock again after it was closed.
       const bar = el.querySelector('h2');
       if (!bar) continue;
+      if (p === 'panel-journal' || p === 'panel-shop' || p === 'panel-skills' || p === 'panel-trades') continue; // fixed in the middle of the screen
       bar.classList.add('grip');
       dragBox(el, bar);
     }
@@ -6557,45 +6703,37 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       row.title = itemTip({ id: e.item, qty: 1 });
       if ((w[e.cur] || 0) < e.price) row.classList.add('poor');
       row.append(iconCanvas(def), el('span', 'name', def.name), price(e.price, e.cur));
-      if (G.shopSel === e.item) row.classList.add('sel');
-      row.addEventListener('click', () => {
-        G.shopSel = e.item;
-        renderShop();
-      });
-      box.appendChild(row);
+      const qk = `buy:${e.item}`;
+      const line = qtyLine(row, qk, 99);
+      row.addEventListener('click', () => askBuy(e, def, qtyOf(qk, 99)));
+      box.appendChild(line);
     }
-    const picked = shop.stock.find((e) => e.item === G.shopSel);
-    if (picked && G.data.items.get(picked.item)) {
-      const pdef = G.data.items.get(picked.item);
-      const bar = el('div', '');
-      bar.id = 'shop-buy';
-      bar.appendChild(el('p', 'buy-title', `${pdef.name}: how many?`));
-      const line = el('div', 'buy-row');
-      for (const n of [1, 5, 10]) {
-        const b = el('button', 'act', `Buy ${n}`);
-        b.type = 'button';
-        b.addEventListener('click', () => askBuy(picked, pdef, n));
-        line.appendChild(b);
-      }
-      const amount = el('input');
-      amount.type = 'number';
-      amount.min = '1';
-      amount.max = '99';
-      amount.value = String(G.shopX || 1);
-      amount.setAttribute('aria-label', 'Amount');
-      amount.addEventListener('input', () => (G.shopX = amount.value));
-      const bx = el('button', 'act', 'Buy X');
-      bx.type = 'button';
-      bx.addEventListener('click', () => {
-        const n = Math.floor(Number(amount.value));
-        if (!Number.isFinite(n) || n < 1 || n > 99) return toast('Choose an amount from 1 to 99.');
-        askBuy(picked, pdef, n);
+    box.appendChild(el('p', 'muted', 'Pick an amount with - and +, then click the item to buy it.'));
+  }
+
+  /** Per-row amounts for the shop windows. */
+  function qtyOf(key, max) {
+    G.shopQty = G.shopQty || new Map();
+    return Math.max(1, Math.min(max, G.shopQty.get(key) || 1));
+  }
+
+  /** Wraps an item row with a - amount + stepper beside it. */
+  function qtyLine(row, key, max) {
+    const line = el('div', 'shop-line');
+    const amt = el('span', 'qty-n', String(qtyOf(key, max)));
+    const step = (d, label) => {
+      const b = el('button', 'qty-b', label);
+      b.type = 'button';
+      b.setAttribute('aria-label', d < 0 ? 'Decrease amount' : 'Increase amount');
+      b.addEventListener('click', () => {
+        G.shopQty.set(key, Math.max(1, Math.min(max, qtyOf(key, max) + d)));
+        amt.textContent = String(qtyOf(key, max));
+        play('click');
       });
-      line.append(amount, bx);
-      bar.appendChild(line);
-      box.appendChild(bar);
-    }
-    box.appendChild(el('p', 'muted', 'Click an item to choose how many to buy.'));
+      return b;
+    };
+    line.append(row, step(-1, '-'), amt, step(1, '+'));
+    return line;
   }
 
   function renderShopSell(box) {
@@ -6611,12 +6749,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         row.type = 'button';
         row.title = itemTip(ref);
         row.append(iconCanvas(def), el('span', 'name', `${itemName(ref)}${ref.qty > 1 ? ` x${ref.qty}` : ''}`), price(each, 'iron_bits'));
-        row.addEventListener('click', (ev) => window.wealdmark.send({ t: 'sell', slot: i, qty: ev.shiftKey ? ref.qty : 1 }));
-        box.appendChild(row);
+        const qk = `sell:${ref.id}:${i}`;
+        const line = qtyLine(row, qk, ref.qty);
+        row.addEventListener('click', (ev) => window.wealdmark.send({ t: 'sell', slot: i, qty: ev.shiftKey ? ref.qty : qtyOf(qk, ref.qty) }));
+        box.appendChild(line);
       });
     }
     if (!any) box.appendChild(el('p', 'muted', 'Nothing in your bag sells here.'));
-    box.appendChild(el('p', 'muted', 'Click an item to sell one. Shift-click sells the whole stack.'));
+    box.appendChild(el('p', 'muted', 'Pick an amount with - and +, then click the item to sell. Shift-click sells the whole stack.'));
   }
 
   function closeBuyConfirm() {
@@ -6916,15 +7056,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.fillRect(bx - 2, by - 2, w + 4, h + 4);
     ctx.fillStyle = '#6a9a4a';
     ctx.fillRect(bx, by, Math.round(w * frac), h);
-    // The name sits inside the bar so the whole thing is one rectangle that fits under any roof line.
+    // The action (Chopping, Mining, Fishing, Trapping) sits inside the bar so the whole thing is one rectangle that fits under any roof line.
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#000';
-    ctx.strokeText(def.name, bx + w / 2, by + h / 2 + 1);
+    const act = { tree: 'Chopping', rock: 'Mining', fish: 'Fishing', warren: 'Trapping' }[def.art] || def.name;
+    ctx.strokeText(act, bx + w / 2, by + h / 2 + 1);
     ctx.fillStyle = '#fff';
-    ctx.fillText(def.name, bx + w / 2, by + h / 2 + 1);
+    ctx.fillText(act, bx + w / 2, by + h / 2 + 1);
   }
 
   function onBusy(msg) {
@@ -9127,6 +9268,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     });
     on($('btn-trades'), 'click', () => togglePanel('panel-trades'));
     on($('btn-store'), 'click', () => togglePanel('panel-store'));
+    on($('btn-sort'), 'click', () => (G.fight ? toast("You can't sort your bag in a fight.") : window.wealdmark.send({ t: 'sort' })));
     on($('btn-belt'), 'click', () => togglePanel('panel-belt'));
     on($('qt-min'), 'click', () => {
       try {

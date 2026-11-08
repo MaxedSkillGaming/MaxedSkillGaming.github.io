@@ -1056,9 +1056,9 @@ button.qtrack.on { background: #2f6b3a; }
   pointer-events: none;
   z-index: 5;
 }
-#vitals, #tframe { width: 224px; height: 96px; justify-content: space-between; }
+#vitals, #tframe { width: 204px; height: 88px; justify-content: space-between; }
 #vitals { left: max(10px, calc(8px / var(--ui, 1))); }
-#tframe { left: calc(max(10px, calc(8px / var(--ui, 1))) + 224px + 8px); }
+#tframe { left: calc(max(10px, calc(8px / var(--ui, 1))) + 204px + 8px); }
 #tframe.hidden { display: none; }
 #vitals .meter.pxp { display: block; margin: 0; height: 4px; border-width: 1px; }
 #vitals .meter.pxp .meter-fill { background: #d8b040; }
@@ -1217,4 +1217,81 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
 #mp-zone { color: var(--trim-hi); }
 #mp-map { color: #a898d0; }
 /* The pinned journal takes the spot the location tag used to hold, top left under the vitals. */
-#qtrack { top: calc((max(10px, calc(8px / var(--ui, 1))) + 84px) / var(--wz, 1)); left: calc(max(10px, calc(8px / var(--ui, 1))) / var(--wz, 1)); }
+#qtrack { top: calc(((max(10px, calc(8px / var(--ui, 1))) + 88px) * var(--ui, 1) + 8px) / var(--wz, 1)); left: calc(max(10px, calc(8px / var(--ui, 1))) * var(--ui, 1) / var(--wz, 1)); }
+
+/* Bottom HUD text size: window buttons, slot hotkeys and the Swap plate were too small to read. */
+.wide-hud #toolbar button { height: 36px; font-size: 14px; }
+.wide-hud #menu-list, .wide-hud #menu-list.hidden { gap: 4px; padding: 4px; }
+.bslot .hk, .qslot .hk, .sslot .hk { font-size: 13px; line-height: 14px; }
+.qslot, .sslot { font-size: 13px; }
+
+/* Shop rows: item button plus a - amount + stepper. */
+.shop-line { display: flex; align-items: stretch; gap: 4px; margin-bottom: 4px; }
+.shop-line > .row-item { flex: 1; min-width: 0; margin: 0; }
+.shop-line .qty-b { margin: 0; width: 28px; min-width: 28px; min-height: 28px; padding: 0; font-size: 16px; line-height: 1; }
+.shop-line .qty-n { min-width: 24px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink); }
+.wide-hud.narrow-hud #toolbar button { font-size: 14px; }
+
+/* Journal and shop: always centered, never resized or moved. The dialog is already fixed in the middle. */
+@media (pointer: fine) and (min-width: 761px) {
+  #panel-journal { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 340px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); resize: none; }
+  #toolbar button { font-size: 14px !important; }
+}
+/* Pinned journal, top left: a little larger. */
+#qtrack { width: 240px; font-size: 14px; }
+#qtrack .qt-title { font-size: 15px; }
+#qtrack .qt-head button { font-size: 13px; }
+
+/* Hotbar fills more of the gap between the chat and the window buttons on wide screens. */
+@media (pointer: fine) and (min-width: 1100px) { #bhud { --slot: 44px; } }
+@media (pointer: fine) and (min-width: 1500px) { #bhud { --slot: 52px; } }
+@media (pointer: fine) and (min-width: 2200px) { #bhud { --slot: 60px; } }
+@media (pointer: fine) and (min-width: 1100px) {
+  #bhud .bslot { width: var(--slot); max-width: var(--slot); height: var(--slot); }
+  #hotbar { gap: 6px; }
+}
+
+/* Tool belt button: a clear gold-trimmed bar under the bag grid. */
+#panel-bag #btn-belt { min-height: 40px; margin-top: 10px; padding: 0 12px; font-size: 15px; justify-content: center; color: var(--gold); border-color: var(--gold); background: #3a2d63; }
+#btn-belt .ico.belt { width: 20px; height: 20px; }
+#btn-belt:hover:not(:disabled) { background: #4a3a7a; }
+
+/* Click menu on trees, rocks and spots: toned down. */
+#node-menu { gap: 2px; padding: 3px; }
+#node-menu .act { margin: 0; padding: 3px 10px; min-height: 24px; font-size: 13px; line-height: 16px; }
+
+/* Skills and Trades: fixed in the middle of the screen, never docked, moved or resized. */
+#tree-grid { position: relative; }
+#tree-grid svg.branches { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 0; }
+#tree-grid svg.branches path { fill: none; stroke: #3a2f63; stroke-width: 3; }
+#tree-grid svg.branches path.on { stroke: var(--gold); }
+#tree-grid button.node { position: relative; z-index: 1; gap: 2px; }
+#tree-grid button.node .node-ic { display: flex; align-items: center; justify-content: center; color: var(--gold); line-height: 0; }
+#tree-grid button.node.locked .node-ic { color: #8a80b0; }
+#tree-grid button.node .node-name { font-size: 11px; line-height: 12px; }
+#aff-bar .aff-ic { display: flex; line-height: 0; }
+.trade-tile { cursor: pointer; }
+.trade-tile .tt-ic { display: flex; line-height: 0; color: var(--tc, #aaa); }
+.trade-tile.sel { border-color: var(--gold); }
+.trade-tile .tt-name { font-size: 12px; color: var(--text, #eee); }
+#trades-guide { margin-top: 8px; border: 2px solid var(--hud-line, #4a3a8a); background: rgba(0, 0, 0, 0.28); padding: 4px 8px; }
+#trades-guide .tg-head { color: var(--gold); font-size: 13px; margin-bottom: 4px; }
+#trades-guide .tg-row { display: flex; gap: 8px; font-size: 12px; line-height: 16px; padding: 2px 0; border-top: 1px solid #2a2150; color: var(--muted); }
+#trades-guide .tg-row.ok { color: var(--text, #eee); }
+#trades-guide .tg-lv { width: 44px; flex: none; color: var(--gold); font-weight: normal; }
+#trades-guide .tg-name { flex: 1; min-width: 0; }
+#trades-guide .tg-extra { color: var(--muted); }
+@media (pointer: fine) and (min-width: 761px) {
+  #panel-trades { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 520px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); resize: none; overflow-y: auto; }
+  #panel-skills { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 640px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); resize: none; overflow-y: auto; }
+  #tree-grid { grid-template-rows: repeat(6, 60px); gap: 12px 24px; padding: 0; }
+  #tree-grid button.node { min-height: 0; }
+}
+
+.bag-btns { display: flex; gap: 8px; margin-top: 10px; }
+.bag-btns button { flex: 1; margin: 0; }
+#panel-bag #btn-sort { min-height: 40px; margin-top: 0; padding: 0 12px; font-size: 15px; justify-content: center; color: var(--gold); border-color: var(--gold); background: #3a2d63; }
+#panel-bag .bag-btns #btn-belt { margin-top: 0; }
+#btn-sort:hover:not(:disabled) { background: #4a3a7a; }
+#panel-bag .bag-btns button { white-space: nowrap; padding-left: 8px; padding-right: 8px; font-size: 14px; }
+#panel-bag .bag-btns button { flex: 1 1 0; min-width: 0; }
