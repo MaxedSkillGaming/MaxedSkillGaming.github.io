@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://therapeutic-conditioning-techrepublic-directed.trycloudflare.com",
-  "authUrl": "https://recommends-implementing-threats-purple.trycloudflare.com",
+  "server": "wss://pierre-redhead-ala-local.trycloudflare.com",
+  "authUrl": "https://beats-plymouth-acting-offline.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 404825,
-      "sha256": "231254c6cdcb1927ee3204ddedf1f558f1b374397a80b361f17008bb2236aa25",
-      "url": "c/231254c6cdcb1927ee3204ddedf1f558f1b374397a80b361f17008bb2236aa25"
+      "size": 404841,
+      "sha256": "6b4cfba4ca82879ec26e6104477e9b5a868dc6d8b5a8ad413aafb4ff581623bc",
+      "url": "c/6b4cfba4ca82879ec26e6104477e9b5a868dc6d8b5a8ad413aafb4ff581623bc"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -132,5 +132,5 @@
       "url": "c/7be076216475ce854ef0f19ee76222bd5db86647765246daa74504df53eb8a8a"
     }
   ],
-  "signature": "0m2mwLAeSxGNBXYV6k0/1RgjvreSheF8VIs3uK4/3ArzHvHFLgAdyjG5Yn9KJevtblPwlpM/s0I041+2oiStBw=="
+  "signature": "ay6pcqyd+/Xw6mJp1tlLELC0y+vF3s8u1tCOCMWOUJ73I4XdVX1mhBn3XAEDeZjVpQAtGQd4TaJzm12BQnU0Bw=="
 }
