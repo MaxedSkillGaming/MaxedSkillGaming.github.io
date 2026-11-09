@@ -3142,7 +3142,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           }
           floater(ev.target, ev.crit ? `${ev.damage}!` : String(ev.damage), ev.target === G.selfId ? '#ff7a7a' : ev.crit ? '#ffb347' : '#ffe066', Boolean(ev.crit));
           if (ev.crit) shake(ev.target === G.selfId ? 3 : 2, 220);
-          else if (tt && tt.boss) shake(1.5, 160);
+          else if (tt && isBossActor(tt)) shake(1.5, 160);
         };
         if (src && src.lunge) setTimeout(landed, 170);
         else landed();
@@ -3240,7 +3240,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (ev.actor === G.selfId) play('death');
         else {
           burst(ev.actor, '#ffd86a');
-          shake(a && a.boss ? 4 : 2, 260);
+          shake(a && isBossActor(a) ? 4 : 2, 260);
           play('kill');
         }
         break;
