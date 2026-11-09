@@ -20,7 +20,7 @@
   const spanOf = (rounds) => (G && G.fight && G.fight.rt ? `${Math.max(1, Math.round((rounds * RT_ROUND_MS) / 1000))} seconds` : `${rounds} rounds`);
   const spanNum = (rounds) => (G && G.fight && G.fight.rt ? Math.max(1, Math.round((rounds * RT_ROUND_MS) / 1000)) : rounds);
   const MAX_LEVEL = 100;
-  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-store', 'panel-belt', 'panel-party', 'panel-merc', 'panel-dungeon'];
+  const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-tasks', 'panel-store', 'panel-belt', 'panel-party', 'panel-merc', 'panel-dungeon'];
   /** Iron bits each hero pays to enter a dungeon run. Matches the server's default. */
   const DUNGEON_FEE = 25;
   const TOWN_PANELS = ['dialog', 'panel-shop', 'panel-storage', 'panel-station', 'panel-perks', 'panel-anchor'];
@@ -2731,7 +2731,24 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
   }
 
-  const play = (name) => window.wealdmarkAudio && window.wealdmarkAudio.play(name);
+  const play = (name, arg) => window.wealdmarkAudio && window.wealdmarkAudio.play(name, arg);
+  const reducedMotion = () => Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // Short screen shake and kill bursts. Crits, kills and boss hits only, so normal hits stay quiet.
+  function shake(amp, dur) {
+    if (reducedMotion()) return;
+    G.shake = { t0: performance.now(), amp, dur };
+  }
+  function burst(id, color) {
+    if (reducedMotion() || !G.fight) return;
+    const a = G.fight.actors.get(id);
+    if (!a) return;
+    const p = a.anim ? a.anim.from : a.pos;
+    const n = 10;
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + Math.random() * 0.5;
+      G.bursts.push({ x: p.x, y: p.y, vx: Math.cos(ang) * (0.6 + Math.random() * 0.8), vy: Math.sin(ang) * (0.6 + Math.random() * 0.8) - 0.4, color, t0: performance.now() });
+    }
+  }
   const myCombat = () => (G.stats ? G.stats.combatLevel : 1);
 
   // ---- server messages
@@ -2834,6 +2851,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         return onStation(msg);
       case 'perks':
         return onPerks(msg);
+      case 'tasks':
+        G.tasks = msg;
+        return renderTasks();
       case 'anchors':
         G.anchors = msg.list;
         if (G.town && G.town.kind === 'anchor') renderAnchor();
@@ -3023,7 +3043,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       case 'ability':
         return 240;
       case 'hit':
-        return 420;
+        return ev.crit ? 520 : 420; // a crit holds the frame a beat longer
       case 'miss':
         return 330;
       case 'heal':
@@ -3048,11 +3068,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
   }
 
-  function floater(id, text, color) {
+  function floater(id, text, color, big) {
     const a = G.fight.actors.get(id);
     if (!a) return;
     const p = a.anim ? a.anim.from : a.pos;
-    G.floaters.push({ x: p.x, y: p.y, text, color, t0: performance.now() });
+    G.floaters.push({ x: p.x, y: p.y, text, color, big, t0: performance.now() });
   }
 
   function applyEvent(ev, now) {
@@ -3120,7 +3140,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
             tt.flash = at;
             if (src && src !== tt) tt.kick = { dir: dirToward(src.pos, tt.pos), t0: at };
           }
-          floater(ev.target, ev.crit ? `${ev.damage}!` : String(ev.damage), ev.target === G.selfId ? '#ff7a7a' : ev.crit ? '#ffb347' : '#ffe066');
+          floater(ev.target, ev.crit ? `${ev.damage}!` : String(ev.damage), ev.target === G.selfId ? '#ff7a7a' : ev.crit ? '#ffb347' : '#ffe066', Boolean(ev.crit));
+          if (ev.crit) shake(ev.target === G.selfId ? 3 : 2, 220);
+          else if (tt && tt.boss) shake(1.5, 160);
         };
         if (src && src.lunge) setTimeout(landed, 170);
         else landed();
@@ -3133,7 +3155,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           `${who(ev.source)} ${ev.source === G.selfId ? 'hit' : 'hits'} ${ev.target === G.selfId ? 'you' : lowerName(who(ev.target))} for ${ev.damage}${ev.crit ? ' (critical)' : ''}${ev.prevented > 0 ? `, ${ev.prevented} stopped` : ''}.`,
           ev.source === G.selfId ? 'mine' : 'bad',
         );
-        play(ev.source === G.selfId ? 'hit' : 'hurt');
+        if (ev.source === G.selfId) {
+          // consecutive hits by the hero raise the pitch a little, up to a cap
+          const nowMs = performance.now();
+          G.combo = nowMs - (G.comboAt || 0) < 2500 ? Math.min(6, (G.combo || 0) + 1) : 0;
+          G.comboAt = nowMs;
+          if (ev.crit) play('crit');
+          else play('hit', 1 + G.combo * 0.06);
+        } else play('hurt');
         break;
       }
       case 'miss':
@@ -3208,7 +3237,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const a = act(ev.actor);
         if (a) a.alive = false;
         addLog(ev.actor === G.selfId ? 'You fall.' : `${who(ev.actor)} falls.`, ev.actor === G.selfId ? 'bad' : 'mine');
-        play('death');
+        if (ev.actor === G.selfId) play('death');
+        else {
+          burst(ev.actor, '#ffd86a');
+          shake(a && a.boss ? 4 : 2, 260);
+          play('kill');
+        }
         break;
       }
       case 'flee':
@@ -5365,6 +5399,109 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
   }
 
+  // ---- Tasks and Bestiary
+  let tkTab = 'tasks';
+  let tkTier = 'easy';
+  let tkMon = null;
+  let tkTimer = 0;
+
+  function openTasks() {
+    togglePanel('panel-tasks');
+    clearInterval(tkTimer);
+    if ($('panel-tasks').classList.contains('hidden')) return;
+    window.wealdmark.send({ t: 'tasks' });
+    renderTasks();
+    tkTimer = setInterval(() => {
+      if ($('panel-tasks').classList.contains('hidden')) clearInterval(tkTimer);
+      else window.wealdmark.send({ t: 'tasks' });
+    }, 4000);
+  }
+
+  function monsterThumb(id, known) {
+    const c = document.createElement('canvas');
+    c.width = 56;
+    c.height = 56;
+    const cx = c.getContext('2d');
+    cx.imageSmoothingEnabled = false;
+    drawMonster(cx, id, 16, 16, 3, 0, 0);
+    if (!known) c.style.filter = 'brightness(0) opacity(0.55)';
+    return c;
+  }
+
+  function renderTasks() {
+    const box = $('tk-body');
+    if (!box) return;
+    for (const b of document.querySelectorAll('#tk-tabs button')) b.classList.toggle('on', b.dataset.tab === tkTab);
+    box.textContent = '';
+    const d = G && G.tasks;
+    if (!d) return void box.appendChild(el('p', 'muted', 'Loading...'));
+    if (tkTab === 'bestiary') return renderBestiary(box, d);
+    const tabs = el('div', 'tk-tiers');
+    for (const [id, label] of [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']]) {
+      const list = d.tasks.filter((t) => t.tier === id);
+      const b = el('button', 'tk-tier' + (tkTier === id ? ' on' : ''), id === 'hard' ? label : `${label} ${list.filter((t) => t.done).length}/${list.length}`);
+      b.type = 'button';
+      b.onclick = () => {
+        tkTier = id;
+        renderTasks();
+      };
+      tabs.appendChild(b);
+    }
+    box.appendChild(tabs);
+    const list = d.tasks.filter((t) => t.tier === tkTier);
+    if (!list.length) return void box.appendChild(el('p', 'muted', 'Hard tasks are coming later.'));
+    const done = list.filter((t) => t.done).length;
+    const head = el('div', 'tk-head');
+    const bar = el('div', 'trade-bar');
+    const fill = document.createElement('div');
+    fill.style.width = `${(done / list.length) * 100}%`;
+    bar.appendChild(fill);
+    head.append(el('b', '', `${done} / ${list.length} done`), bar);
+    box.appendChild(head);
+    const rows = el('div', 'tk-list');
+    for (const t of [...list].sort((a, b) => Number(a.done) - Number(b.done))) {
+      const row = el('div', 'tk-row' + (t.done ? ' done' : ''));
+      const txt = el('div', 'tk-txt');
+      txt.append(el('b', '', t.name), el('span', 'muted', t.desc));
+      const pb = el('div', 'trade-bar');
+      const pf = document.createElement('div');
+      pf.style.width = `${(t.have / t.goal) * 100}%`;
+      pb.appendChild(pf);
+      row.append(txt, pb, el('span', 'tk-num', t.done ? 'Done' : `${t.have}/${t.goal}`), el('span', 'tk-gold', `${t.gold} gold`));
+      rows.appendChild(row);
+    }
+    box.appendChild(rows);
+    box.appendChild(el('p', 'muted', `Finish every ${tkTier} task to earn the title "${d.titles[tkTier]}".`));
+  }
+
+  function renderBestiary(box, d) {
+    const seen = d.bestiary.filter((m) => m.kills > 0).length;
+    box.appendChild(el('div', 'tk-head', `Seen ${seen} / ${d.bestiary.length}`));
+    const grid = el('div', 'bs-grid');
+    for (const m of d.bestiary) {
+      const t = el('button', 'bs-tile' + (tkMon === m.id ? ' sel' : '') + (m.boss ? ' boss' : ''));
+      t.type = 'button';
+      t.title = m.name || 'Unknown';
+      t.appendChild(monsterThumb(m.id, m.kills > 0));
+      t.appendChild(el('span', 'bs-name', m.name || '???'));
+      t.onclick = () => {
+        tkMon = m.id;
+        renderTasks();
+      };
+      grid.appendChild(t);
+    }
+    box.appendChild(grid);
+    const m = d.bestiary.find((x) => x.id === tkMon);
+    const det = el('div', 'bs-detail');
+    if (!m) det.appendChild(el('p', 'muted', 'Pick a creature to see what you know about it.'));
+    else if (m.kills === 0) det.appendChild(el('p', 'muted', 'You have not beaten this creature yet.'));
+    else {
+      det.append(el('b', '', `${m.name}${m.boss ? ' (boss)' : ''}`), el('span', 'muted', `Level ${m.level}. Beaten ${m.kills} time${m.kills === 1 ? '' : 's'}.`));
+      det.appendChild(el('span', '', m.dropCount ? `Drops found: ${m.drops.length} / ${m.dropCount}${m.drops.length ? ': ' + m.drops.map((x) => x.name).join(', ') : ''}` : 'Drops: only iron coins.'));
+    }
+    box.appendChild(det);
+  }
+
   /** Mirrors levelNeeded, affinityNeeded and rankCost in the shared trees module. */
   const rankLevel = (sk, r) => ROW_LEVELS[sk.row] + 2 * (r - 1);
   const rankAffinity = (sk, r) => 2 * sk.row + 2 + 2 * (r - 1);
@@ -6692,7 +6829,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       el.style.maxHeight = '';
       return;
     }
-    if (el.id === 'panel-journal' || el.id === 'panel-skills' || el.id === 'panel-trades' || el.id === 'panel-world') {
+    if (el.id === 'panel-journal' || el.id === 'panel-skills' || el.id === 'panel-trades' || el.id === 'panel-tasks' || el.id === 'panel-world') {
       // The journal always sits in the middle of the screen (CSS), never docked, moved or resized.
       for (const p of ['left', 'right', 'top', 'bottom', 'width', 'height', 'maxHeight']) el.style[p] = '';
       return;
@@ -6802,7 +6939,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       // Windows are not remembered: each one opens in the dock again after it was closed.
       const bar = el.querySelector('h2');
       if (!bar) continue;
-      if (p === 'panel-journal' || p === 'panel-shop' || p === 'panel-skills' || p === 'panel-trades' || p === 'panel-world') continue; // fixed in the middle of the screen
+      if (p === 'panel-journal' || p === 'panel-shop' || p === 'panel-skills' || p === 'panel-trades' || p === 'panel-tasks' || p === 'panel-world') continue; // fixed in the middle of the screen
       bar.classList.add('grip');
       dragBox(el, bar);
     }
@@ -7999,8 +8136,19 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       cam.x = Math.max(0, Math.min(map.width - 1, cam.x + G.look.x));
       cam.y = Math.max(0, Math.min(map.height - 1, cam.y + G.look.y));
     }
-    const offX = Math.round(w / 2 - (cam.x * TILE + TILE / 2) * s);
-    const offY = Math.round(h / 2 - (cam.y * TILE + TILE / 2) * s);
+    let shX = 0;
+    let shY = 0;
+    if (G.shake) {
+      const k = (now - G.shake.t0) / G.shake.dur;
+      if (k >= 1) G.shake = null;
+      else {
+        const amp = G.shake.amp * s * (1 - k);
+        shX = Math.sin(now * 0.09) * amp;
+        shY = Math.cos(now * 0.13) * amp;
+      }
+    }
+    const offX = Math.round(w / 2 - (cam.x * TILE + TILE / 2) * s + shX);
+    const offY = Math.round(h / 2 - (cam.y * TILE + TILE / 2) * s + shY);
     // The button only shows once the hero has left the screen.
     const rc = $('recenter');
     if (rc) {
@@ -8335,9 +8483,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       ctx.fillRect(Math.round(nx - 2 * s), Math.round(ny - 2 * s), 2 * s, 2 * s);
     }
     G.floaters = G.floaters.filter((f) => now - f.t0 < 900);
-    ctx.font = `bold ${Math.max(10, 4 * s)}px Tahoma, Verdana, sans-serif`;
+    const baseFont = Math.max(10, 4 * s);
     for (const f of G.floaters) {
       const t = (now - f.t0) / 900;
+      // crits pop: start large, settle to 1.5x
+      const pop = f.big ? 1.5 + Math.max(0, 0.7 - t * 5) : 1;
+      ctx.font = `bold ${Math.round(baseFont * pop)}px Tahoma, Verdana, sans-serif`;
       ctx.globalAlpha = 1 - t * t;
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#000';
@@ -8346,6 +8497,15 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const fy = offY + f.y * px - 4 * s - t * 14 * s;
       ctx.strokeText(f.text, fx, fy);
       ctx.fillText(f.text, fx, fy);
+    }
+    G.bursts = G.bursts.filter((b) => now - b.t0 < 600);
+    for (const b of G.bursts) {
+      const t = (now - b.t0) / 600;
+      ctx.globalAlpha = 1 - t;
+      ctx.fillStyle = b.color;
+      const bx = offX + (b.x + 0.5 + b.vx * t * 0.9) * px;
+      const by = offY + (b.y + 0.5 + b.vy * t * 0.9 + t * t * 0.6) * px;
+      ctx.fillRect(Math.round(bx), Math.round(by), Math.max(2, 1.5 * s), Math.max(2, 1.5 * s));
     }
     ctx.globalAlpha = 1;
 
@@ -8660,6 +8820,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (k === 't') return goToTown();
     if (k === 'k') return togglePanel('panel-skills');
     if (k === 'v') return togglePanel('panel-trades');
+    if (k === 'y') return openTasks();
     if (k === 'j') {
       togglePanel('panel-journal');
       return renderJournal();
@@ -9553,6 +9714,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       inv: null,
       fight: null,
       floaters: [],
+      bursts: [],
+      shake: null,
+      combo: 0,
+      comboAt: 0,
       shots: [],
       modal: false,
       scale: 3,
@@ -9619,6 +9784,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (!ev.target.closest('#toolbar')) $('menu-list').classList.add('hidden');
     });
     on($('btn-trades'), 'click', () => togglePanel('panel-trades'));
+    on($('btn-tasks'), 'click', openTasks);
+    for (const b of document.querySelectorAll('#tk-tabs button')) {
+      on(b, 'click', () => {
+        tkTab = b.dataset.tab;
+        renderTasks();
+      });
+    }
     on($('btn-store'), 'click', () => togglePanel('panel-store'));
     on($('btn-sort'), 'click', () => (G.fight ? toast("You can't sort your bag in a fight.") : window.wealdmark.send({ t: 'sort' })));
     on($('btn-belt'), 'click', () => togglePanel('panel-belt'));

@@ -1336,3 +1336,51 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
 #btn-sort:hover:not(:disabled) { background: #4a3a7a; }
 #panel-bag .bag-btns button { white-space: nowrap; padding-left: 8px; padding-right: 8px; font-size: 14px; }
 #panel-bag .bag-btns button { flex: 1 1 0; min-width: 0; }
+
+/* Bottom row, one pass: chat, ability plate and window buttons share a bottom edge. The plate and the button block are both 88 units tall,
+   the plate stretches to fill the gap, and the buttons sit 4 units from it. Everything uses the UI scale so the heights always match. */
+@media (pointer: fine) and (min-width: 761px) {
+  .wide-hud #gameview > #toolbar { zoom: var(--ui, 1); left: auto; top: auto; right: max(8px, calc(8px / var(--ui, 1))); bottom: max(8px, calc(8px / var(--ui, 1))); width: 320px; height: 88px; box-sizing: border-box; padding: 0; }
+  .wide-hud #menu-list, .wide-hud #menu-list.hidden { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 4px; padding: 4px; height: 100%; box-sizing: border-box; }
+  .wide-hud #toolbar button { height: 100%; min-height: 0; padding: 0 4px; }
+  .wide-hud #toolbar .grp { height: 100%; min-width: 0; }
+  .wide-hud #bhud { --slot: 40px; left: calc(max(8px, calc(8px / var(--ui, 1))) + min(380px, calc(var(--vw, 100vw) * 0.34)) + 8px); right: calc(max(8px, calc(8px / var(--ui, 1))) + 324px); bottom: max(8px, calc(8px / var(--ui, 1))); height: 88px; justify-content: stretch; align-items: stretch; }
+  .wide-hud #hotcol { flex: 1 1 auto; display: flex; flex-direction: column; height: 88px; }
+  .wide-hud #hotcol .meter.xp { height: 10px; margin: 0 0 2px; flex: none; }
+  .wide-hud #hotcol .pbar.vit { height: 24px; flex: none; }
+  .wide-hud #hotrow { flex: 1 1 auto; justify-content: center; padding: 4px 8px; align-items: center; }
+  .wide-hud #hotrow { display: flex; grid-template-columns: none; grid-template-areas: none; row-gap: 0; gap: 8px; }
+  .wide-hud #hl, .wide-hud #hmid { align-items: center; grid-area: auto; justify-self: auto; }
+  .wide-hud #hotrow #side-r { grid-area: auto; justify-self: auto; }
+  .wide-hud #bhud { right: calc(max(8px, calc(8px / var(--ui, 1))) + 324px); }
+  /* The dialog rests above the row: 8 margin + 88 row + 12 gap, in UI units converted to the dialog's own zoom. */
+  #gameview > #dialog { bottom: calc(108px * var(--ui, 1) / var(--wz, 1)); width: min(880px, calc((var(--vw, 100vw) - 2 * (min(380px, calc(var(--vw, 100vw) * 0.34)) + 16px)) * var(--ui, 1) / var(--wz, 1))); }
+}
+/* Phone: the dialog rests above the ability plate (6 margin + 86 plate + 4 gap). */
+@media (pointer: coarse), (max-width: 760px) {
+  #dialog { bottom: 108px !important; max-height: calc(100% - 116px); }
+}
+
+/* Tasks and Bestiary */
+#tk-tabs { display: flex; gap: 4px; margin: 4px 0 8px; }
+#tk-tabs button { flex: 1; min-height: 28px; }
+#tk-tabs button.on, .tk-tier.on { color: var(--gold); border-color: var(--gold); background: #3a2d63; }
+.tk-tiers { display: flex; gap: 4px; margin-bottom: 8px; }
+.tk-tier { flex: 1; min-height: 28px; font-size: 12px; }
+.tk-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+.tk-head .trade-bar { flex: 1; }
+.tk-list { display: flex; flex-direction: column; gap: 4px; max-height: 340px; overflow-y: auto; }
+.tk-row { display: grid; grid-template-columns: 1fr 72px 48px 56px; gap: 8px; align-items: center; padding: 4px 8px; border: 1px solid #2a2150; background: #1b1538; font-size: 12px; }
+.tk-row.done { opacity: 0.6; }
+.tk-txt { display: flex; flex-direction: column; min-width: 0; }
+.tk-num { text-align: right; white-space: nowrap; }
+.tk-gold { color: var(--gold); text-align: right; white-space: nowrap; }
+.bs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 4px; max-height: 300px; overflow-y: auto; }
+.bs-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px; min-height: 80px; font-size: 11px; }
+.bs-tile.sel { border-color: var(--gold); }
+.bs-tile.boss { border-color: #7a4ea0; }
+.bs-name { white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.bs-detail { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; padding: 8px; border: 1px solid #2a2150; font-size: 12px; min-height: 64px; }
+@media (pointer: fine) and (min-width: 761px) {
+  #panel-tasks { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 560px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); resize: none; overflow-y: auto; }
+}

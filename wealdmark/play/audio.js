@@ -91,9 +91,20 @@
     click: () => tone({ freq: 660, to: 880, dur: 0.05, vol: 0.12 }),
     step: () => noise({ dur: 0.05, freq: 300 + Math.random() * 120, vol: 0.12 }),
     swing: () => noise({ dur: 0.09, freq: 2200, vol: 0.12, q: 0.4 }),
-    hit: () => {
-      noise({ dur: 0.1, freq: 500, vol: 0.35 });
-      tone({ freq: 220, to: 90, dur: 0.12, type: 'sawtooth', vol: 0.25 });
+    // pitch rises a little with each hit in a combo (1 = normal)
+    hit: (pitch = 1) => {
+      noise({ dur: 0.1, freq: 500 * pitch, vol: 0.35 });
+      tone({ freq: 220 * pitch, to: 90 * pitch, dur: 0.12, type: 'sawtooth', vol: 0.25 });
+    },
+    crit: () => {
+      noise({ dur: 0.14, freq: 900, vol: 0.4 });
+      tone({ freq: 330, to: 110, dur: 0.16, type: 'sawtooth', vol: 0.28 });
+      tone({ freq: 880, to: 1320, dur: 0.1, type: 'square', vol: 0.12, delay: 0.03 });
+    },
+    kill: () => {
+      noise({ dur: 0.2, freq: 700, vol: 0.35 });
+      tone({ freq: 440, to: 80, dur: 0.3, type: 'sawtooth', vol: 0.25 });
+      tone({ freq: 660, dur: 0.08, type: 'triangle', vol: 0.15, delay: 0.12 });
     },
     hurt: () => {
       noise({ dur: 0.12, freq: 380, vol: 0.35 });
@@ -116,6 +127,8 @@
     },
     level: () => {
       [523, 659, 784, 1047].forEach((f, i) => tone({ freq: f, dur: 0.18, type: 'square', vol: 0.2, delay: i * 0.11 }));
+      [1047, 1319, 1568].forEach((f) => tone({ freq: f, dur: 0.5, type: 'triangle', vol: 0.16, delay: 0.5 }));
+      tone({ freq: 523, to: 1047, dur: 0.4, type: 'sine', vol: 0.12, delay: 0.5 });
     },
     victory: () => {
       [392, 392, 392, 523].forEach((f, i) => tone({ freq: f, dur: 0.16, type: 'square', vol: 0.2, delay: i * 0.14 }));
@@ -302,10 +315,10 @@
 
   window.wealdmarkAudio = {
     settings,
-    play(name) {
+    play(name, arg) {
       if (settings.muted || !sounds[name] || !ensure()) return;
       try {
-        sounds[name]();
+        sounds[name](arg);
       } catch {
         // a sound that fails to play must never break the game
       }
