@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://speeds-bug-sept-spyware.trycloudflare.com",
-  "authUrl": "https://livestock-schemes-terminal-honolulu.trycloudflare.com",
+  "server": "wss://therapeutic-conditioning-techrepublic-directed.trycloudflare.com",
+  "authUrl": "https://recommends-implementing-threats-purple.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -79,15 +79,15 @@
     },
     {
       "path": "ui/audio.js",
-      "size": 12691,
-      "sha256": "dbd5355267c06e59e901213c2bc715658223a7ef448ea0921c19da5a9c19132e",
-      "url": "c/dbd5355267c06e59e901213c2bc715658223a7ef448ea0921c19da5a9c19132e"
+      "size": 13458,
+      "sha256": "2555d3c0d3c14e524b5a48ce3c07e61eed293b9ec7eb3039ae691d6fbbda4bb7",
+      "url": "c/2555d3c0d3c14e524b5a48ce3c07e61eed293b9ec7eb3039ae691d6fbbda4bb7"
     },
     {
       "path": "ui/game.js",
-      "size": 397385,
-      "sha256": "09f4507d4a92408af61fc1ccd218191842703809e1109245a1b90a7e1ca6ba19",
-      "url": "c/09f4507d4a92408af61fc1ccd218191842703809e1109245a1b90a7e1ca6ba19"
+      "size": 404825,
+      "sha256": "231254c6cdcb1927ee3204ddedf1f558f1b374397a80b361f17008bb2236aa25",
+      "url": "c/231254c6cdcb1927ee3204ddedf1f558f1b374397a80b361f17008bb2236aa25"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 20883,
-      "sha256": "afc4ac95cf6e502e194b39757b481d6096cddbb798b504d29c6f988b59adeb3c",
-      "url": "c/afc4ac95cf6e502e194b39757b481d6096cddbb798b504d29c6f988b59adeb3c"
+      "size": 21227,
+      "sha256": "797cb2fb400ef012907d1421bbc9a3f7ebefcb997b8749cea5af74827482c1be",
+      "url": "c/797cb2fb400ef012907d1421bbc9a3f7ebefcb997b8749cea5af74827482c1be"
     },
     {
       "path": "ui/renderer.js",
@@ -127,10 +127,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 81720,
-      "sha256": "49c4df53f4ce92b9d472a95a5dd5b2e9d5b3aa8cdbffefb52ad451e8d6ec6248",
-      "url": "c/49c4df53f4ce92b9d472a95a5dd5b2e9d5b3aa8cdbffefb52ad451e8d6ec6248"
+      "size": 84648,
+      "sha256": "7be076216475ce854ef0f19ee76222bd5db86647765246daa74504df53eb8a8a",
+      "url": "c/7be076216475ce854ef0f19ee76222bd5db86647765246daa74504df53eb8a8a"
     }
   ],
-  "signature": "Tzg3NpPGe2afbFgdyY3wcKPfhU5jAOgUkPOKSJ93h4ZMramGag8+1LFt33NPDzZGbFk5j6zH+yeHT6iL3d2DBA=="
+  "signature": "0m2mwLAeSxGNBXYV6k0/1RgjvreSheF8VIs3uK4/3ArzHvHFLgAdyjG5Yn9KJevtblPwlpM/s0I041+2oiStBw=="
 }
