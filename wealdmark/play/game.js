@@ -1886,6 +1886,47 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         r(6, 5, 1, 1, '#cfe8f0');
         r(10, 5, 1, 1, '#cfe8f0');
       }
+    } else if (node.art === 'herb') {
+      r(4, 12, 8, 3, '#5a3c22');
+      r(4, 12, 8, 1, '#7a5632');
+      if (depleted) {
+        r(7, 10, 1, 2, dark);
+        r(9, 11, 1, 1, dark);
+        return;
+      }
+      for (const [x, h] of [[4, 4], [7, 6], [10, 5], [12, 3]]) {
+        r(x, 12 - h, 1, h, dark);
+        r(x - 1, 12 - h - 1, 3, 2, base);
+        r(x, 12 - h - 1, 1, 1, light);
+      }
+      r(8, 5, 2, 2, light);
+      r(6, 4, 1, 1, '#ffffff');
+    } else if (node.art === 'dig') {
+      r(2, 11, 12, 4, '#6a5030');
+      r(3, 9, 10, 3, base);
+      r(5, 8, 6, 2, base);
+      r(3, 9, 10, 1, light);
+      r(5, 8, 6, 1, light);
+      r(2, 14, 12, 1, '#4a3820');
+      if (depleted) {
+        r(5, 10, 6, 2, dark);
+        return;
+      }
+      r(6, 10, 4, 2, '#1a1008');
+      r(4, 12, 2, 1, dark);
+      r(11, 12, 2, 1, dark);
+      r(7, 7, 2, 1, '#e8d89a');
+      r(4, 6, 1, 1, '#ffffff');
+    } else if (node.art === 'plot') {
+      // phase: 0 bare, 1 seedling, 2 growing, 3 ready to harvest
+      r(1, 5, 14, 10, '#5a3c22');
+      r(1, 5, 14, 1, '#7a5632');
+      for (let y = 7; y < 15; y += 3) r(2, y, 12, 1, '#44301a');
+      r(0, 4, 1, 11, '#8a5a2c');
+      r(15, 4, 1, 11, '#8a5a2c');
+      if (phase >= 1) for (const x of [4, 8, 12]) r(x, 10, 1, 1, '#6fbf5a');
+      if (phase >= 2) for (const x of [4, 8, 12]) { r(x, 8, 1, 3, '#4a8a3c'); r(x - 1, 8, 1, 1, '#6fbf5a'); r(x + 1, 9, 1, 1, '#6fbf5a'); }
+      if (phase === 3) for (const x of [4, 8, 12]) { r(x - 1, 6, 3, 2, base); r(x, 6, 1, 1, light); }
     } else {
       const rows = [[5, 10], [3, 12], [2, 13], [2, 13], [2, 13], [2, 13]];
       rows.forEach(([a, b], i) => r(a, 8 + i, b - a + 1, 1, i > 3 ? dark : base));
@@ -1903,8 +1944,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
   }
 
-  function drawNode(ctx, node, depleted, x, y, s, now) {
-    const phase = node.art === 'fish' ? Math.floor(now / 420) % 3 : 0;
+  /** How far a farm plot has come: 0 bare, 1 just planted, 2 growing, 3 ready. */
+  function plotPhase(tx, ty) {
+    const pl = G.plots && G.plots[`${tx},${ty}`];
+    if (!pl) return 0;
+    const left = pl.readyAt - Date.now();
+    return left <= 0 ? 3 : left < 90000 ? 2 : 1;
+  }
+
+  function drawNode(ctx, node, depleted, x, y, s, now, tx, ty) {
+    const phase = node.art === 'fish' ? Math.floor(now / 420) % 3 : node.art === 'plot' ? plotPhase(tx, ty) : 0;
     const c = sprite(`n|${node.id}|${depleted ? 1 : 0}|${phase}`, (r) => paintNode(r, node, depleted, phase));
     blitTile(ctx, c, x, y, s);
   }
@@ -1952,6 +2001,28 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       r(4, 1, 8, 3, '#8a8a94');
       r(4, 1, 8, 1, '#b4b4be');
       r(12, 2, 2, 1, '#6a4426');
+    } else if (id === 'cauldron') {
+      r(3, 13, 10, 2, '#3a3a44');
+      r(2, 6, 12, 8, '#4a4a56');
+      r(2, 6, 12, 1, '#6a6a76');
+      r(3, 7, 1, 6, '#6a6a76');
+      r(4, 5, 8, 2, '#2a8a78');
+      r(5, 5, 6, 1, phase ? '#7affd8' : '#5ae8c0');
+      r(phase ? 6 : 9, 3, 1, 1, '#bffff0');
+      r(phase ? 10 : 6, 2 + phase, 1, 1, '#8affe0');
+      r(1, 8, 1, 3, '#3a3a44');
+      r(14, 8, 1, 3, '#3a3a44');
+    } else if (id === 'gem_bench') {
+      r(1, 8, 14, 3, '#8a6a4c');
+      r(1, 8, 14, 1, '#aa8a68');
+      r(2, 11, 2, 4, '#5a3c22');
+      r(12, 11, 2, 4, '#5a3c22');
+      r(3, 5, 3, 3, '#e07ab8');
+      r(3, 5, 1, 1, '#ffd0ec');
+      r(8, 6, 3, 2, '#5ac8e8');
+      r(8, 6, 1, 1, '#c0f0ff');
+      r(12, 7, 2, 1, '#9aa0aa');
+      r(phase ? 5 : 10, 3, 1, 1, '#ffffff');
     } else if (id === 'bench') {
       r(1, 7, 14, 3, '#a8743c');
       r(1, 7, 14, 1, '#c89050');
@@ -2030,7 +2101,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   function drawStation(ctx, id, x, y, s, now) {
     const phase = Math.floor(now / 260) % 2;
-    const moving = id === 'furnace' || id === 'range' || id === 'bellstone' || id === 'anchor';
+    const moving = id === 'furnace' || id === 'range' || id === 'bellstone' || id === 'anchor' || id === 'cauldron' || id === 'gem_bench';
     const c = sprite(`s|${id}|${moving ? phase : 0}`, (r) => paintStation(r, id, phase));
     blitTile(ctx, c, x, y, s);
   }
@@ -2075,6 +2146,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       hid: itemDef(g.h) ? g.h : '',
       bid: itemDef(g.b) ? g.b : '',
       cid: itemDef(g.c) ? g.c : '',
+      kt: (itemDef(g.k) || {}).tier || 1,
+      at: (itemDef(g.a) || {}).tier || 1,
+      nt: (itemDef(g.n) || {}).tier || 1,
+      ot: (o && o.tier) || 1,
+      lid: itemDef(g.l) ? g.l : '',
+      kid: itemDef(g.k) ? g.k : '',
+      aid: itemDef(g.a) ? g.a : '',
+      nid: itemDef(g.n) ? g.n : '',
+      // Rarity digits in the order w o h b c l k a n; the shimmer uses the best of them.
+      rar: String(g.r || ''),
+      best: Math.max(0, ...String(g.r || '0').split('').map(Number)),
     };
   }
 
@@ -2613,7 +2695,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (id === G.selfId) {
       const eq = (G.inv && G.inv.equipment) || {};
       const idOf = (ref) => (ref ? ref.id : undefined);
-      return gearHeld({ w: idOf(eq.weapon), o: idOf(eq.offhand), h: idOf(eq.head), b: idOf(eq.body), c: idOf(eq.cloak) });
+      const order = ['weapon', 'offhand', 'head', 'body', 'cloak', 'legs', 'belt', 'amulet', 'ring'];
+      const r = order.map((k) => Math.max(0, ['basic', 'magic', 'rare', 'legendary'].indexOf((eq[k] && eq[k].rarity) || 'basic'))).join('');
+      return gearHeld({ w: idOf(eq.weapon), o: idOf(eq.offhand), h: idOf(eq.head), b: idOf(eq.body), c: idOf(eq.cloak), l: idOf(eq.legs), k: idOf(eq.belt), a: idOf(eq.amulet), n: idOf(eq.ring), r });
     }
     const e = G.entities.get(id);
     return gearHeld((e && e.gear) || {});
@@ -2792,6 +2876,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (me) me.pet = msg.id || undefined;
         return renderLook();
       }
+      case 'plots':
+        G.plots = msg.plots || {};
+        return;
       case 'unlocks':
         G.locks = { pets: msg.pets, mercs: msg.mercs };
         renderLook();
@@ -4289,6 +4376,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     { id: 'rock', label: 'Mining', color: '#a8a8b8', badge: 'M' },
     { id: 'fish', label: 'Fishing', color: '#4a9fe0', badge: 'F' },
     { id: 'warren', label: 'Hunting', color: '#b8885a', badge: 'H' },
+    { id: 'herb', label: 'Herbs', color: '#8ed06a', badge: 'L' },
+    { id: 'dig', label: 'Excavation', color: '#c0a070', badge: 'X' },
+    { id: 'plot', label: 'Farm plots', color: '#d8b04a', badge: 'P' },
+    { id: 'brew', label: 'Alchemy', color: '#5ad0c0', badge: 'A' },
+    { id: 'gem', label: 'Jewelcrafting', color: '#e07ab8', badge: 'J' },
   ];
   const worldHidden = new Set();
 
@@ -4308,9 +4400,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const def = G.data.stations.get(s.station);
       if (!def) continue;
       if (def.kind === 'bell') pts.push({ k: 'bell', x: s.x, y: s.y, name: def.name });
-      else if (def.kind === 'craft') pts.push({ k: def.skill === 'smithing' ? 'smith' : def.skill === 'cooking' ? 'cook' : 'craft', x: s.x, y: s.y, name: def.name });
+      else if (def.kind === 'craft') pts.push({ k: { smithing: 'smith', cooking: 'cook', alchemy: 'brew', jewelcrafting: 'gem' }[def.skill] || 'craft', x: s.x, y: s.y, name: def.name });
     }
-    const art = { tree: 'tree', rock: 'rock', fish: 'fish', warren: 'warren' };
+    const art = { tree: 'tree', rock: 'rock', fish: 'fish', warren: 'warren', herb: 'herb', dig: 'dig', plot: 'plot' };
     for (const n of map.nodes || []) {
       const def = G.data.nodes.get(n.node);
       const k = def && art[def.art];
@@ -4420,7 +4512,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const inView = (px, py, m) => px > -m && py > -m && px < w + m && py < h + m;
 
     if (!WV.pts) WV.pts = worldPoints();
-    const natural = new Set(['tree', 'rock', 'fish', 'warren']);
+    const natural = new Set(['tree', 'rock', 'fish', 'warren', 'herb', 'dig', 'plot']);
     const hits = [];
     for (const p of WV.pts) {
       if (worldHidden.has(p.k)) continue;
@@ -5301,6 +5393,11 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     pot: 'M5 10h14v8a2 2 0 01-2 2H7a2 2 0 01-2-2zM3 10h18M9 5c0 1 1 1 1 3M14 5c0 1 1 1 1 3',
     needle: 'M4 20L19 5M16 4l4 4M6 18l-2 2',
     anvil: 'M4 8h16l-3 4h-4v4h4v3H7v-3h4v-4H7z',
+    leaf: 'M5 19C5 9 11 4 20 4c0 9-5 15-13 15zM5 19l8-8',
+    sprout: 'M12 21v-8M12 13c0-4-3-6-7-6 0 4 3 6 7 6zM12 15c0-3 2-5 6-5 0 3-2 5-6 5z',
+    gem: 'M6 4h12l3 5-9 11L3 9zM3 9h18M9 4l-2 5 5 11 5-11-2-5',
+    flask: 'M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3M7 15h10',
+    shovel: 'M14 3l7 7-3 1-5-5zM13 7l-9 11 2 2 11-9M4 18l-1 3 3-1',
   };
   function icon(name, size) {
     const ns = 'http://www.w3.org/2000/svg';
@@ -5318,7 +5415,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     s.appendChild(p);
     return s;
   }
-  const TRADE_ICON = { forestry: 'tree', mining: 'pick', fishing: 'fish', hunting: 'bow', smithing: 'anvil', cooking: 'pot', crafting: 'needle' };
+  const TRADE_ICON = { forestry: 'tree', mining: 'pick', fishing: 'fish', hunting: 'bow', smithing: 'anvil', cooking: 'pot', crafting: 'needle', herbalism: 'leaf', alchemy: 'flask', farming: 'sprout', jewelcrafting: 'gem', excavation: 'shovel' };
   const AFF_ICON = { might: 'barbell', agility: 'boot', intellect: 'brain', vitality: 'heart', spirit: 'star' };
   const AFF_COLOR = { might: '#e66', agility: '#6c6', intellect: '#5ae', vitality: '#e94', spirit: '#b7e' };
   /** Passives have no hotbar icon, so they get a line icon; every other skill reuses its hotbar icon. */
@@ -5346,7 +5443,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   /** The Trades window: a grid of skill tiles with level and progress, and the total at the end. */
-  const TRADE_COLOR = { forestry: '#7fc46a', mining: '#b0b8c8', fishing: '#5aa8e0', hunting: '#e08a5a', smithing: '#e0b84a', cooking: '#e06a6a', crafting: '#b07ae0' };
+  const TRADE_COLOR = { forestry: '#7fc46a', mining: '#b0b8c8', fishing: '#5aa8e0', hunting: '#e08a5a', smithing: '#e0b84a', cooking: '#e06a6a', crafting: '#b07ae0', herbalism: '#8ed06a', alchemy: '#5ad0c0', farming: '#d8b04a', jewelcrafting: '#e07ab8', excavation: '#c0a070' };
   function renderTrades() {
     const s = G.stats;
     const box = $('trades-body');
@@ -6447,6 +6544,239 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   });
 
   /** The lesser potions are smaller bottles; the full ones carry a gold cap. */
+  // ---- icons for the five newer trades: herbs, seeds, crops, gems, rings, relics and brews
+
+  const GEM_COLOR = { topaz: '#f0b43a', amethyst: '#a860e0', emerald: '#3ac870', ruby: '#e03a4a', sapphire: '#3a78e0' };
+  const gemShape = (col) => (r) => {
+    r(5, 3, 6, 1, tint(col, 1.45));
+    r(3, 4, 10, 2, col);
+    r(4, 6, 8, 2, col);
+    r(5, 8, 6, 2, tint(col, 0.75));
+    r(6, 10, 4, 2, tint(col, 0.65));
+    r(7, 12, 2, 1, tint(col, 0.55));
+    r(4, 4, 2, 1, '#ffffff');
+    r(7, 4, 1, 3, tint(col, 1.3));
+    r(10, 5, 2, 3, tint(col, 0.8));
+  };
+  const roughShape = (col) => (r) => {
+    r(4, 5, 8, 8, '#7a7a86');
+    r(5, 4, 5, 1, '#7a7a86');
+    r(4, 5, 3, 1, '#a4a4b0');
+    r(10, 8, 2, 5, '#585864');
+    r(6, 7, 3, 4, col);
+    r(6, 7, 1, 2, tint(col, 1.5));
+    r(9, 6, 2, 2, tint(col, 0.8));
+  };
+  const ringShape = (m, col, tier) => (r) => {
+    r(5, 8, 6, 1, m.l);
+    r(4, 9, 1, 4, m.m);
+    r(11, 9, 1, 4, m.d);
+    r(5, 13, 6, 1, m.d);
+    r(5, 7, 6, 1, m.m);
+    r(6, 3, 4, 4, col);
+    r(6, 3, 4, 1, tint(col, 1.5));
+    r(7, 4, 1, 1, '#ffffff');
+    r(9, 5, 1, 2, tint(col, 0.7));
+    r(5, 5, 1, 2, m.l);
+    r(10, 5, 1, 2, m.m);
+    if (tier >= 3) {
+      r(5, 3, 1, 1, m.l);
+      r(10, 3, 1, 1, m.m);
+    }
+    if (tier >= 4) {
+      r(3, 2, 1, 1, '#ffffff');
+      r(12, 4, 1, 1, '#ffffff');
+    }
+  };
+  const chainTop = (r, c) => {
+    r(4, 1, 1, 5, c);
+    r(11, 1, 1, 5, c);
+    r(5, 6, 1, 2, c);
+    r(10, 6, 1, 2, c);
+    r(6, 8, 4, 1, c);
+  };
+  function seedBag(r, col) {
+    r(5, 2, 6, 2, '#a88858');
+    r(4, 4, 8, 9, '#c8a468');
+    r(4, 4, 2, 7, '#e0c288');
+    r(10, 6, 2, 7, '#a88444');
+    r(5, 13, 6, 1, '#8a6a30');
+    r(6, 7, 4, 3, col);
+    r(6, 7, 1, 1, '#ffffff');
+  }
+  const BREW = {
+    clover_salve: ['#5ac85a', '#a0f0a0'], moonpetal_tonic: ['#8a8aff', '#c4c4ff'], sunwheat_elixir: ['#f0c030', '#fff0a0'],
+    ghostcap_draught: ['#9ae0d8', '#e0fffa'], moonberry_cordial: ['#a04ad8', '#d89aff'], emberbloom_tincture: ['#ff7a2a', '#ffc08a'],
+  };
+  const brewShape = (id, i) => (r) => {
+    const [liq, hi] = BREW[id];
+    if (i % 2 === 0) {
+      r(7, 2, 2, 2, '#8a6a44');
+      r(6, 4, 4, 1, '#cfd6e4');
+      r(4, 5, 8, 9, '#cfd6e4');
+      r(5, 6, 6, 7, liq);
+      r(5, 6, 2, 5, hi);
+      r(9, 10, 2, 3, tint(liq, 0.7));
+    } else {
+      r(6, 1, 4, 2, '#8a6a44');
+      r(7, 3, 2, 3, '#cfd6e4');
+      r(3, 6, 10, 8, '#cfd6e4');
+      r(4, 7, 8, 6, liq);
+      r(4, 7, 2, 4, hi);
+      r(9, 10, 3, 3, tint(liq, 0.7));
+    }
+    r(7, 5, 1, 1, '#ffffff');
+  };
+  Object.assign(UNIQUE_ICONS, {
+    clover_leaf: (r) => {
+      for (const [x, y] of [[4, 3], [8, 3], [6, 7]]) {
+        r(x, y, 4, 4, '#5ab04a');
+        r(x, y, 2, 2, '#8ae070');
+        r(x + 2, y + 2, 2, 2, '#3a8a34');
+      }
+      r(7, 10, 1, 5, '#3a7a2c');
+    },
+    moonpetal: (r) => {
+      for (const [x, y] of [[6, 1], [2, 5], [10, 5], [4, 9], [8, 9]]) {
+        r(x, y, 4, 4, '#b9a8ff');
+        r(x, y, 2, 2, '#e4dcff');
+      }
+      r(6, 5, 4, 4, '#fff0a0');
+      r(7, 6, 1, 1, '#ffffff');
+      r(7, 12, 2, 3, '#4a8a3c');
+    },
+    ghostcap: (r) => {
+      r(3, 3, 10, 5, '#d8e4ec');
+      r(5, 2, 6, 1, '#d8e4ec');
+      r(3, 3, 4, 1, '#ffffff');
+      r(10, 4, 3, 4, '#a4b4c0');
+      r(6, 8, 4, 6, '#b8c4cc');
+      r(6, 8, 1, 6, '#e4eef4');
+      r(5, 5, 1, 1, '#7a8a96');
+      r(9, 4, 1, 1, '#7a8a96');
+    },
+    emberbloom: (r) => {
+      r(7, 8, 2, 7, '#4a8a3c');
+      for (const [x, y, w] of [[5, 2, 6], [3, 4, 10], [4, 6, 8]]) r(x, y, w, 2, '#ff8a4a');
+      r(6, 3, 4, 3, '#ffd84a');
+      r(7, 1, 2, 1, '#ffb040');
+      r(4, 4, 2, 1, '#ffc08a');
+      r(11, 6, 1, 1, '#c8481a');
+      r(7, 4, 1, 1, '#ffffff');
+    },
+    turnip_seed: (r) => seedBag(r, '#d8d0e8'),
+    sunwheat_seed: (r) => seedBag(r, '#f0c030'),
+    moonberry_seed: (r) => seedBag(r, '#8a6aff'),
+    turnip: (r) => {
+      r(5, 2, 2, 4, '#4a9a3c');
+      r(9, 1, 2, 5, '#5ab04a');
+      r(7, 3, 2, 3, '#6ac05a');
+      r(3, 6, 10, 5, '#f4f0f8');
+      r(4, 5, 8, 1, '#f4f0f8');
+      r(5, 11, 6, 2, '#e4dcec');
+      r(7, 13, 2, 2, '#e4dcec');
+      r(3, 6, 10, 2, '#b86ad0');
+      r(4, 6, 2, 1, '#e8b0f4');
+      r(10, 9, 2, 2, '#c8c0d4');
+    },
+    sunwheat: (r) => {
+      r(7, 7, 2, 8, '#a89440');
+      for (const [x, y] of [[4, 2], [7, 1], [10, 2], [5, 5], [9, 5]]) {
+        r(x, y, 2, 3, '#f0c030');
+        r(x, y, 1, 2, '#fff0a0');
+        r(x + 1, y + 2, 1, 1, '#c89418');
+      }
+    },
+    moonberry: (r) => {
+      r(7, 1, 2, 3, '#4a8a3c');
+      r(9, 2, 3, 1, '#5ab04a');
+      for (const [x, y] of [[3, 5], [8, 5], [5, 9]]) {
+        r(x, y, 5, 5, '#7a5ae0');
+        r(x, y, 2, 2, '#c4b4ff');
+        r(x + 3, y + 3, 2, 2, '#4a34a8');
+      }
+    },
+    old_coin: (r) => {
+      r(4, 4, 8, 8, '#d8b04a');
+      r(5, 3, 6, 1, '#d8b04a');
+      r(5, 12, 6, 1, '#8a6a20');
+      r(4, 4, 3, 2, '#fff0a0');
+      r(7, 6, 2, 4, '#a8801c');
+      r(10, 8, 2, 4, '#a8801c');
+    },
+    carved_bone: (r) => {
+      for (const [x, y, w, h] of [[2, 2, 3, 3], [4, 4, 3, 3], [6, 6, 4, 4], [9, 9, 3, 3], [11, 11, 3, 3], [2, 4, 2, 2], [4, 2, 2, 2], [11, 9, 2, 2], [9, 11, 2, 2]]) r(x, y, w, h, '#ece4cc');
+      r(2, 2, 2, 1, '#ffffff');
+      r(7, 8, 3, 2, '#b8ae90');
+      r(8, 7, 1, 1, '#6a5a3a');
+      r(5, 5, 1, 1, '#6a5a3a');
+    },
+    rune_shard: (r) => {
+      r(6, 1, 4, 3, '#8a96a8');
+      r(4, 4, 8, 8, '#7a86a0');
+      r(5, 12, 6, 2, '#5a6680');
+      r(4, 4, 3, 2, '#aab4c8');
+      r(10, 6, 2, 6, '#5a6680');
+      r(7, 5, 2, 6, '#7af0ff');
+      r(6, 7, 4, 1, '#7af0ff');
+      r(7, 5, 1, 1, '#ffffff');
+    },
+    ancient_relic: (r) => {
+      r(6, 1, 4, 4, '#e8c050');
+      r(7, 2, 2, 2, '#1a1008');
+      r(7, 5, 2, 8, '#e8c050');
+      r(3, 7, 10, 2, '#e8c050');
+      r(5, 13, 6, 2, '#a88020');
+      r(6, 1, 4, 1, '#fff0a0');
+      r(7, 5, 1, 7, '#fff0a0');
+      r(11, 8, 2, 1, '#a88020');
+      r(7, 9, 2, 1, '#5ac8e8');
+    },
+    old_coin_amulet: (r) => {
+      chainTop(r, '#8a7a60');
+      r(5, 9, 6, 6, '#d8b04a');
+      r(5, 9, 3, 2, '#fff0a0');
+      r(8, 11, 3, 4, '#a8801c');
+      r(7, 11, 2, 2, '#8a6a20');
+    },
+    carved_bone_amulet: (r) => {
+      chainTop(r, '#8a7a60');
+      r(4, 9, 3, 3, '#ece4cc');
+      r(6, 10, 4, 3, '#ece4cc');
+      r(9, 12, 3, 3, '#ece4cc');
+      r(4, 9, 2, 1, '#ffffff');
+      r(7, 11, 2, 1, '#b8ae90');
+    },
+    rune_shard_amulet: (r) => {
+      chainTop(r, '#9aa4b4');
+      r(5, 9, 6, 6, '#7a86a0');
+      r(5, 9, 2, 3, '#aab4c8');
+      r(9, 11, 2, 4, '#5a6680');
+      r(7, 10, 2, 4, '#7af0ff');
+      r(7, 10, 1, 1, '#ffffff');
+    },
+    ancient_relic_amulet: (r) => {
+      chainTop(r, '#d8b04a');
+      r(5, 9, 6, 6, '#e8c050');
+      r(5, 9, 3, 2, '#fff0a0');
+      r(9, 11, 2, 4, '#a88020');
+      r(7, 10, 2, 4, '#5ac8e8');
+      r(7, 10, 1, 1, '#ffffff');
+      r(3, 8, 1, 1, '#ffffff');
+      r(12, 14, 1, 1, '#ffffff');
+    },
+  });
+  for (const [gem, col] of Object.entries(GEM_COLOR)) {
+    UNIQUE_ICONS[gem] = gemShape(col);
+    UNIQUE_ICONS[`rough_${gem}`] = roughShape(col);
+    ['bronze', 'iron', 'steel', 'moonsilver'].forEach((metal, i) => {
+      UNIQUE_ICONS[`${metal}_${gem}_ring`] = ringShape(METALS[i], col, i + 1);
+    });
+  }
+  Object.keys(BREW).forEach((id, i) => {
+    UNIQUE_ICONS[id] = brewShape(id, i);
+  });
+
   function potionIcon(def) {
     const mana = Boolean(def.mana);
     const small = /^minor_/.test(def.id);
@@ -6655,9 +6985,72 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
   }
 
-  /** A 20x20 canvas holding the item's icon, with the usual dark outline. */
+  const ICON_N = 24;
+  const ICON_PAD = 4;
+  const itemIconCache = new Map();
+
+  /**
+   * Run the 16px item art through a shading pass onto a 24px canvas: rim light on the top and left edges, rim shade on
+   * the bottom and right, an outline tinted from the pixel it wraps, one specular pixel, and a soft drop shadow.
+   */
+  function shadeIcon(paint) {
+    const raw = document.createElement('canvas');
+    raw.width = raw.height = 16;
+    const rg = raw.getContext('2d');
+    paint((x, y, w, h, color) => {
+      rg.fillStyle = color;
+      rg.fillRect(x, y, w, h);
+    });
+    const src = rg.getImageData(0, 0, 16, 16).data;
+    const solid = (x, y) => x >= 0 && y >= 0 && x < 16 && y < 16 && src[(y * 16 + x) * 4 + 3] >= 64;
+    const rgb = (x, y) => [src[(y * 16 + x) * 4], src[(y * 16 + x) * 4 + 1], src[(y * 16 + x) * 4 + 2]];
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = ICON_N;
+    const g = cv.getContext('2d');
+    const put = (x, y, c, a = 1) => {
+      g.fillStyle = `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+      g.fillRect(x + ICON_PAD, y + ICON_PAD, 1, 1);
+    };
+    const mul = (c, f) => c.map((v) => Math.max(0, Math.min(255, f <= 1 ? v * f : v + (255 - v) * (f - 1))));
+    let spec = null;
+    for (let y = -1; y < 17; y++) {
+      for (let x = -1; x < 17; x++) {
+        if (!solid(x, y) && (solid(x + 1, y - 1) || solid(x - 1, y - 2) || solid(x, y - 2))) put(x, y, [0, 0, 0], 0.26);
+      }
+    }
+    for (let y = 0; y < 16; y++) {
+      for (let x = 0; x < 16; x++) {
+        if (!solid(x, y)) continue;
+        let c = rgb(x, y);
+        const up = !solid(x, y - 1), left = !solid(x - 1, y), down = !solid(x, y + 1), right = !solid(x + 1, y);
+        if ((up || left) && !(down || right)) c = mul(c, 1.18);
+        else if ((down || right) && !(up || left)) c = mul(c, 0.8);
+        put(x, y, c);
+        if (up && left && !spec && c[0] + c[1] + c[2] > 330) spec = [x, y];
+      }
+    }
+    for (let y = -1; y < 17; y++) {
+      for (let x = -1; x < 17; x++) {
+        if (solid(x, y)) continue;
+        const near = [[0, -1], [-1, 0], [1, 0], [0, 1]].find(([dx, dy]) => solid(x + dx, y + dy));
+        if (!near) continue;
+        const c = rgb(x + near[0], y + near[1]);
+        put(x, y, [c[0] * 0.2 + 22, c[1] * 0.2 + 12, c[2] * 0.2 + 10]);
+      }
+    }
+    if (spec) put(spec[0], spec[1], [255, 255, 255], 0.9);
+    return cv;
+  }
+
+  /** A 24x24 canvas holding the item's icon: the 16px art, shaded and outlined, with a margin for the shadow. */
   function itemIcon(def) {
-    return sprite(`i|${def.id}`, (r) => paintItem(r, def));
+    const key = def.id;
+    let c = itemIconCache.get(key);
+    if (!c) {
+      c = shadeIcon((r) => paintItem(r, def));
+      itemIconCache.set(key, c);
+    }
+    return c;
   }
 
   function slotButton(ref, onClick, label, ghost) {
@@ -7033,7 +7426,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   // ---- talking, shopping, storage, crafting, and the journal
 
-  const SKILL_LABEL = { forestry: 'Forestry', mining: 'Mining', fishing: 'Fishing', hunting: 'Hunting', smithing: 'Smithing', cooking: 'Cooking', crafting: 'Crafting' };
+  const SKILL_LABEL = { forestry: 'Forestry', mining: 'Mining', fishing: 'Fishing', hunting: 'Hunting', smithing: 'Smithing', cooking: 'Cooking', crafting: 'Crafting', herbalism: 'Herbalism', alchemy: 'Alchemy', farming: 'Farming', jewelcrafting: 'Jewelcrafting', excavation: 'Excavation' };
   const CUR_NAME = { iron_bits: 'iron coins', gold_coins: 'gold coins', favor_tokens: 'favor tokens' };
   const CUR_CLASS = { iron_bits: 'iron', gold_coins: 'gold', favor_tokens: 'favor' };
   // Mirrors the server: a shop pays 40% of an item's value, more for rolled gear.
@@ -7551,7 +7944,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.textBaseline = 'middle';
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#000';
-    const act = { tree: 'Chopping', rock: 'Mining', fish: 'Fishing', warren: 'Trapping' }[def.art] || def.name;
+    const act = { tree: 'Chopping', rock: 'Mining', fish: 'Fishing', warren: 'Trapping', herb: 'Picking', dig: 'Digging' }[def.art] || def.name;
     ctx.strokeText(act, bx + w / 2, by + h / 2 + 1);
     ctx.fillStyle = '#fff';
     ctx.fillText(act, bx + w / 2, by + h / 2 + 1);
@@ -8262,7 +8655,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         if (r.kind === 'node' || r.kind === 'station') {
           const def = G.data && (r.kind === 'node' ? G.data.nodes : G.data.stations).get(r.ref);
           if (def && r.kind === 'node') {
-            drawNode(ctx, def, r.depleted, offX + r.x * px, offY + r.y * px, s, now);
+            drawNode(ctx, def, r.depleted, offX + r.x * px, offY + r.y * px, s, now, r.x, r.y);
             if (r.id === gatherTargetId()) {
               // Sit above whichever of tree and hero stands higher, clear of the hero's name tag.
               const who = list.find((o) => o.self);

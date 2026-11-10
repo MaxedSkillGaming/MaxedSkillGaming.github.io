@@ -239,7 +239,7 @@ footer { margin-top: 16px; text-align: right; }
 #hotbar { position: relative; flex: none; min-width: 0; display: flex; gap: 4px; }
 #hotbar:before { content: attr(data-style) " bar"; position: absolute; left: 2px; top: -13px; font-size: 9px; line-height: 10px; letter-spacing: 1px; text-transform: uppercase; color: #8a80a8; text-shadow: 1px 1px 0 #000; pointer-events: none; }
 .bslot { flex: 1; max-width: 48px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-.bslot img, .bslot canvas.icon, .qslot canvas.icon, .sslot canvas.icon { width: 80%; height: 80%; image-rendering: pixelated; }
+.bslot img, .bslot canvas.icon, .qslot canvas.icon, .sslot canvas.icon { width: 92%; height: 92%; image-rendering: pixelated; }
 .bslot.off, .qslot.off, .sslot.off { filter: grayscale(0.8) brightness(0.65); }
 .bslot.empty { border-style: dashed; border-color: #3a2f55; }
 .bslot.selected { outline: 3px solid var(--gold); }
@@ -390,7 +390,7 @@ button.slot {
   align-items: center;
   justify-content: center;
 }
-button.slot canvas.icon { width: 40px; height: 40px; image-rendering: pixelated; pointer-events: none; }
+button.slot canvas.icon { width: 46px; height: 46px; image-rendering: pixelated; pointer-events: none; }
 button.slot:hover:not(:disabled) { background: #4a3a7a; }
 button.slot.empty { background: #1c1530; opacity: 0.7; color: var(--muted); }
 button.slot.magic { border-color: #6aa9ff; }
@@ -445,10 +445,10 @@ button.slot i { position: absolute; right: 3px; bottom: 1px; font-style: normal;
 .row-item:hover { background: #4a3a7a; }
 .row-item.poor { opacity: 0.55; }
 .row-item .name { flex: 1; }
-.row-item canvas.icon, .recipe canvas.icon { width: 28px; height: 28px; image-rendering: pixelated; flex: none; }
+.row-item canvas.icon, .recipe canvas.icon { width: 32px; height: 32px; image-rendering: pixelated; flex: none; }
 .slot-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .slot-grid button.slot { height: 44px; }
-.slot-grid button.slot canvas.icon { width: 32px; height: 32px; }
+.slot-grid button.slot canvas.icon { width: 37px; height: 37px; }
 .exchange { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
 .exchange button.act { padding: 4px 6px; font-size: 11px; margin: 0; }
 .recipe { padding: 6px; margin-bottom: 6px; background: #2a2044; border: 2px solid #000; }
@@ -462,12 +462,12 @@ button.slot i { position: absolute; right: 3px; bottom: 1px; font-style: normal;
 .recipe-btns button.act { padding: 3px 8px; font-size: 11px; margin: 0; }
 .make-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 6px 0; }
 .make-tile { height: 44px; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; background: #36295a; border: 2px solid #000; }
-.make-tile canvas.icon { width: 32px; height: 32px; image-rendering: pixelated; }
+.make-tile canvas.icon { width: 37px; height: 37px; image-rendering: pixelated; }
 .make-tile:hover { background: #4a3a7a; }
 .make-tile.poor { opacity: 0.5; }
 .make-tile.sel { border-color: var(--gold); background: #5a4a9a; opacity: 1; }
 .make-detail { padding: 6px; margin-bottom: 6px; background: #2a2044; border: 2px solid #000; }
-.make-detail canvas.icon { width: 28px; height: 28px; image-rendering: pixelated; flex: none; }
+.make-detail canvas.icon { width: 32px; height: 32px; image-rendering: pixelated; flex: none; }
 .make-amount { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .make-amount button.act { padding: 3px 8px; font-size: 12px; min-width: 24px; }
 .make-num { min-width: 36px; padding: 3px 8px; text-align: center; background: #120a22; border: 2px solid #000; }
@@ -570,7 +570,7 @@ button.slot i { position: absolute; right: 3px; bottom: 1px; font-style: normal;
 
 #chatlog li.quest { color: #ffd84a; }
 #chatlog li.work { color: #b8e0a0; }
-button.slot.empty canvas.icon { opacity: 0.22; filter: grayscale(1); width: 32px; height: 32px; }
+button.slot.empty canvas.icon { opacity: 0.22; filter: grayscale(1); width: 37px; height: 37px; }
 button.slot.empty { position: relative; }
 button.slot .slot-name { position: absolute; left: 0; right: 0; bottom: 1px; font-size: 9px; text-align: center; color: var(--muted); }
 
@@ -1259,7 +1259,7 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
 .shop-wrap { display: flex; gap: 12px; align-items: flex-start; margin: 8px 0; }
 .shop-grid { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(auto-fill, 48px); gap: 4px; align-content: start; justify-content: start; max-height: 280px; overflow: auto; }
 .shop-slot { position: relative; width: 48px; height: 48px; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }
-.shop-slot canvas.icon { width: 32px; height: 32px; image-rendering: pixelated; }
+.shop-slot canvas.icon { width: 37px; height: 37px; image-rendering: pixelated; }
 .shop-slot.poor canvas.icon { opacity: 0.5; }
 .shop-slot.sel { outline: 2px solid var(--gold); background: #5a4a9a; }
 .shop-qty { position: absolute; right: 4px; bottom: 2px; font-size: 11px; line-height: 12px; color: var(--gold); text-shadow: 1px 1px 0 #000; }
@@ -1384,3 +1384,15 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
 @media (pointer: fine) and (min-width: 761px) {
   #panel-tasks { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 560px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); resize: none; overflow-y: auto; }
 }
+
+/* Rarity: inner glow in the corners, and a slow sheen across rare and legendary slots. */
+button.slot.magic:not(.empty) { box-shadow: inset 0 0 8px rgba(106, 169, 255, 0.55); }
+button.slot.rare:not(.empty) { box-shadow: inset 0 0 8px rgba(255, 210, 74, 0.6); }
+button.slot.legendary:not(.empty) { box-shadow: inset 0 0 10px rgba(255, 138, 58, 0.75); }
+button.slot.rare:not(.empty)::before, button.slot.legendary:not(.empty)::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.35) 50%, transparent 60%) no-repeat -100% 0 / 100% 100%;
+  animation: slot-sheen 3.6s ease-in-out infinite;
+}
+@keyframes slot-sheen { 0%, 60% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+@media (prefers-reduced-motion: reduce) { button.slot.rare:not(.empty)::before, button.slot.legendary:not(.empty)::before { animation: none; } }

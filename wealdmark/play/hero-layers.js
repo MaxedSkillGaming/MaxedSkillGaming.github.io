@@ -31,6 +31,75 @@
     return 2;
   }
 
+  const MASK = 'pickmans_bone_mask';
+  const METAL = ['#e8a060', '#c4cad2', '#eef4ff', '#b8e4ff'];
+  const TIER_GEM = ['#e04a4a', '#4a8aff', '#4ae080', '#c85aff'];
+  const GEM = { topaz: '#f0b43a', amethyst: '#a860e0', emerald: '#3ac870', ruby: '#e03a4a', sapphire: '#3a78e0' };
+  const RARITY_GLINT = ['', '#bcd8ff', '#ffe27a', '#ff9a50'];
+  /** Trousers take the colour family of the legs armor: [tint, strength]. */
+  const LEG_TINT = { soft: ['#c08a52', 0.28], hard: ['#2a1608', 0.38], chain: ['#aab0bc', 0.5], mithril: ['#6ab8ff', 0.5] };
+  const legFamily = (id) => (id ? id.split('_')[0] : '');
+  const tierOf = (n) => Math.max(0, Math.min(3, (n | 0) - 1));
+  const ringGem = (id, t) => {
+    for (const g in GEM) if (id.indexOf(g) >= 0) return GEM[g];
+    return TIER_GEM[t];
+  };
+
+  /** Held-weapon facts that no longer come from a cell. */
+  const weaponCell = (held) => Boolean(held.weapon) && held.weapon !== 'pistol';
+  const offCell = (held, cat) => !held.offPistol && Boolean(held.shield) && Boolean(held.oid) && Boolean(cat.shield[held.oid]);
+
+  /**
+   * Small pixel sprites for what the sheet has no cell for, in cell coordinates ([x, y, w, h, colour]).
+   * torso moves with the chest, face with the head, hand with the arm.
+   */
+  function overlays(held) {
+    const o = { torso: [], face: [], hand: [] };
+    if (held.kid) {
+      const m = METAL[tierOf(held.kt)];
+      o.torso.push([4, 10, 8, 1, '#6a4426'], [4, 11, 8, 1, '#4a2e18'], [7, 10, 2, 2, m], [7, 10, 1, 1, '#ffffff'], [5, 10, 1, 1, '#8a5a34'], [10, 10, 1, 1, '#8a5a34']);
+    }
+    if (held.aid) {
+      const t = tierOf(held.at);
+      o.torso.push([6, 6, 4, 1, '#8a7a60'], [7, 7, 2, 2, ringGem(held.aid, t)], [7, 7, 1, 1, '#ffffff']);
+    }
+    if (held.nid) {
+      const t = tierOf(held.nt);
+      o.hand.push([0, 11, 2, 1, METAL[t]], [1, 10, 1, 1, ringGem(held.nid, t)]);
+    }
+    if (held.hid === MASK) {
+      o.face.push([5, 2, 6, 6, '#ece4cc'], [5, 2, 6, 1, '#ffffff'], [6, 4, 1, 2, '#1a1426'], [9, 4, 1, 2, '#1a1426'], [7, 6, 2, 1, '#b8ae90'], [5, 7, 1, 1, '#b8ae90'], [10, 7, 1, 1, '#b8ae90'], [7, 4, 2, 1, '#b8ae90']);
+    }
+    return o;
+  }
+  const overlayKey = (held) => [held.kid, held.kt, held.aid, held.at, held.nid, held.nt, held.hid === MASK ? 1 : 0, held.lid, held.weapon === 'pistol' ? held.wt : 0, held.offPistol ? 1 : 0].join('/');
+
+  /** A pistol in the hand at (hx, hy), muzzle to the left of the art: [x, y, w, h, colour] in a frame whose origin is the grip. */
+  function pistolRects(tier) {
+    const m = METAL[tierOf(tier)];
+    // Held upright, barrel up: a grip in the fist, the frame above it, and a sight at the muzzle.
+    return [[0, -5, 2, 4, m], [0, -5, 1, 4, '#ffffff'], [1, -6, 1, 1, '#3a3a46'], [0, -1, 2, 3, '#6a4020'], [2, -2, 1, 2, '#3a3a46']];
+  }
+
+  const tintCache = new Map();
+  /** One cell washed with a colour (k is the strength 0 to 1), used for trousers. */
+  function tinted(image, cat, cell, color, k) {
+    const key = cell[0] + ',' + cell[1] + ',' + color + ',' + k;
+    let c = tintCache.get(key);
+    if (c) return c;
+    c = document.createElement('canvas');
+    c.width = c.height = cat.cell;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 0, 0, cat.cell, cat.cell);
+    g.globalCompositeOperation = 'source-atop';
+    g.globalAlpha = k;
+    g.fillStyle = color;
+    g.fillRect(0, 0, cat.cell, cat.cell);
+    tintCache.set(key, c);
+    return c;
+  }
+
   /** The cells for one figure, back to front, or null when any part has no cell. */
   function plan(look, held, catalog) {
     const cat = catalog || root.HERO_CATALOG;
@@ -46,6 +115,7 @@
     const codeArt = cat.codeArt || [];
     // Weapons with no Kenney shape (the sheet has no guns) keep the code art for the whole figure.
     if (codeArt.indexOf(held.wid) >= 0 || codeArt.indexOf(held.oid) >= 0) return null;
+    // Pistols and the bone mask have no cell; they are drawn as overlays on top of the figure.
     const out = [];
 
     /** Look up an item id in one catalog table. Returns false when the figure must use code art. */
@@ -69,11 +139,11 @@
     if (!item('cloak', held.cid)) return null;
     out.push(hairs[(look.hairSeed >>> 0) % hairs.length]);
     if (held.hid) {
-      if (!item('helm', held.hid)) return null;
+      if (held.hid !== MASK && !item('helm', held.hid)) return null;
     } else if (cat.hat[hat]) {
       out.push(cat.hat[hat]);
     }
-    if (held.weapon) {
+    if (held.weapon && held.weapon !== 'pistol') {
       const tiers = cat.weapon[held.weapon];
       if (!tiers) {
         warnOnce('weapon', held.weapon);
@@ -81,13 +151,7 @@
       }
       out.push(tiers[Math.max(1, Math.min(4, held.wt | 0)) - 1]);
     }
-    if (held.offPistol) {
-      if (!cat.offPistol) {
-        warnOnce('offhand pistol', held.oid);
-        return null;
-      }
-      out.push(cat.offPistol);
-    } else if (held.shield && !item('shield', held.oid)) return null;
+    if (!held.offPistol && held.shield && !item('shield', held.oid)) return null;
     return out;
   }
 
@@ -165,7 +229,7 @@
     if (!cells) return null;
     const image = sheet(cat);
     if (!image) return null;
-    const key = JSON.stringify(cells) + '|' + step;
+    const key = JSON.stringify(cells) + '|' + step + '|' + overlayKey(held) + '|' + (held.best | 0);
     const hit = cache.get(key);
     if (hit) return hit;
     const c = document.createElement('canvas');
@@ -174,19 +238,35 @@
     g.imageSmoothingEnabled = false;
     // The trailing cells are the weapon and the offhand. They stay in the same hand on the mirrored step.
     let held_n = 0;
-    if (held.weapon) held_n++;
-    if (held.offPistol ? cat.offPistol : held.shield && held.oid && cat.shield[held.oid]) held_n++;
+    if (weaponCell(held)) held_n++;
+    if (offCell(held, cat)) held_n++;
     const body_n = cells.length - held_n;
     const dy = step === 1 ? 1 : 2;
-    const draw = (cell) => g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 2, dy, cat.cell, cat.cell);
+    const lt = LEG_TINT[legFamily(held.lid)];
+    const draw = (cell) => {
+      if (lt && cell === cat.legs) g.drawImage(tinted(image, cat, cell, lt[0], lt[1]), 2, dy);
+      else g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 2, dy, cat.cell, cat.cell);
+    };
     if (step === 2) {
       g.save();
       g.translate(20, 0);
       g.scale(-1, 1);
     }
     for (let i = 0; i < body_n; i++) draw(cells[i]);
+    const ov = overlays(held);
+    const rects = (list, ox, oy) => {
+      for (const [x, y, w, h, col] of list) {
+        g.fillStyle = col;
+        g.fillRect(2 + ox + x, dy + oy + y, w, h);
+      }
+    };
+    rects(ov.torso, 0, 0);
+    rects(ov.face, 0, 0);
+    rects(ov.hand, 0, 0);
     if (step === 2) g.restore();
     for (let i = body_n; i < cells.length; i++) draw(cells[i]);
+    if (held.weapon === 'pistol') rects(pistolRects(held.wt).map(([x, y, w, h, c]) => [x + 1, y + 10, w, h, c]), 0, 0);
+    if (held.offPistol) rects(pistolRects(held.ot || held.wt).map(([x, y, w, h, c]) => [x + 13, y + 10, w, h, c]), 0, 0);
     if (cache.size > 400) cache.clear();
     cache.set(key, c);
     return c;
@@ -244,8 +324,8 @@
     if (!image) return false;
     const C = cat.cell;
     let held_n = 0;
-    if (held.weapon) held_n++;
-    if (held.offPistol ? cat.offPistol : held.shield && held.oid && cat.shield[held.oid]) held_n++;
+    if (weaponCell(held)) held_n++;
+    if (offCell(held, cat)) held_n++;
     const body_n = cells.length - held_n;
     const t = a.t || 0;
     const mv = a.mv || 0;
@@ -311,14 +391,70 @@
       part(cc, snap(trail * 1.2), snap(dyTorso + 0.5), 0, LEGS, 0, C, img);
       part(cc, snap(trail * 1.8), snap(0.5), LEGS, C, 0, C, img);
     }
+    const lt = LEG_TINT[legFamily(held.lid)];
     for (let i = 0; i < body_n; i++) {
       const cell = cells[i];
-      part(cell, snap(lean), snap(dyTorso), 0, LEGS, 0, C);
-      part(cell, snap(-legDx), snap(-lift[0]), LEGS, C, 0, 8);
-      part(cell, snap(legDx), snap(-lift[1]), LEGS, C, 8, C);
+      const tint = lt && cell === cat.legs ? tinted(image, cat, cell, lt[0], lt[1]) : undefined;
+      part(cell, snap(lean), snap(dyTorso), 0, LEGS, 0, C, tint);
+      part(cell, snap(-legDx), snap(-lift[0]), LEGS, C, 0, 8, tint);
+      part(cell, snap(legDx), snap(-lift[1]), LEGS, C, 8, C, tint);
+    }
+    // Belt, amulet, the bone mask and a ring: pixel sprites that ride with the chest, the head and the hand.
+    const ov = overlays(held);
+    const rects = (list, ox, oy) => {
+      for (const [rx, ry, rw, rh, col] of list) {
+        ctx.fillStyle = col;
+        ctx.fillRect(Math.round(x + (rx + ox) * s), Math.round(y + (ry + oy) * s), rw * s, rh * s);
+      }
+    };
+    rects(ov.torso, snap(lean), snap(dyTorso));
+    rects(ov.face, snap(lean), snap(dyTorso));
+    rects(ov.hand, snap(lean * 0.8), snap(dyTorso));
+    // A faint glint wanders over rare and legendary gear.
+    if (held.best >= 2) {
+      for (let k = 0; k < (held.best === 3 ? 2 : 1); k++) {
+        const ph2 = (t / 1400 + seed * 0.37 + k * 0.5) % 1;
+        const gx = 4 + Math.floor(((seed * 7 + k * 5 + Math.floor(t / 1400 + seed)) % 8 + 8) % 8);
+        const gy = 4 + Math.floor(ph2 * 8);
+        const keepA = ctx.globalAlpha;
+        ctx.globalAlpha = keepA * Math.sin(ph2 * Math.PI) * 0.75;
+        ctx.fillStyle = RARITY_GLINT[held.best];
+        ctx.fillRect(Math.round(x + (gx + snap(lean)) * s), Math.round(y + (gy + snap(dyTorso)) * s), s, s);
+        ctx.globalAlpha = keepA;
+      }
     }
     let wi = body_n;
-    if (held.weapon) {
+    if (held.weapon === 'pistol') {
+      // Hand pistol: it lifts on the swing and flashes at the muzzle on the shot.
+      const ang = sw >= 0 ? (-35 * Math.sin(Math.min(1, sw / 0.55) * Math.PI)) : (stance ? -8 : -4);
+      const ox = 1 + snap(lean), oy = 10 + snap(dyTorso);
+      ctx.save();
+      ctx.translate(x + ox * s, y + oy * s);
+      ctx.rotate((Math.round(ang / 15) * 15 * Math.PI) / 180);
+      for (const [rx, ry, rw, rh, col] of pistolRects(held.wt)) {
+        ctx.fillStyle = col;
+        ctx.fillRect(rx * s, ry * s, rw * s, rh * s);
+      }
+      if (sw >= 0.3 && sw < 0.5) {
+        ctx.fillStyle = '#fff6b0';
+        ctx.fillRect(-s, -8 * s, 3 * s, 2 * s);
+        ctx.fillStyle = '#ffb040';
+        ctx.fillRect(0, -10 * s, s, 2 * s);
+      }
+      ctx.restore();
+    }
+    if (held.offPistol) {
+      const ox = 14 + snap(lean * 0.8), oy = 10 + snap(dyTorso);
+      ctx.save();
+      ctx.translate(x + ox * s, y + oy * s);
+      ctx.scale(-1, 1);
+      for (const [rx, ry, rw, rh, col] of pistolRects(held.ot || held.wt)) {
+        ctx.fillStyle = col;
+        ctx.fillRect(rx * s, ry * s, rw * s, rh * s);
+      }
+      ctx.restore();
+    }
+    if (weaponCell(held)) {
       const cell = cells[wi++];
       const pv = PIVOT[held.weapon] || [12, 11];
       const px = x + (pv[0] + lean) * s;

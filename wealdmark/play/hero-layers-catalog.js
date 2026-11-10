@@ -63,6 +63,6 @@
     mace: [[47, 6], [47, 0], [47, 4], [47, 8]],
     spear: [[49, 6], [49, 0], [49, 4], [49, 8]],
   },
-  // The sheet has no guns and no bone mask: figures holding or wearing these keep the code art.
-  codeArt: ['bronze_pistol', 'iron_pistol', 'steel_pistol', 'mithril_pistol', 'pickmans_bone_mask'],
+  // The sheet has no guns and no bone mask; hero-layers.js draws those as overlays, so nothing here needs the code art.
+  codeArt: [],
 };
