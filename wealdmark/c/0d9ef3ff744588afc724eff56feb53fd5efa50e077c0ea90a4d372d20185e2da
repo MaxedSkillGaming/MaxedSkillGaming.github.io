@@ -1,0 +1,1645 @@
+[
+  {
+    "id": "smelt_bronze",
+    "station": "furnace",
+    "skill": "smithing",
+    "level": 1,
+    "xp": 4,
+    "inputs": [
+      {
+        "item": "copper_ore",
+        "qty": 1
+      },
+      {
+        "item": "tin_ore",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_bar",
+      "qty": 1
+    }
+  },
+  {
+    "id": "smelt_iron",
+    "station": "furnace",
+    "skill": "smithing",
+    "level": 10,
+    "xp": 8,
+    "inputs": [
+      {
+        "item": "iron_ore",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_bar",
+      "qty": 1
+    }
+  },
+  {
+    "id": "smelt_steel",
+    "station": "furnace",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "iron_ore",
+        "qty": 1
+      },
+      {
+        "item": "coal",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "steel_bar",
+      "qty": 1
+    }
+  },
+  {
+    "id": "smelt_moonsilver",
+    "station": "furnace",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "moonsilver_ore",
+        "qty": 1
+      },
+      {
+        "item": "coal",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonsilver_bar",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_bronze_dagger",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 1,
+    "xp": 8,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_dagger",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_bronze_sword",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "bronze_sword",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_iron_dagger",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 10,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_dagger",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_iron_sword",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 10,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "iron_sword",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_steel_dagger",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "steel_dagger",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_steel_sword",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "steel_sword",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_mithril_dagger",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "mithril_dagger",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_mithril_sword",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "mithril_sword",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_chain_body",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 4
+      }
+    ],
+    "output": {
+      "item": "chain_body",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_chain_legs",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 96,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 3
+      }
+    ],
+    "output": {
+      "item": "chain_legs",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_chain_head",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "chain_head",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_briar_buckler",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 10,
+    "xp": 40,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "briar_buckler",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_briar_shield",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 72,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 3
+      }
+    ],
+    "output": {
+      "item": "briar_shield",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_briar_bulwark",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 280,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 3
+      }
+    ],
+    "output": {
+      "item": "briar_bulwark",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_chain_offhand",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 20,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "chain_offhand",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_mithril_body",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 256,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 4
+      }
+    ],
+    "output": {
+      "item": "mithril_body",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_mithril_legs",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 192,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 3
+      }
+    ],
+    "output": {
+      "item": "mithril_legs",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_mithril_head",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "mithril_head",
+      "qty": 1
+    }
+  },
+  {
+    "id": "forge_mithril_offhand",
+    "station": "anvil",
+    "skill": "smithing",
+    "level": 30,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "mithril_offhand",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_shrimp",
+    "station": "range",
+    "skill": "cooking",
+    "level": 1,
+    "xp": 5,
+    "inputs": [
+      {
+        "item": "raw_shrimp",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "cooked_shrimp",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_trout",
+    "station": "range",
+    "skill": "cooking",
+    "level": 10,
+    "xp": 10,
+    "inputs": [
+      {
+        "item": "raw_trout",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "cooked_trout",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_salmon",
+    "station": "range",
+    "skill": "cooking",
+    "level": 20,
+    "xp": 20,
+    "inputs": [
+      {
+        "item": "raw_salmon",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "cooked_salmon",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_tuna",
+    "station": "range",
+    "skill": "cooking",
+    "level": 30,
+    "xp": 40,
+    "inputs": [
+      {
+        "item": "raw_tuna",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "cooked_tuna",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_rabbit",
+    "station": "range",
+    "skill": "cooking",
+    "level": 1,
+    "xp": 5,
+    "inputs": [
+      {
+        "item": "raw_rabbit",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "cooked_rabbit",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_pine_shortbow",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "pine_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "pine_shortbow",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_hazel_staff",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "pine_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "hazel_staff",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_birch_bow",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "birch_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "birch_bow",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_rowan_staff",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "birch_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "rowan_staff",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_oak_bow",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 20,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "oak_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "oak_bow",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_yew_staff",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 20,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "oak_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "yew_staff",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_willow_bow",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 30,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "willow_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "willow_bow",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_elder_staff",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 30,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "willow_logs",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "elder_staff",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_soft_leather_body",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "soft_leather",
+        "qty": 4
+      }
+    ],
+    "output": {
+      "item": "soft_leather_body",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_soft_leather_legs",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 24,
+    "inputs": [
+      {
+        "item": "soft_leather",
+        "qty": 3
+      }
+    ],
+    "output": {
+      "item": "soft_leather_legs",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_soft_leather_head",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "soft_leather",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "soft_leather_head",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_soft_leather_offhand",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "soft_leather",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "soft_leather_offhand",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_soft_leather_cloak",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "soft_leather",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "soft_leather_cloak",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_hard_leather_body",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "hard_leather",
+        "qty": 4
+      }
+    ],
+    "output": {
+      "item": "hard_leather_body",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_hard_leather_legs",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 48,
+    "inputs": [
+      {
+        "item": "hard_leather",
+        "qty": 3
+      }
+    ],
+    "output": {
+      "item": "hard_leather_legs",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_hard_leather_head",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "hard_leather",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "hard_leather_head",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_hard_leather_offhand",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "hard_leather",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "hard_leather_offhand",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_hard_leather_cloak",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 10,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "hard_leather",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "hard_leather_cloak",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_chain_cloak",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 20,
+    "xp": 64,
+    "inputs": [
+      {
+        "item": "stagskin",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "chain_cloak",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_mithril_cloak",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 30,
+    "xp": 128,
+    "inputs": [
+      {
+        "item": "shadowhide",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "mithril_cloak",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_ember_stew",
+    "station": "range",
+    "skill": "cooking",
+    "level": 36,
+    "xp": 190,
+    "inputs": [
+      {
+        "item": "lizard_meat",
+        "qty": 2
+      },
+      {
+        "item": "ashroot",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "ember_stew",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cook_smoked_lizard",
+    "station": "range",
+    "skill": "cooking",
+    "level": 32,
+    "xp": 150,
+    "inputs": [
+      {
+        "item": "lizard_meat",
+        "qty": 2
+      },
+      {
+        "item": "cinderwood_logs",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "smoked_lizard",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_greater_health_potion",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 30,
+    "xp": 120,
+    "inputs": [
+      {
+        "item": "ashroot",
+        "qty": 2
+      },
+      {
+        "item": "sulfur",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "greater_health_potion",
+      "qty": 1
+    }
+  },
+  {
+    "id": "make_greater_mana_potion",
+    "station": "bench",
+    "skill": "crafting",
+    "level": 32,
+    "xp": 130,
+    "inputs": [
+      {
+        "item": "ember_shard",
+        "qty": 2
+      },
+      {
+        "item": "ashroot",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "greater_mana_potion",
+      "qty": 1
+    }
+  },
+  {
+    "id": "brew_clover_salve",
+    "station": "cauldron",
+    "skill": "alchemy",
+    "level": 1,
+    "xp": 6,
+    "inputs": [
+      {
+        "item": "clover_leaf",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "clover_salve",
+      "qty": 1
+    }
+  },
+  {
+    "id": "brew_moonpetal_tonic",
+    "station": "cauldron",
+    "skill": "alchemy",
+    "level": 8,
+    "xp": 14,
+    "inputs": [
+      {
+        "item": "moonpetal",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "moonpetal_tonic",
+      "qty": 1
+    }
+  },
+  {
+    "id": "brew_sunwheat_elixir",
+    "station": "cauldron",
+    "skill": "alchemy",
+    "level": 12,
+    "xp": 24,
+    "inputs": [
+      {
+        "item": "sunwheat",
+        "qty": 1
+      },
+      {
+        "item": "clover_leaf",
+        "qty": 2
+      }
+    ],
+    "output": {
+      "item": "sunwheat_elixir",
+      "qty": 1
+    }
+  },
+  {
+    "id": "brew_ghostcap_draught",
+    "station": "cauldron",
+    "skill": "alchemy",
+    "level": 16,
+    "xp": 34,
+    "inputs": [
+      {
+        "item": "ghostcap",
+        "qty": 2
+      },
+      {
+        "item": "moonpetal",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "ghostcap_draught",
+      "qty": 1
+    }
+  },
+  {
+    "id": "brew_moonberry_cordial",
+    "station": "cauldron",
+    "skill": "alchemy",
+    "level": 22,
+    "xp": 52,
+    "inputs": [
+      {
+        "item": "moonberry",
+        "qty": 1
+      },
+      {
+        "item": "sunwheat",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonberry_cordial",
+      "qty": 1
+    }
+  },
+  {
+    "id": "brew_emberbloom_tincture",
+    "station": "cauldron",
+    "skill": "alchemy",
+    "level": 26,
+    "xp": 70,
+    "inputs": [
+      {
+        "item": "emberbloom",
+        "qty": 2
+      },
+      {
+        "item": "ghostcap",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "emberbloom_tincture",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cut_topaz",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 1,
+    "xp": 10,
+    "inputs": [
+      {
+        "item": "rough_topaz",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "topaz",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cut_amethyst",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 10,
+    "xp": 28,
+    "inputs": [
+      {
+        "item": "rough_amethyst",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "amethyst",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cut_emerald",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 18,
+    "xp": 44,
+    "inputs": [
+      {
+        "item": "rough_emerald",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "emerald",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cut_ruby",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 26,
+    "xp": 60,
+    "inputs": [
+      {
+        "item": "rough_ruby",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "ruby",
+      "qty": 1
+    }
+  },
+  {
+    "id": "cut_sapphire",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 6,
+    "xp": 20,
+    "inputs": [
+      {
+        "item": "rough_sapphire",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "sapphire",
+      "qty": 1
+    }
+  },
+  {
+    "id": "set_bronze_topaz_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 1,
+    "xp": 16,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      },
+      {
+        "item": "topaz",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_topaz_ring",
+      "qty": 1,
+      "mod": "ironfind"
+    }
+  },
+  {
+    "id": "set_iron_topaz_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 4,
+    "xp": 22,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 1
+      },
+      {
+        "item": "topaz",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_topaz_ring",
+      "qty": 1,
+      "mod": "ironfind"
+    }
+  },
+  {
+    "id": "set_steel_topaz_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 7,
+    "xp": 28,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 1
+      },
+      {
+        "item": "topaz",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "steel_topaz_ring",
+      "qty": 1,
+      "mod": "ironfind"
+    }
+  },
+  {
+    "id": "set_moonsilver_topaz_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 10,
+    "xp": 34,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      },
+      {
+        "item": "topaz",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonsilver_topaz_ring",
+      "qty": 1,
+      "mod": "ironfind"
+    }
+  },
+  {
+    "id": "set_bronze_amethyst_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 10,
+    "xp": 34,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      },
+      {
+        "item": "amethyst",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_amethyst_ring",
+      "qty": 1,
+      "mod": "resist"
+    }
+  },
+  {
+    "id": "set_iron_amethyst_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 13,
+    "xp": 40,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 1
+      },
+      {
+        "item": "amethyst",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_amethyst_ring",
+      "qty": 1,
+      "mod": "resist"
+    }
+  },
+  {
+    "id": "set_steel_amethyst_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 16,
+    "xp": 46,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 1
+      },
+      {
+        "item": "amethyst",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "steel_amethyst_ring",
+      "qty": 1,
+      "mod": "resist"
+    }
+  },
+  {
+    "id": "set_moonsilver_amethyst_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 19,
+    "xp": 52,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      },
+      {
+        "item": "amethyst",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonsilver_amethyst_ring",
+      "qty": 1,
+      "mod": "resist"
+    }
+  },
+  {
+    "id": "set_bronze_emerald_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 18,
+    "xp": 50,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      },
+      {
+        "item": "emerald",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_emerald_ring",
+      "qty": 1,
+      "mod": "dodge"
+    }
+  },
+  {
+    "id": "set_iron_emerald_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 21,
+    "xp": 56,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 1
+      },
+      {
+        "item": "emerald",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_emerald_ring",
+      "qty": 1,
+      "mod": "dodge"
+    }
+  },
+  {
+    "id": "set_steel_emerald_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 24,
+    "xp": 62,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 1
+      },
+      {
+        "item": "emerald",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "steel_emerald_ring",
+      "qty": 1,
+      "mod": "dodge"
+    }
+  },
+  {
+    "id": "set_moonsilver_emerald_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 27,
+    "xp": 68,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      },
+      {
+        "item": "emerald",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonsilver_emerald_ring",
+      "qty": 1,
+      "mod": "dodge"
+    }
+  },
+  {
+    "id": "set_bronze_ruby_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 26,
+    "xp": 66,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      },
+      {
+        "item": "ruby",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_ruby_ring",
+      "qty": 1,
+      "mod": "damage"
+    }
+  },
+  {
+    "id": "set_iron_ruby_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 29,
+    "xp": 72,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 1
+      },
+      {
+        "item": "ruby",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_ruby_ring",
+      "qty": 1,
+      "mod": "damage"
+    }
+  },
+  {
+    "id": "set_steel_ruby_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 32,
+    "xp": 78,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 1
+      },
+      {
+        "item": "ruby",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "steel_ruby_ring",
+      "qty": 1,
+      "mod": "damage"
+    }
+  },
+  {
+    "id": "set_moonsilver_ruby_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 35,
+    "xp": 84,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      },
+      {
+        "item": "ruby",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonsilver_ruby_ring",
+      "qty": 1,
+      "mod": "damage"
+    }
+  },
+  {
+    "id": "set_bronze_sapphire_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 6,
+    "xp": 26,
+    "inputs": [
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      },
+      {
+        "item": "sapphire",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "bronze_sapphire_ring",
+      "qty": 1,
+      "mod": "mana"
+    }
+  },
+  {
+    "id": "set_iron_sapphire_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 9,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "iron_bar",
+        "qty": 1
+      },
+      {
+        "item": "sapphire",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "iron_sapphire_ring",
+      "qty": 1,
+      "mod": "mana"
+    }
+  },
+  {
+    "id": "set_steel_sapphire_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 12,
+    "xp": 38,
+    "inputs": [
+      {
+        "item": "steel_bar",
+        "qty": 1
+      },
+      {
+        "item": "sapphire",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "steel_sapphire_ring",
+      "qty": 1,
+      "mod": "mana"
+    }
+  },
+  {
+    "id": "set_moonsilver_sapphire_ring",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 15,
+    "xp": 44,
+    "inputs": [
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      },
+      {
+        "item": "sapphire",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "moonsilver_sapphire_ring",
+      "qty": 1,
+      "mod": "mana"
+    }
+  },
+  {
+    "id": "forge_old_coin_amulet",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 4,
+    "xp": 32,
+    "inputs": [
+      {
+        "item": "old_coin",
+        "qty": 2
+      },
+      {
+        "item": "bronze_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "old_coin_amulet",
+      "qty": 1,
+      "mod": "ironfind"
+    }
+  },
+  {
+    "id": "forge_carved_bone_amulet",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 12,
+    "xp": 56,
+    "inputs": [
+      {
+        "item": "carved_bone",
+        "qty": 2
+      },
+      {
+        "item": "iron_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "carved_bone_amulet",
+      "qty": 1,
+      "mod": "hp"
+    }
+  },
+  {
+    "id": "forge_rune_shard_amulet",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 20,
+    "xp": 80,
+    "inputs": [
+      {
+        "item": "rune_shard",
+        "qty": 2
+      },
+      {
+        "item": "steel_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "rune_shard_amulet",
+      "qty": 1,
+      "mod": "cdr"
+    }
+  },
+  {
+    "id": "forge_ancient_relic_amulet",
+    "station": "gem_bench",
+    "skill": "jewelcrafting",
+    "level": 28,
+    "xp": 104,
+    "inputs": [
+      {
+        "item": "ancient_relic",
+        "qty": 2
+      },
+      {
+        "item": "moonsilver_bar",
+        "qty": 1
+      }
+    ],
+    "output": {
+      "item": "ancient_relic_amulet",
+      "qty": 1,
+      "mod": "crit"
+    }
+  }
+]
