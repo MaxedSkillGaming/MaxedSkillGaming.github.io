@@ -2,74 +2,74 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://happens-glory-primarily-patterns.trycloudflare.com",
-  "authUrl": "https://ons-regardless-exercises-galleries.trycloudflare.com",
+  "server": "wss://films-domestic-clarity-pubmed.trycloudflare.com",
+  "authUrl": "https://deny-brain-hook-trek.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
-      "size": 1508,
-      "sha256": "a851b382b2712513620d3b98e508820b3fa431617f36141168dc9d43c003d92e",
-      "url": "c/a851b382b2712513620d3b98e508820b3fa431617f36141168dc9d43c003d92e"
+      "size": 1817,
+      "sha256": "031663144b5c8817df06dd040fd7fbee4fe1757362f20fdbe74174bd40e0a4c8",
+      "url": "c/031663144b5c8817df06dd040fd7fbee4fe1757362f20fdbe74174bd40e0a4c8"
     },
     {
       "path": "data/game.json",
-      "size": 221,
-      "sha256": "8feb114e8b71e1e185929c4459d834c34025602fc21244f4a089cd496a5e5b4d",
-      "url": "c/8feb114e8b71e1e185929c4459d834c34025602fc21244f4a089cd496a5e5b4d"
+      "size": 245,
+      "sha256": "95e787740cc3ec4a87fee25d543acc7d88b7519b96fa05f869ec49cbed78d5d6",
+      "url": "c/95e787740cc3ec4a87fee25d543acc7d88b7519b96fa05f869ec49cbed78d5d6"
     },
     {
       "path": "data/items.json",
-      "size": 42323,
-      "sha256": "95e405f23fc8cfc430943ce234c809ffd56a6a2f8554c35a1b6fa43c2ea411a9",
-      "url": "c/95e405f23fc8cfc430943ce234c809ffd56a6a2f8554c35a1b6fa43c2ea411a9"
+      "size": 59423,
+      "sha256": "a1a45341a7817a778d3eda50d6baeddb66c5a4635f65c49a284dfb47a294aced",
+      "url": "c/a1a45341a7817a778d3eda50d6baeddb66c5a4635f65c49a284dfb47a294aced"
     },
     {
       "path": "data/monsters.json",
-      "size": 24056,
-      "sha256": "fb892e3b19b2d68e65ce4618ca0128284ace7886e485459ac50e7bf12df3db8d",
-      "url": "c/fb892e3b19b2d68e65ce4618ca0128284ace7886e485459ac50e7bf12df3db8d"
+      "size": 44328,
+      "sha256": "a1435d0589aa254ece72f62dbc110d545962c1128692e390b3917bcb6b8d0e0d",
+      "url": "c/a1435d0589aa254ece72f62dbc110d545962c1128692e390b3917bcb6b8d0e0d"
     },
     {
       "path": "data/nodes.json",
-      "size": 10809,
-      "sha256": "c2a19c9c5164b49244193d2331be871b578548e07ac754338310c51be6b5e818",
-      "url": "c/c2a19c9c5164b49244193d2331be871b578548e07ac754338310c51be6b5e818"
+      "size": 14108,
+      "sha256": "36fc131a01c8e347c08006c6d80f0a615f6700678e09181174ba84708ca8a64d",
+      "url": "c/36fc131a01c8e347c08006c6d80f0a615f6700678e09181174ba84708ca8a64d"
     },
     {
       "path": "data/npcs.json",
-      "size": 52625,
-      "sha256": "9ed71b811c5cbdbd7f04d5c60412ee352714f1b42d3be3d2d4b9f5aee59edf3c",
-      "url": "c/9ed71b811c5cbdbd7f04d5c60412ee352714f1b42d3be3d2d4b9f5aee59edf3c"
+      "size": 58024,
+      "sha256": "e7e56bb4b75e8748814b7bd17d09c7fc76cfcd4852d98792167fee2785e2dac4",
+      "url": "c/e7e56bb4b75e8748814b7bd17d09c7fc76cfcd4852d98792167fee2785e2dac4"
     },
     {
       "path": "data/quests.json",
-      "size": 64306,
-      "sha256": "1edfe487c42e2b899addd35461e803eac7e0f991ef554ce17e469412dea5e5fa",
-      "url": "c/1edfe487c42e2b899addd35461e803eac7e0f991ef554ce17e469412dea5e5fa"
+      "size": 81892,
+      "sha256": "3fc55dc01a0f99ed8b4e3ab1364c2e8e0c829f7257e0aec6f03a5847d5ac706d",
+      "url": "c/3fc55dc01a0f99ed8b4e3ab1364c2e8e0c829f7257e0aec6f03a5847d5ac706d"
     },
     {
       "path": "data/recipes.json",
-      "size": 27096,
-      "sha256": "0d9ef3ff744588afc724eff56feb53fd5efa50e077c0ea90a4d372d20185e2da",
-      "url": "c/0d9ef3ff744588afc724eff56feb53fd5efa50e077c0ea90a4d372d20185e2da"
+      "size": 37575,
+      "sha256": "637ea1368fd0552378a709e3a3de8dbfa6db5a9d56c362f8472d881073381f76",
+      "url": "c/637ea1368fd0552378a709e3a3de8dbfa6db5a9d56c362f8472d881073381f76"
     },
     {
       "path": "data/shops.json",
-      "size": 17691,
-      "sha256": "24c887fd502619227119c3aa870039179f8c641210f468660804365b8f0b3423",
-      "url": "c/24c887fd502619227119c3aa870039179f8c641210f468660804365b8f0b3423"
+      "size": 19130,
+      "sha256": "c0c258d8f4d47ce6333fa904e2ba768aa9d898af66c23a234502ed42930e7799",
+      "url": "c/c0c258d8f4d47ce6333fa904e2ba768aa9d898af66c23a234502ed42930e7799"
     },
     {
       "path": "data/stations.json",
-      "size": 17028,
-      "sha256": "ce7e8ef254bff72aed645d138969ef21f39f6c77f8db31b16b92e51dddf893ff",
-      "url": "c/ce7e8ef254bff72aed645d138969ef21f39f6c77f8db31b16b92e51dddf893ff"
+      "size": 19658,
+      "sha256": "d5f36aa5575d9a65a82e6d6c7736ce98f9f64569af0c89d79a3320e1da0e51c9",
+      "url": "c/d5f36aa5575d9a65a82e6d6c7736ce98f9f64569af0c89d79a3320e1da0e51c9"
     },
     {
       "path": "maps/mossgate.json",
-      "size": 931450,
-      "sha256": "abd3daf9a629e3838655f1fbbe20fff9e8da7c19f002353748b797e558fc0189",
-      "url": "c/abd3daf9a629e3838655f1fbbe20fff9e8da7c19f002353748b797e558fc0189"
+      "size": 1143600,
+      "sha256": "a05fcd62bd6de6a9017ab22abec290ae55da93bf008357d70d5334f860907706",
+      "url": "c/a05fcd62bd6de6a9017ab22abec290ae55da93bf008357d70d5334f860907706"
     },
     {
       "path": "tiles/placeholder.png",
@@ -79,27 +79,27 @@
     },
     {
       "path": "ui/audio.js",
-      "size": 13458,
-      "sha256": "2555d3c0d3c14e524b5a48ce3c07e61eed293b9ec7eb3039ae691d6fbbda4bb7",
-      "url": "c/2555d3c0d3c14e524b5a48ce3c07e61eed293b9ec7eb3039ae691d6fbbda4bb7"
+      "size": 15597,
+      "sha256": "8e11fb811f2ca84d7a24a5e1dbe2a8a6a63e8e82fef14ef35a4b951d03c58053",
+      "url": "c/8e11fb811f2ca84d7a24a5e1dbe2a8a6a63e8e82fef14ef35a4b951d03c58053"
     },
     {
       "path": "ui/game.js",
-      "size": 409444,
-      "sha256": "c60b217c553f3f07fe7e9ca79f32c0976272dd2cbac8df6c89618a8903dfffad",
-      "url": "c/c60b217c553f3f07fe7e9ca79f32c0976272dd2cbac8df6c89618a8903dfffad"
+      "size": 430047,
+      "sha256": "59b84f12875696896ee18c11a725b5f7931326d76dc3096c392f735a9c12fa9e",
+      "url": "c/59b84f12875696896ee18c11a725b5f7931326d76dc3096c392f735a9c12fa9e"
     },
     {
       "path": "ui/hero-layers-catalog.js",
-      "size": 2606,
-      "sha256": "3cab1b71415cecaa9e443a823a21d3c9221371a38258c32a0eb7050fb7ed1ee8",
-      "url": "c/3cab1b71415cecaa9e443a823a21d3c9221371a38258c32a0eb7050fb7ed1ee8"
+      "size": 2882,
+      "sha256": "5a8ed0b5caede987265f2c0d8cfbf2753e7c7b160f32cd27048381bc692e4b52",
+      "url": "c/5a8ed0b5caede987265f2c0d8cfbf2753e7c7b160f32cd27048381bc692e4b52"
     },
     {
       "path": "ui/hero-layers.js",
-      "size": 21224,
-      "sha256": "2e5d5e32c8ae14438fc01738d69f1fc7e8a19e6e8d23de0ba955d62a18878bb4",
-      "url": "c/2e5d5e32c8ae14438fc01738d69f1fc7e8a19e6e8d23de0ba955d62a18878bb4"
+      "size": 23626,
+      "sha256": "0fcf1303e602c4b238f13d6ef1daf78f7e4c5aba26a19956107d80e2309221c8",
+      "url": "c/0fcf1303e602c4b238f13d6ef1daf78f7e4c5aba26a19956107d80e2309221c8"
     },
     {
       "path": "ui/hero-layers.png",
@@ -115,9 +115,45 @@
     },
     {
       "path": "ui/index.html",
-      "size": 21227,
-      "sha256": "797cb2fb400ef012907d1421bbc9a3f7ebefcb997b8749cea5af74827482c1be",
-      "url": "c/797cb2fb400ef012907d1421bbc9a3f7ebefcb997b8749cea5af74827482c1be"
+      "size": 21245,
+      "sha256": "2cc7b8e834c9008497b0b5677a8deb62d1b2efa1072fd1786f957c3cbd116830",
+      "url": "c/2cc7b8e834c9008497b0b5677a8deb62d1b2efa1072fd1786f957c3cbd116830"
+    },
+    {
+      "path": "ui/music/akash-chamber.ogg",
+      "size": 907553,
+      "sha256": "ee7a0707b2ac9466e4309d72722356c8aa53c49e669ab681711409eb51c8e190",
+      "url": "c/ee7a0707b2ac9466e4309d72722356c8aa53c49e669ab681711409eb51c8e190"
+    },
+    {
+      "path": "ui/music/aural.ogg",
+      "size": 2787523,
+      "sha256": "d1e5c91d513a3673ab6c2ce7f6f80d7658e2136b2b17645d3aa0a8ce17e31e1d",
+      "url": "c/d1e5c91d513a3673ab6c2ce7f6f80d7658e2136b2b17645d3aa0a8ce17e31e1d"
+    },
+    {
+      "path": "ui/music/awakening.ogg",
+      "size": 2041060,
+      "sha256": "97de5e6859b94752beaafce9153243565d0d044248c11a097a373b8b932a5fa9",
+      "url": "c/97de5e6859b94752beaafce9153243565d0d044248c11a097a373b8b932a5fa9"
+    },
+    {
+      "path": "ui/music/elven-companion.ogg",
+      "size": 890607,
+      "sha256": "f817f8cfcb9b1b87cd7e719a1adab4ea2f48271ec689d60f12f491289c94b6fd",
+      "url": "c/f817f8cfcb9b1b87cd7e719a1adab4ea2f48271ec689d60f12f491289c94b6fd"
+    },
+    {
+      "path": "ui/music/faerie-shrine.ogg",
+      "size": 878317,
+      "sha256": "bb753f34ff508bad597cedb804c0a45244b697080bbde7ff2354602b5d7eb1f2",
+      "url": "c/bb753f34ff508bad597cedb804c0a45244b697080bbde7ff2354602b5d7eb1f2"
+    },
+    {
+      "path": "ui/music/shores-of-yore.ogg",
+      "size": 1274299,
+      "sha256": "0b8013350cd90ce5fa1534ca9f9b70a7aff63dc8b631ed79f5d6aa9e3d9b552d",
+      "url": "c/0b8013350cd90ce5fa1534ca9f9b70a7aff63dc8b631ed79f5d6aa9e3d9b552d"
     },
     {
       "path": "ui/renderer.js",
@@ -132,5 +168,5 @@
       "url": "c/b6ea01d31a7bff6e7f710a37c8619c5f554b7e563bdcff153fbbb6aca2964f64"
     }
   ],
-  "signature": "8fcOqOBoDLiv7t2BfaGUPBiaVQkDQfb/FdSEUthtDZER+v9D5iq4Wb4ndeYv+GFfpgDyvHootyHvrhPAQlnSCA=="
+  "signature": "Z+Ym+4SJBDEZdQCXs6k2ArvhH8YWp1IsYVUkBsbguCvqZlUBFpQYF82/37Lgf2YyhQwRTJwVaZcr1J2+g5AhDA=="
 }

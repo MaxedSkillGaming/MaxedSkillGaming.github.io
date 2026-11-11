@@ -1,0 +1,3145 @@
+[
+  {
+    "id": "a_hero_begins",
+    "name": "The Road Begins",
+    "summary": "Reeve Ivy Penn has a kit for every newcomer.",
+    "level": 1,
+    "after": [],
+    "steps": [
+      {
+        "npc": "guide",
+        "todo": "Take the kit from Reeve Ivy Penn.",
+        "say": [
+          "There. A blade at your hip, and the tools to work the land. Chop, mine, fish, snare. Heroes eat too.",
+          "Warden Osric has the first real jobs. Go and earn a name."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 30,
+      "iron_bits": 0,
+      "gold_coins": 0,
+      "favor_tokens": 0,
+      "items": [
+        {
+          "item": "bronze_axe",
+          "qty": 1
+        },
+        {
+          "item": "bronze_pickaxe",
+          "qty": 1
+        },
+        {
+          "item": "reed_rod",
+          "qty": 1
+        },
+        {
+          "item": "rope_snare",
+          "qty": 1
+        }
+      ]
+    },
+    "done": [
+      "Ivy nods once, the way people do when they have given this kit to many and seen few of them come back.",
+      "\"Walk well, Wanderer.\""
+    ],
+    "giver": "guide",
+    "offer": [
+      "Every hero leaves home with something. You already carry a blade. Here are the tools of the trade, the ones that feed a hero between fights."
+    ]
+  },
+  {
+    "id": "the_empty_stand",
+    "name": "First Favors",
+    "summary": "Osric has more jobs than hands. Start with the imps at Tam's stable.",
+    "level": 1,
+    "after": [
+      "a_hero_begins"
+    ],
+    "steps": [
+      {
+        "npc": "tam",
+        "todo": "Ask Tam what he saw. He wants three imps driven off the road first.",
+        "say": [
+          "The harness is safe again. Thank you."
+        ],
+        "waiting": [
+          "I will tell you what I saw. But the imps keep chewing the harness. Drive off three, outside the wall, and I will tell you everything. They are south of the gate, among the trees."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "moss_imp",
+          "count": 3
+        }
+      },
+      {
+        "npc": "tam",
+        "todo": "Hear what Tam saw.",
+        "say": [
+          "A woman in green walked the west road at dawn. Barefoot, with moss in her hair. The horses went quiet as she passed.",
+          "Tell the Warden. And tell him I did not take the mare."
+        ],
+        "need": {
+          "type": "none"
+        }
+      },
+      {
+        "npc": "osbric",
+        "todo": "Tell Osric about the woman in green.",
+        "say": [
+          "A woman in green, barefoot, on the west road. The old farmers say Seraphino walks the roads when the land needs a hand. I never believed it.",
+          "You have done more in an afternoon than my watch did in a week. Take this for your trouble. A name starts like that."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 120,
+      "iron_bits": 40,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Osric looks toward the west road for a long time, then back at you.",
+      "\"Good work, Wanderer. Come back when you have more of the Reach in your boots.\""
+    ],
+    "giver": "osbric",
+    "offer": [
+      "Aldmoor has more work than hands. Start small: go to the stable and talk to Tam. Imps are chewing his harness and he is too embarrassed to ask for help.",
+      "Be kind to him. He is twelve and thinks he is in trouble."
+    ]
+  },
+  {
+    "id": "first_lesson",
+    "name": "The First Lesson",
+    "summary": "Magister Edith wants to see you spend your first skill point.",
+    "level": 1,
+    "after": [],
+    "steps": [
+      {
+        "npc": "elowen",
+        "todo": "Open the skill tree (K) and spend a point, then return to the Magister.",
+        "say": [],
+        "waiting": [
+          "You have not spent a point yet. Press K."
+        ],
+        "need": {
+          "type": "spent",
+          "points": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 40,
+      "iron_bits": 20,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Good. Now you know how it feels. Every rank counts, and you can take them all back for a fee if you change your mind.\"",
+      "She nods, once, the way teachers do when you have not embarrassed them."
+    ],
+    "giver": "elowen",
+    "offer": [
+      "You have points to spend already. Open the tree with K and put one into anything. A hero with unspent points is a hero who is not trying."
+    ]
+  },
+  {
+    "id": "timber_for_the_gate",
+    "name": "Timber for the Gate",
+    "summary": "Hob needs pine to mend the south gate.",
+    "level": 1,
+    "after": [],
+    "steps": [
+      {
+        "npc": "hob",
+        "todo": "Bring Hob 10 pine logs (Forestry).",
+        "say": [],
+        "waiting": [
+          "Ten pine logs. Meg Hollis is in the grove west of the wall. Chop a tree, it takes a few swings."
+        ],
+        "need": {
+          "type": "have",
+          "item": "pine_logs",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 60,
+      "iron_bits": 70,
+      "gold_coins": 0,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "Hob takes the logs, counts them twice, and counts them a third time on principle.",
+      "\"Honest weight. Fine work.\""
+    ],
+    "giver": "hob",
+    "offer": [
+      "The south gate has not been mended since before the war. Ten pine logs, cut and clean. I will pay you out of my own pocket, which is a sentence I have never said."
+    ]
+  },
+  {
+    "id": "copper_and_tin",
+    "name": "Copper and Tin",
+    "summary": "Hadley needs bronze bars for the guard.",
+    "level": 1,
+    "after": [],
+    "steps": [
+      {
+        "npc": "brandt",
+        "todo": "Bring Hadley 3 bronze bars (Mining and Smithing).",
+        "say": [],
+        "waiting": [
+          "Three bronze bars. One copper and one tin each. The furnace is behind me."
+        ],
+        "need": {
+          "type": "have",
+          "item": "bronze_bar",
+          "count": 3
+        }
+      }
+    ],
+    "reward": {
+      "xp": 80,
+      "iron_bits": 120,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Hadley turns a bar over, sniffs it, and nods.",
+      "\"Clean smelt. You might be a smith yet.\""
+    ],
+    "giver": "brandt",
+    "offer": [
+      "The guard wants new buckles and I am out of bronze. Three bars. Copper and tin from the Old Quarry, smelt them at my furnace, a bar each.",
+      "Do it yourself. I will not pay for work I could do faster myself."
+    ]
+  },
+  {
+    "id": "supper_for_the_watch",
+    "name": "Supper for the Watch",
+    "summary": "Bert needs five cooked shrimp for the night watch.",
+    "level": 1,
+    "after": [],
+    "steps": [
+      {
+        "npc": "bram",
+        "todo": "Bring Bert 5 cooked shrimp (Fishing and Cooking).",
+        "say": [],
+        "waiting": [
+          "Five cooked shrimp. Catch them in the pond, cook them at my range. Do not burn them."
+        ],
+        "need": {
+          "type": "have",
+          "item": "cooked_shrimp",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 60,
+      "iron_bits": 80,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "bread",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Bert counts them. \"Five. Good. Have some bread. I mean it.\""
+    ],
+    "giver": "bram",
+    "offer": [
+      "The night watch eats better than the day watch, and I resent it. Five cooked shrimp, and I will not ask where you got them."
+    ]
+  },
+  {
+    "id": "leather_for_the_barracks",
+    "name": "Leather for the Barracks",
+    "summary": "Joan needs soft leather for new guard caps.",
+    "level": 1,
+    "after": [],
+    "steps": [
+      {
+        "npc": "hild",
+        "todo": "Bring Joan 4 soft leather (Hunting).",
+        "say": [],
+        "waiting": [
+          "Four soft leather. Kit Ferris will sell you a snare."
+        ],
+        "need": {
+          "type": "have",
+          "item": "soft_leather",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 60,
+      "iron_bits": 60,
+      "gold_coins": 0,
+      "favor_tokens": 0,
+      "items": [
+        {
+          "item": "soft_leather_head",
+          "qty": 1
+        }
+      ]
+    },
+    "done": [
+      "Joan turns the leather in the light. \"Supple. You have a good eye. Keep the cap.\""
+    ],
+    "giver": "hild",
+    "offer": [
+      "The guard wears out caps like some people wear out socks. Four pieces of soft leather. Snare rabbits in the meadow south-west of the wall."
+    ]
+  },
+  {
+    "id": "imps_on_the_road",
+    "name": "Imps on the Road",
+    "summary": "Hob says the imps have got bold.",
+    "level": 1,
+    "after": [
+      "the_empty_stand"
+    ],
+    "steps": [
+      {
+        "npc": "hob",
+        "todo": "Defeat eight imps.",
+        "say": [],
+        "waiting": [
+          "Eight imps. Along the south road and in the trees."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "moss_imp",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 100,
+      "iron_bits": 100,
+      "gold_coins": 0,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "Hob nods. \"The road is quieter. Thank you.\""
+    ],
+    "giver": "hob",
+    "offer": [
+      "The imps have started biting carts. Eight of them. Not a hero's job, just a job."
+    ]
+  },
+  {
+    "id": "glow_in_the_dark",
+    "name": "Glow in the Dark",
+    "summary": "Sergeant Maud wants the spiders thinned out.",
+    "level": 3,
+    "after": [
+      "the_empty_stand"
+    ],
+    "steps": [
+      {
+        "npc": "maud",
+        "todo": "Defeat six spiders.",
+        "say": [],
+        "waiting": [
+          "Six spiders. They poison on a hit; eat before you start."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "glowcap_crawler",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 160,
+      "iron_bits": 80,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Maud grunts. \"Not bad for a Wanderer. You may report to the yard whenever you want a drink of water.\""
+    ],
+    "giver": "maud",
+    "offer": [
+      "Crawlers. Poison on every bite. Six of them, farther out than the imps. Bring a shield and some food."
+    ]
+  },
+  {
+    "id": "gnashers_on_the_road",
+    "name": "Wild dogs on the Road",
+    "summary": "The Warden wants the wild dogs cleared from the road beyond the Reach.",
+    "level": 5,
+    "after": [
+      "glow_in_the_dark"
+    ],
+    "steps": [
+      {
+        "npc": "osbric",
+        "todo": "Defeat three wild dogs.",
+        "say": [],
+        "waiting": [
+          "Three wild dogs. They are in the far corners of the Reach."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "gnasher",
+          "count": 3
+        }
+      }
+    ],
+    "reward": {
+      "xp": 300,
+      "iron_bits": 150,
+      "gold_coins": 2,
+      "favor_tokens": 2,
+      "items": []
+    },
+    "done": [
+      "Osric clasps your arm. \"The Reach is yours for now. Wait until you see the Moors.\""
+    ],
+    "giver": "osbric",
+    "offer": [
+      "The wild dogs have taken the far road. They come in packs of three. Bring armor, bring food, and do not go alone if you can help it. You can't, I know. Go anyway."
+    ]
+  },
+  {
+    "id": "the_mind_goblin",
+    "name": "The Mind Goblin",
+    "summary": "Wren wants the goblins cleared from the warren and their leader put down.",
+    "level": 8,
+    "after": [
+      "glow_in_the_dark"
+    ],
+    "steps": [
+      {
+        "npc": "wren",
+        "todo": "Defeat four goblins.",
+        "say": [],
+        "waiting": [
+          "Four goblins. They keep to the hall and the western den."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "pinegrub_goblin",
+          "count": 4
+        }
+      },
+      {
+        "npc": "wren",
+        "todo": "Defeat the Mind Goblin.",
+        "say": [
+          "Good. Now the big one. He sits in the chamber at the back, behind the middle den. Eat before you go in, and do not count on running."
+        ],
+        "waiting": [
+          "The Mind Goblin is in the back chamber. Bring food."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "mind_goblin",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 600,
+      "iron_bits": 300,
+      "gold_coins": 3,
+      "favor_tokens": 2,
+      "items": []
+    },
+    "done": [
+      "Wren laughs, tired and relieved. \"Quiet at last. The pines will grow back. Keep whatever he dropped.\""
+    ],
+    "giver": "wren",
+    "offer": [
+      "The warren mouth is north of the pines. Four of the pinegrubs first, so the rest learn to be careful. Then we talk about their leader."
+    ]
+  },
+  {
+    "id": "the_drainage_cut",
+    "name": "The Drainage Cut",
+    "summary": "Foreman Marrow needs timber and ore for the drainage cut.",
+    "level": 4,
+    "after": [
+      "glow_in_the_dark"
+    ],
+    "steps": [
+      {
+        "npc": "marrow",
+        "todo": "Bring six birch logs to Marrow.",
+        "say": [],
+        "waiting": [
+          "Six birch logs. Alderwood is west of the cut."
+        ],
+        "need": {
+          "type": "have",
+          "item": "birch_logs",
+          "count": 6
+        }
+      },
+      {
+        "npc": "marrow",
+        "todo": "Bring four iron ore to Marrow.",
+        "say": [
+          "Good timber. Now the ore for the pins: four iron. Ironback Rocks are east of the village. A level 10 pick."
+        ],
+        "waiting": [
+          "Four iron ore. East of the village, in the Ironback Rocks."
+        ],
+        "need": {
+          "type": "have",
+          "item": "iron_ore",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 350,
+      "iron_bits": 120,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Marrow slaps the last pin into the timber with the flat of her hand. \"That will hold until the next flood. Which is Tuesday.\""
+    ],
+    "giver": "marrow",
+    "offer": [
+      "The cut is not holding. I need birch for the shoring, six logs, and iron ore for the pins. Cut the birch in Alderwood, west of the water. Your forestry has to be level 10."
+    ]
+  },
+  {
+    "id": "a_crew_below",
+    "name": "A Crew Below",
+    "summary": "Lenny wants proof of what happened to the second shift.",
+    "level": 6,
+    "after": [
+      "the_drainage_cut"
+    ],
+    "steps": [
+      {
+        "npc": "corley",
+        "todo": "Find three crew notes in the Delve and the Downs.",
+        "say": [],
+        "waiting": [
+          "Three crew notes. The rats, the bats and the wretches carry them."
+        ],
+        "need": {
+          "type": "have",
+          "item": "crew_note",
+          "count": 3
+        }
+      }
+    ],
+    "reward": {
+      "xp": 450,
+      "iron_bits": 160,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Lenny reads each slip twice and puts them away, one by one, inside his coat. \"They were trying to climb out. The water was faster. Thank you.\""
+    ],
+    "giver": "corley",
+    "offer": [
+      "The crew kept notes. Tally slips, shift marks, a line or two to their families. The things down there carry them still, in their pockets, in their nests. Bring me three. Then I will know."
+    ]
+  },
+  {
+    "id": "rats_in_the_stores",
+    "name": "Rats in the Stores",
+    "summary": "Peg wants the rats cleared out of the ore store.",
+    "level": 4,
+    "after": [
+      "glow_in_the_dark"
+    ],
+    "steps": [
+      {
+        "npc": "peg",
+        "todo": "Defeat eight rats.",
+        "say": [],
+        "waiting": [
+          "Eight rats. They run in packs of three."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "sump_rat",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 300,
+      "iron_bits": 140,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Peg counts the sacks twice. \"Whole. First time in a month. Take this and do not tell Ray I paid you.\""
+    ],
+    "giver": "peg",
+    "offer": [
+      "Eight rats, as many as you can find on the Downs or in the Delve. They come in threes, so bring something that does not die from three bites."
+    ]
+  },
+  {
+    "id": "iron_for_the_smith",
+    "name": "Iron for the Smith",
+    "summary": "Ray needs four iron bars, smelted by hand.",
+    "level": 8,
+    "after": [
+      "the_drainage_cut"
+    ],
+    "steps": [
+      {
+        "npc": "brannoch",
+        "todo": "Bring four iron bars to Ray.",
+        "say": [],
+        "waiting": [
+          "Four iron bars. Ore from Ironback Rocks, smelted at the furnace."
+        ],
+        "need": {
+          "type": "have",
+          "item": "iron_bar",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 500,
+      "iron_bits": 180,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Ray turns a bar over in the tongs and nods. \"Even. Clean. You will do.\""
+    ],
+    "giver": "brannoch",
+    "offer": [
+      "Four iron bars. You dig the ore, you smelt it at my furnace, one ore a bar. Smithing level 10. If you cannot smelt, learn on bronze and come back."
+    ]
+  },
+  {
+    "id": "the_foreman_below",
+    "name": "The Foreman Below",
+    "summary": "Marrow needs to know what became of her brother, the old foreman.",
+    "level": 10,
+    "after": [
+      "the_drainage_cut",
+      "a_crew_below"
+    ],
+    "steps": [
+      {
+        "npc": "marrow",
+        "todo": "Defeat the Foreman Below in the Delve of the Black Sump.",
+        "say": [],
+        "waiting": [
+          "The Foreman is in the chamber at the bottom of the Delve. Bring food."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "foreman_below",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 1200,
+      "iron_bits": 500,
+      "gold_coins": 4,
+      "favor_tokens": 3,
+      "items": []
+    },
+    "done": [
+      "Marrow stands very still for a long time. \"Thank you. I will tell the village he was a good foreman. That is true as far as it goes.\""
+    ],
+    "giver": "marrow",
+    "offer": [
+      "Lenny told me what you found. My brother is still down there. What is left of him throws picks at anything that moves.",
+      "The Delve is south of the village, down the road. Go through the galleries to the chamber at the bottom. You cannot run from him once it starts."
+    ]
+  },
+  {
+    "id": "harbor_catch",
+    "name": "A Catch for the Harbor",
+    "summary": "The harbormaster needs trout for the quay crews.",
+    "level": 10,
+    "after": [],
+    "steps": [
+      {
+        "npc": "jory",
+        "todo": "Bring six raw trout to Harbormaster Eli.",
+        "say": [],
+        "waiting": [
+          "Six raw trout. They bite near the shore on an ash rod."
+        ],
+        "need": {
+          "type": "have",
+          "item": "raw_trout",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 520,
+      "iron_bits": 140,
+      "gold_coins": 1,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "Eli counts them twice and writes in the ledger. It is the first honest entry the book has seen all month."
+    ],
+    "giver": "jory",
+    "offer": [
+      "The crews have eaten nothing but bread for a week. Fish, good fish, from the piers. Trout will do. Six of them, raw, and I will see you paid.",
+      "Dan has the rods. Fish the south piers."
+    ]
+  },
+  {
+    "id": "the_maid_at_the_salt_lantern",
+    "name": "The Maid at the Salt Lantern",
+    "summary": "Maren wants to hit something. The dune boars will do.",
+    "level": 8,
+    "after": [],
+    "steps": [
+      {
+        "npc": "maid",
+        "todo": "Defeat five wild boars in the dunes east of Gullsend.",
+        "say": [],
+        "waiting": [
+          "Five boars. They are in the dunes, east of the city."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "stone_boar",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 720,
+      "iron_bits": 210,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Maren listens, nods once, and for the first time that day stops carrying plates. \"Better. Thank you. I will remember this when it matters.\""
+    ],
+    "giver": "maid",
+    "offer": [
+      "The boars in the dunes keep eating the tavern garden. I would go myself but Tess says I would be missed.",
+      "I would like you to hit five of them. Hard. Hard enough that I feel it from here."
+    ]
+  },
+  {
+    "id": "bow_practice",
+    "name": "Bow Practice",
+    "summary": "Dame Rhoda wants you to shoot four wild dogs on the road.",
+    "level": 8,
+    "after": [],
+    "steps": [
+      {
+        "npc": "orla",
+        "todo": "Defeat four wild dogs along the road with any weapon, a bow by preference.",
+        "say": [],
+        "waiting": [
+          "Four wild dogs on the road verge. Keep your distance."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "gnasher",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 460,
+      "iron_bits": 150,
+      "gold_coins": 1,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "\"Four. Good. You flinched less each time.\" Rhoda sets a hand on your shoulder for exactly one second."
+    ],
+    "giver": "orla",
+    "offer": [
+      "Words teach nothing. Four wild dogs on the road verge. Shoot them from range if you have a bow, and if you do not, go and buy one."
+    ]
+  },
+  {
+    "id": "supper_for_the_quay",
+    "name": "Supper for the Quay",
+    "summary": "Bill wants five cooked trout for the quay crews.",
+    "level": 10,
+    "after": [],
+    "steps": [
+      {
+        "npc": "brisket",
+        "todo": "Bring five cooked trout to Bill Hale.",
+        "say": [],
+        "waiting": [
+          "Five cooked trout. Catch them, then use the range."
+        ],
+        "need": {
+          "type": "have",
+          "item": "cooked_trout",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 580,
+      "iron_bits": 170,
+      "gold_coins": 1,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "Bill tastes one and goes quiet. \"Perfect. Do not tell the others I said so.\""
+    ],
+    "giver": "brisket",
+    "offer": [
+      "The crews are hungry and the range is free. Five trout, properly cooked, and I will pay you well."
+    ]
+  },
+  {
+    "id": "lights_on_the_dunes",
+    "name": "Lights on the Dunes",
+    "summary": "Eli wants the blue lights on the dunes put out.",
+    "level": 10,
+    "after": [
+      "harbor_catch"
+    ],
+    "steps": [
+      {
+        "npc": "jory",
+        "todo": "Defeat five wolves on the dunes east of Gullsend.",
+        "say": [],
+        "waiting": [
+          "Five wolves. They run the dunes east of the city at night."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "wisp_hound",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 900,
+      "iron_bits": 240,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Eli takes the report without looking up. \"Good. Now the dunes are only dark. I can work with dark.\""
+    ],
+    "giver": "jory",
+    "offer": [
+      "There are lights on the dunes after dark. Blue, low, and moving the wrong way. The crews say they are hounds, and that they follow the boats in.",
+      "Put out five. I do not care how. I care that they stop."
+    ]
+  },
+  {
+    "id": "wolf_at_the_door",
+    "name": "A Wolf at the Door",
+    "summary": "Rhoda wants the dire wolves west of the city thinned.",
+    "level": 12,
+    "after": [
+      "bow_practice"
+    ],
+    "steps": [
+      {
+        "npc": "orla",
+        "todo": "Defeat four dire wolves in the west woods.",
+        "say": [],
+        "waiting": [
+          "Four dire wolves in the west woods. Do not let them close."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "dire_wolf",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 1100,
+      "iron_bits": 300,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Rhoda looks at the pelts a long time. \"Shadow-touched. Burn them. Do not keep a scrap.\" Then, quieter, \"Well shot.\""
+    ],
+    "giver": "orla",
+    "offer": [
+      "The wolves came down from the hills this autumn. Too still, too quiet, always looking the wrong way. They took a net-mender last week.",
+      "Four of them. Keep your range. If one closes, you have already lost the exchange. Then make it a different exchange."
+    ]
+  },
+  {
+    "id": "wolf_moon_fever",
+    "name": "The Wolf-Moon's Fever",
+    "summary": "Warden Leofric wants the sick wolves put down and the source found.",
+    "level": 11,
+    "after": [
+      "bow_practice"
+    ],
+    "steps": [
+      {
+        "npc": "warden_leofric",
+        "todo": "Defeat six grave wolves on the moors.",
+        "say": [],
+        "waiting": [
+          "Six grave wolves. They run the moors south of the lodge."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "grave_wolf",
+          "count": 6
+        }
+      },
+      {
+        "npc": "warden_leofric",
+        "todo": "Defeat Greymuzzle the Pack-Lord in the Nameless Cairns.",
+        "say": [],
+        "waiting": [
+          "Greymuzzle leads the pack in the cairns, south of the lodge."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "ghashul",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 2400,
+      "iron_bits": 420,
+      "gold_coins": 3,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "The Warden looks at the pelt, then at you. \"It was not hunger. The wild is restless, and the beasts feel it first. Well done.\""
+    ],
+    "giver": "warden_leofric",
+    "offer": [
+      "Wolves are dying wrong, and the hunters blame each other. Kill six that have gone mad, and you will see what I mean.",
+      "Then find the pack-lord. He is in the cairns, with something wrong in his eyes."
+    ]
+  },
+  {
+    "id": "the_bone_mask",
+    "name": "The Bone Mask",
+    "summary": "Morwenna Pickman sits in the heart of the cairns. End her.",
+    "level": 14,
+    "after": [
+      "wolf_moon_fever"
+    ],
+    "steps": [
+      {
+        "npc": "warden_leofric",
+        "todo": "Defeat Morwenna Pickman in the Nameless Cairns.",
+        "say": [],
+        "waiting": [
+          "She sits at the bottom of the cairns, past the warden Ethelgar."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "morwenna_pickman",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 4200,
+      "iron_bits": 700,
+      "gold_coins": 5,
+      "favor_tokens": 2,
+      "items": []
+    },
+    "done": [
+      "Leofric turns the mask over and does not touch it. \"Bone. Her kind carve their charms from it. Take it with you. Please do not leave it here.\""
+    ],
+    "giver": "warden_leofric",
+    "offer": [
+      "The feeding came from her. She talks pleasantly the whole time, and she means every word. End it."
+    ]
+  },
+  {
+    "id": "grave_dust",
+    "name": "Grave Dust",
+    "summary": "Dot wants five measures of grave dust for the smokehouse seal.",
+    "level": 12,
+    "after": [
+      "bow_practice"
+    ],
+    "steps": [
+      {
+        "npc": "smoker_edda",
+        "todo": "Bring five grave dust to Dot Fell.",
+        "say": [],
+        "waiting": [
+          "Five grave dust. Skeletons in the cairns carry it."
+        ],
+        "need": {
+          "type": "have",
+          "item": "grave_dust",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 1500,
+      "iron_bits": 260,
+      "gold_coins": 2,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "Dot sniffs it and wrinkles her nose. \"Yes. That is the stuff. No, do not ask what for.\""
+    ],
+    "giver": "smoker_edda",
+    "offer": [
+      "I have a use for dust from the old dead. The kind that stays on the shoes. Five measures, from the wights."
+    ]
+  },
+  {
+    "id": "lamps_upon_the_mere",
+    "name": "Lamps Upon the Mere",
+    "summary": "Moll wants trout for the lamp oil, then the Tide Matron dealt with.",
+    "level": 15,
+    "after": [
+      "wolf_moon_fever"
+    ],
+    "steps": [
+      {
+        "npc": "marren",
+        "todo": "Bring eight raw trout to Moll Lowe.",
+        "say": [],
+        "waiting": [
+          "Eight raw trout. Fish off the deck edge in Marwick."
+        ],
+        "need": {
+          "type": "have",
+          "item": "raw_trout",
+          "count": 8
+        }
+      },
+      {
+        "npc": "marren",
+        "todo": "Defeat Nyth-Ael, the Tide Matron, in the Drowned Hall.",
+        "say": [],
+        "waiting": [
+          "Nyth-Ael keeps the gallery of the Drowned Hall, down the causeway south of the village."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "nyth_ael",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 3000,
+      "iron_bits": 520,
+      "gold_coins": 4,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "lantern_rod",
+          "qty": 1
+        }
+      ]
+    },
+    "done": [
+      "Moll sets the lamp down and lets the light flicker. \"She kept the eels. They are leaderless now, and angry. But fewer. Take the rod. It was meant for you.\""
+    ],
+    "giver": "marren",
+    "offer": [
+      "The lamps burn trout oil. Eight, raw, and I will keep them lit.",
+      "Then go down the causeway. Something under the water has been fishing back, and she is the one holding the line."
+    ]
+  },
+  {
+    "id": "eel_trouble",
+    "name": "Eel Trouble",
+    "summary": "Toby wants five eels off the shallows around the village.",
+    "level": 15,
+    "after": [
+      "bow_practice"
+    ],
+    "steps": [
+      {
+        "npc": "tobin",
+        "todo": "Defeat five eels near Marwick.",
+        "say": [],
+        "waiting": [
+          "Five eels. They keep to the shallows on the shore."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "mere_eel",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 2600,
+      "iron_bits": 380,
+      "gold_coins": 3,
+      "favor_tokens": 0,
+      "items": []
+    },
+    "done": [
+      "Toby counts his nets and finds all of them whole for the first time in weeks. \"Good. Do not tell them where the nets are.\""
+    ],
+    "giver": "tobin",
+    "offer": [
+      "The eels have been through every net I own. Thin them out. Five, on the shore."
+    ]
+  },
+  {
+    "id": "the_drowned_prince",
+    "name": "The Drowned Prince",
+    "summary": "Prince Elrenor offers terms to everyone who comes. Refuse him.",
+    "level": 19,
+    "after": [
+      "lamps_upon_the_mere"
+    ],
+    "steps": [
+      {
+        "npc": "wystan",
+        "todo": "Defeat Prince Elrenor the Drowned in the Drowned Hall.",
+        "say": [],
+        "waiting": [
+          "He waits in the chamber at the far end of the Drowned Hall. He will offer terms. Say no."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "prince_elrenor",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 6500,
+      "iron_bits": 900,
+      "gold_coins": 6,
+      "favor_tokens": 2,
+      "items": []
+    },
+    "done": [
+      "Hal looks at the water for a long time. \"He is quiet. First time in eighty years. I will row out tonight and see if the lake is the same.\""
+    ],
+    "giver": "wystan",
+    "offer": [
+      "I took him across once. He asked me to wait. I did not. Go and finish what I left him in."
+    ]
+  },
+  {
+    "id": "the_hermits_supper",
+    "name": "The Hermit's Supper",
+    "summary": "Nick the Hermit wants three cooked rabbit and offers a crystal in return.",
+    "level": 5,
+    "after": [],
+    "steps": [
+      {
+        "npc": "hermit",
+        "todo": "Bring Nick 3 cooked rabbit (Hunting and Cooking).",
+        "say": [],
+        "waiting": [
+          "Three cooked rabbit. Snare them, cook them, and do not tell the goat."
+        ],
+        "need": {
+          "type": "have",
+          "item": "cooked_rabbit",
+          "count": 3
+        }
+      }
+    ],
+    "reward": {
+      "xp": 150,
+      "iron_bits": 0,
+      "gold_coins": 2,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "teleport_crystal",
+          "qty": 1
+        }
+      ]
+    },
+    "done": [
+      "Nick eats the first rabbit in two bites and the second in one. \"Splendid. I have been living on pine nuts and spite.\"",
+      "He presses a blue crystal into your hand. \"Found it in a stream. It hums at the wrong pitch. You may as well have it.\""
+    ],
+    "giver": "hermit",
+    "offer": [
+      "I have not had a hot supper since the autumn. Three rabbit, cooked, and I will see you do not leave empty-handed."
+    ]
+  },
+  {
+    "id": "ashgate_welcome",
+    "name": "A Bed in Ashgate",
+    "summary": "Warden Sael wants you to meet the innkeeper.",
+    "level": 20,
+    "after": [],
+    "steps": [
+      {
+        "npc": "marga_pell",
+        "todo": "Speak to Marga Pell at the Ashgate inn.",
+        "say": [],
+        "waiting": [
+          "Marga is the one with the ladle."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 890,
+      "iron_bits": 160,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Marga looks you over. \"Sael sent you. That means you can hold a blade. Beds are twenty bits. Soup is free the first night.\""
+    ],
+    "giver": "warden_sael",
+    "offer": [
+      "Another boot on the cinder road. Good. Ashgate is short of boots.",
+      "Marga Pell keeps the inn by the bellstone. Go and say hello. She will tell you what the town needs."
+    ]
+  },
+  {
+    "id": "hounds_at_the_gate",
+    "name": "Hounds at the Gate",
+    "summary": "Eight ember hounds keep circling the town.",
+    "level": 20,
+    "after": [
+      "ashgate_welcome"
+    ],
+    "steps": [
+      {
+        "npc": "warden_sael",
+        "todo": "Defeat eight ember hounds in the Scorchfield.",
+        "say": [],
+        "waiting": [
+          "Eight hounds. The Scorchfield starts just past the gate."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "ember_hound",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 2975,
+      "iron_bits": 160,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Sael nods once. \"The night watch will sleep better. So will I.\""
+    ],
+    "giver": "warden_sael",
+    "offer": [
+      "Hounds the colour of coals. They come at dusk and sit on the road, watching the gate.",
+      "Thin them out. Eight should make the rest think twice."
+    ]
+  },
+  {
+    "id": "count_the_crawlers",
+    "name": "Count the Crawlers",
+    "summary": "Ash crawlers are chewing the town's fence posts.",
+    "level": 21,
+    "after": [
+      "hounds_at_the_gate"
+    ],
+    "steps": [
+      {
+        "npc": "hobb_reddick",
+        "todo": "Defeat ten ash crawlers.",
+        "say": [],
+        "waiting": [
+          "Ten crawlers. They live in the ash drifts."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "ash_crawler",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 3385,
+      "iron_bits": 168,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Hobb scratches a tally on the wall. \"Ten. I owe you a drink.\""
+    ],
+    "giver": "hobb_reddick",
+    "offer": [
+      "Every morning there are fewer fence posts. I found the culprits: big grey bugs the size of a dog.",
+      "Ten of them gone and I will stop counting posts."
+    ]
+  },
+  {
+    "id": "imps_among_the_barrels",
+    "name": "Imps Among the Barrels",
+    "summary": "Ilsa needs ember shards, and the imps carry them.",
+    "level": 22,
+    "after": [
+      "ashgate_welcome"
+    ],
+    "steps": [
+      {
+        "npc": "ilsa_vane",
+        "todo": "Bring Ilsa five ember shards.",
+        "say": [],
+        "waiting": [
+          "Five ember shards from the cinder imps."
+        ],
+        "need": {
+          "type": "have",
+          "item": "ember_shard",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 3830,
+      "iron_bits": 176,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "minor_health_potion",
+          "qty": 4
+        }
+      ]
+    },
+    "done": [
+      "Ilsa weighs the shards in her palm. \"Warm. Good. These will do.\""
+    ],
+    "giver": "ilsa_vane",
+    "offer": [
+      "Cinder imps carry shards of hot glass in their fists. I need them for tonics.",
+      "Bring me five. Use gloves, or do not, and learn."
+    ]
+  },
+  {
+    "id": "hides_for_the_wall",
+    "name": "Hides for the Wall",
+    "summary": "Hobb wants charred hides for the palisade.",
+    "level": 23,
+    "after": [
+      "count_the_crawlers"
+    ],
+    "steps": [
+      {
+        "npc": "hobb_reddick",
+        "todo": "Bring Hobb six charred hides.",
+        "say": [],
+        "waiting": [
+          "Charred hides from the char stalkers."
+        ],
+        "need": {
+          "type": "have",
+          "item": "charred_hide",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 4315,
+      "iron_bits": 184,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"That will hold till spring,\" Hobb says, and hangs them up himself."
+    ],
+    "giver": "hobb_reddick",
+    "offer": [
+      "Wet hides over the palisade stop the sparks. Charred ones are even better. The stalkers drop them.",
+      "Six hides, if you please."
+    ]
+  },
+  {
+    "id": "vulture_watch",
+    "name": "Vulture Watch",
+    "summary": "Vultures are circling the supply carts.",
+    "level": 24,
+    "after": [
+      "hounds_at_the_gate"
+    ],
+    "steps": [
+      {
+        "npc": "warden_sael",
+        "todo": "Defeat eight scorch vultures.",
+        "say": [],
+        "waiting": [
+          "Eight vultures. They hang over the Scorchfield road."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "scorch_vulture",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 4825,
+      "iron_bits": 192,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Good. The carts get through tonight.\""
+    ],
+    "giver": "warden_sael",
+    "offer": [
+      "Vultures over the carts means someone is counting what we carry. I want it to stop.",
+      "Eight birds. Shoot them or club them."
+    ]
+  },
+  {
+    "id": "feathers_for_fletching",
+    "name": "Feathers for Fletching",
+    "summary": "Hobb pays well for scorched feathers.",
+    "level": 24,
+    "after": [
+      "hides_for_the_wall"
+    ],
+    "steps": [
+      {
+        "npc": "hobb_reddick",
+        "todo": "Bring Hobb eight scorched feathers.",
+        "say": [],
+        "waiting": [
+          "Scorched feathers, from the vultures."
+        ],
+        "need": {
+          "type": "have",
+          "item": "scorched_feather",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 3860,
+      "iron_bits": 192,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "greater_health_potion",
+          "qty": 1
+        }
+      ]
+    },
+    "done": [
+      "Hobb counts them twice. \"Straight as a plumb line. Take this.\""
+    ],
+    "giver": "hobb_reddick",
+    "offer": [
+      "Scorched feathers fly straight. No one knows why. I sell arrows to half the garrison.",
+      "Eight feathers and I will cut you a deal."
+    ]
+  },
+  {
+    "id": "the_quarry_road",
+    "name": "The Quarry Road",
+    "summary": "Warden Sael sends you to the prospector at Blackrock.",
+    "level": 25,
+    "after": [
+      "vulture_watch"
+    ],
+    "steps": [
+      {
+        "npc": "orla_quill",
+        "todo": "Speak to Orla Quill at the Blackrock camp.",
+        "say": [],
+        "waiting": [
+          "The Blackrock camp is on the east fork of the cinder road."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 2150,
+      "iron_bits": 200,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Orla squints. \"Sael finally remembered us. Fine. You can start by killing something.\""
+    ],
+    "giver": "warden_sael",
+    "offer": [
+      "The quarry crew has gone quiet. Orla Quill runs the camp at Blackrock, down the east fork.",
+      "Go see her. Tell her the garrison has not forgotten them."
+    ]
+  },
+  {
+    "id": "slag_in_the_sieve",
+    "name": "Slag in the Sieve",
+    "summary": "Slag beetles are eating the camp's tools.",
+    "level": 25,
+    "after": [
+      "the_quarry_road"
+    ],
+    "steps": [
+      {
+        "npc": "orla_quill",
+        "todo": "Defeat eight slag beetles.",
+        "say": [],
+        "waiting": [
+          "Eight beetles. Hit them with something that is not a sword."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "slag_beetle",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 5380,
+      "iron_bits": 200,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Orla kicks a shell across the camp. \"Hardest thing I have ever eaten. Good riddance.\""
+    ],
+    "giver": "orla_quill",
+    "offer": [
+      "Slag beetles. Shells like cooled iron, and they love iron. Last week they ate a shovel.",
+      "Eight dead beetles and I can work a full shift again."
+    ]
+  },
+  {
+    "id": "slag_plate_order",
+    "name": "A Smith Needs Slag",
+    "summary": "Dunmar Coalfist wants slag plate.",
+    "level": 25,
+    "after": [
+      "the_quarry_road"
+    ],
+    "steps": [
+      {
+        "npc": "dunmar_coalfist",
+        "todo": "Bring Dunmar six slag plates.",
+        "say": [],
+        "waiting": [
+          "Slag plates, from the slag beetles at Blackrock."
+        ],
+        "need": {
+          "type": "have",
+          "item": "slag_plate",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 5380,
+      "iron_bits": 200,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Dunmar raps one with a knuckle. \"Ringing sound. That is how you know.\""
+    ],
+    "giver": "dunmar_coalfist",
+    "offer": [
+      "Slag plate is the best backing for a hot forge. I can only get it from the beetles, and I do not hunt.",
+      "Six plates, and I will make something worth wearing."
+    ]
+  },
+  {
+    "id": "golem_cores",
+    "name": "Golem Cores",
+    "summary": "Obsidian golems keep walking out of the old pit.",
+    "level": 26,
+    "after": [
+      "slag_in_the_sieve"
+    ],
+    "steps": [
+      {
+        "npc": "orla_quill",
+        "todo": "Bring Orla four obsidian shards from the golems.",
+        "say": [],
+        "waiting": [
+          "Obsidian golems are slow. Their shards are sharper than they look."
+        ],
+        "need": {
+          "type": "have",
+          "item": "obsidian_shard",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 6565,
+      "iron_bits": 208,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Orla holds a shard to the light. \"Clean break. You have done this before.\""
+    ],
+    "giver": "orla_quill",
+    "offer": [
+      "Something woke the golems in the pit. Six of them walk the quarry floor now.",
+      "Break them, and bring me four of the shards. The assayer pays by weight."
+    ]
+  },
+  {
+    "id": "snake_season",
+    "name": "Snake Season",
+    "summary": "Magma snake scales for the apothecary.",
+    "level": 27,
+    "after": [
+      "golem_cores"
+    ],
+    "steps": [
+      {
+        "npc": "ilsa_vane",
+        "todo": "Bring Ilsa six magma snake scales.",
+        "say": [],
+        "waiting": [
+          "Magma snake scales, from the quarry floor."
+        ],
+        "need": {
+          "type": "have",
+          "item": "snake_scale",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 6595,
+      "iron_bits": 216,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "health_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "\"Perfect.\" Ilsa is already grinding. \"Come back if you get singed.\""
+    ],
+    "giver": "ilsa_vane",
+    "offer": [
+      "Magma snakes shed once a season. The scales make a salve for burns, and we have a lot of burns.",
+      "Six scales. Wear boots."
+    ]
+  },
+  {
+    "id": "cragmaw",
+    "name": "Cragmaw the Unburned",
+    "summary": "A boar that has outlived three fires.",
+    "level": 27,
+    "after": [
+      "golem_cores"
+    ],
+    "steps": [
+      {
+        "npc": "orla_quill",
+        "todo": "Defeat Cragmaw the Unburned.",
+        "say": [],
+        "waiting": [
+          "Cragmaw lives in the middle of the quarry."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "cragmaw_the_unburned",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 9235,
+      "iron_bits": 216,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Orla stares at the tusk. \"Not a mark on it. I am keeping this one.\""
+    ],
+    "giver": "orla_quill",
+    "offer": [
+      "There is a boar in the quarry. Big, mean, and not burned in the slightest. It has walked through lava twice.",
+      "I do not like that. Kill it."
+    ]
+  },
+  {
+    "id": "candles_for_the_dead",
+    "name": "Candles for the Dead",
+    "summary": "Brother Tamsin needs cultist ash for his candles.",
+    "level": 28,
+    "after": [
+      "golem_cores"
+    ],
+    "steps": [
+      {
+        "npc": "brother_tamsin",
+        "todo": "Bring Brother Tamsin ten cultist ash.",
+        "say": [],
+        "waiting": [
+          "Cultist ash, from the pyre cultists."
+        ],
+        "need": {
+          "type": "have",
+          "item": "cultist_ash",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 7265,
+      "iron_bits": 224,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Rest, all of you,\" Tamsin says to the ash, and means it."
+    ],
+    "giver": "brother_tamsin",
+    "offer": [
+      "The cultists burn their dead and leave the ash where it falls. It makes good wicks for the chapel.",
+      "Ten handfuls. I will pray over each one."
+    ]
+  },
+  {
+    "id": "the_cultists_altar",
+    "name": "The Cultists' Altar",
+    "summary": "Eight pyre cultists hold the east ridge.",
+    "level": 28,
+    "after": [
+      "cragmaw"
+    ],
+    "steps": [
+      {
+        "npc": "warden_sael",
+        "todo": "Defeat eight pyre cultists.",
+        "say": [],
+        "waiting": [
+          "The altar is on the east ridge, past Blackrock."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "pyre_cultist",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 7990,
+      "iron_bits": 224,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Sael studies you. \"You went through them like a rake through ash.\""
+    ],
+    "giver": "warden_sael",
+    "offer": [
+      "The cultists dance at the altar every new moon. Most of them are harmless. Some are not.",
+      "Take eight down and the ridge is ours."
+    ]
+  },
+  {
+    "id": "quiet_the_quarry",
+    "name": "Quiet the Quarry",
+    "summary": "Wraiths whisper in the pit at night.",
+    "level": 29,
+    "after": [
+      "the_cultists_altar"
+    ],
+    "steps": [
+      {
+        "npc": "orla_quill",
+        "todo": "Defeat eight quarry wraiths.",
+        "say": [],
+        "waiting": [
+          "Quarry wraiths hover over the deepest cut."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "quarry_wraith",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 8765,
+      "iron_bits": 232,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "The camp is quiet. Orla hands you a coin pouch without a word."
+    ],
+    "giver": "orla_quill",
+    "offer": [
+      "The crew will not sleep. The wraiths whisper names in the pit, and the names are theirs.",
+      "Eight wraiths. Then we can sleep."
+    ]
+  },
+  {
+    "id": "forge_fuel",
+    "name": "Forge Fuel",
+    "summary": "Dunmar needs sulfur to keep the forge hot.",
+    "level": 30,
+    "after": [
+      "slag_plate_order"
+    ],
+    "steps": [
+      {
+        "npc": "dunmar_coalfist",
+        "todo": "Bring Dunmar ten sulfur.",
+        "say": [],
+        "waiting": [
+          "Sulfur from the vents at Blackrock. Bring a pickaxe."
+        ],
+        "need": {
+          "type": "have",
+          "item": "sulfur",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 8715,
+      "iron_bits": 240,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "greater_mana_potion",
+          "qty": 2
+        }
+      ]
+    },
+    "done": [
+      "Dunmar sniffs. \"Rotten eggs. Wonderful.\""
+    ],
+    "giver": "dunmar_coalfist",
+    "offer": [
+      "Sulfur burns hotter than coal. It is in the vents around Blackrock if you have a pickaxe.",
+      "Ten lumps and the forge runs all week."
+    ]
+  },
+  {
+    "id": "kiln_warden",
+    "name": "The Kiln-Warden",
+    "summary": "Something rules the old Kiln under the quarry.",
+    "level": 30,
+    "after": [
+      "quiet_the_quarry",
+      "forge_fuel"
+    ],
+    "steps": [
+      {
+        "npc": "dunmar_coalfist",
+        "todo": "Defeat Kiln-Warden Brask in the Forgotten Kiln.",
+        "say": [],
+        "waiting": [
+          "The Kiln door is on the west side of Blackrock Quarry, off the main road."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "kiln_warden_brask",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 17430,
+      "iron_bits": 240,
+      "gold_coins": 3,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "greater_health_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Dunmar sits for a long while. \"He taught me. I did not know he was still down there.\""
+    ],
+    "giver": "dunmar_coalfist",
+    "offer": [
+      "The Forgotten Kiln is under the quarry, and Brask runs it. He used to be a smith. Now he is a furnace that walks.",
+      "Put him out. The whole district will breathe easier."
+    ]
+  },
+  {
+    "id": "ashroot_for_the_sick",
+    "name": "Ashroot for the Sick",
+    "summary": "Ilsa runs low on ashroot.",
+    "level": 22,
+    "after": [
+      "imps_among_the_barrels"
+    ],
+    "steps": [
+      {
+        "npc": "ilsa_vane",
+        "todo": "Bring Ilsa eight ashroot.",
+        "say": [],
+        "waiting": [
+          "Ashroot grows in the Scorchfield, between the dead trees."
+        ],
+        "need": {
+          "type": "have",
+          "item": "ashroot",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 3065,
+      "iron_bits": 176,
+      "gold_coins": 0,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"The cough will pass,\" Ilsa says. \"The smoke will not.\""
+    ],
+    "giver": "ilsa_vane",
+    "offer": [
+      "Half the town has a cough from the smoke. Ashroot clears it. It grows between the dead trees.",
+      "Eight roots will do for a month."
+    ]
+  },
+  {
+    "id": "lizard_tails",
+    "name": "Lizard Tails",
+    "summary": "Lava lizard meat for the inn.",
+    "level": 30,
+    "after": [
+      "the_cultists_altar"
+    ],
+    "steps": [
+      {
+        "npc": "marga_pell",
+        "todo": "Bring Marga eight lava lizard meat.",
+        "say": [],
+        "waiting": [
+          "Lava lizards crawl over the flats."
+        ],
+        "need": {
+          "type": "have",
+          "item": "lizard_meat",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 7845,
+      "iron_bits": 240,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "ember_stew",
+          "qty": 4
+        }
+      ]
+    },
+    "done": [
+      "Marga writes the recipe on your sleeve with soot. \"Low heat. Be patient.\""
+    ],
+    "giver": "marga_pell",
+    "offer": [
+      "Lava lizard tastes like chicken that has been to war. Nobody can keep it in stock.",
+      "Eight pieces and I will teach you the stew."
+    ]
+  },
+  {
+    "id": "lava_flats_patrol",
+    "name": "Lava Flats Patrol",
+    "summary": "Scout Rennick wants the flats cleared of lizards.",
+    "level": 30,
+    "after": [
+      "the_cultists_altar"
+    ],
+    "steps": [
+      {
+        "npc": "rennick",
+        "todo": "Defeat ten lava lizards.",
+        "say": [],
+        "waiting": [
+          "Ten lizards on the Lava Flats."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "lava_lizard",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 9585,
+      "iron_bits": 240,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Rennick whistles low. \"Ten. That is a bad day for lizards.\""
+    ],
+    "giver": "rennick",
+    "offer": [
+      "I scout the flats. The lizards have stopped running when they see me. They have started stalking.",
+      "Ten of them down and I can move again."
+    ]
+  },
+  {
+    "id": "wisp_light",
+    "name": "Wisp Light",
+    "summary": "Ilsa wants ember from the wisps.",
+    "level": 31,
+    "after": [
+      "snake_season"
+    ],
+    "steps": [
+      {
+        "npc": "ilsa_vane",
+        "todo": "Bring Ilsa six wisp embers.",
+        "say": [],
+        "waiting": [
+          "Wisp embers, from the flame wisps on the flats."
+        ],
+        "need": {
+          "type": "have",
+          "item": "wisp_ember",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 9505,
+      "iron_bits": 248,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "The embers hum in her hand. \"Thank you. Go home and sleep.\""
+    ],
+    "giver": "ilsa_vane",
+    "offer": [
+      "The flame wisps leave an ember behind when they go out. It hums. I want six.",
+      "I will not say what for. You would not like it."
+    ]
+  },
+  {
+    "id": "ember_wolves",
+    "name": "Ember Wolves",
+    "summary": "A pack hunts the flats at night.",
+    "level": 32,
+    "after": [
+      "lava_flats_patrol"
+    ],
+    "steps": [
+      {
+        "npc": "rennick",
+        "todo": "Defeat eight ember wolves.",
+        "say": [],
+        "waiting": [
+          "Ember wolves run in packs. Bring friends."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "ember_wolf",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 11370,
+      "iron_bits": 256,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Rennick climbs down from the tree. \"Thank you. My back is not what it was.\""
+    ],
+    "giver": "rennick",
+    "offer": [
+      "Wolves with burning pelts. They do not need a fire to find us. They are the fire.",
+      "Eight, and I will stop sleeping in a tree."
+    ]
+  },
+  {
+    "id": "wights_at_the_forge",
+    "name": "Wights at the Forge",
+    "summary": "The dead smiths are working again.",
+    "level": 33,
+    "after": [
+      "ember_wolves"
+    ],
+    "steps": [
+      {
+        "npc": "rennick",
+        "todo": "Defeat eight forge wights.",
+        "say": [],
+        "waiting": [
+          "The forge wights are on the north side of the flats."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "forge_wight",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 12335,
+      "iron_bits": 264,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Quiet,\" Rennick says. \"Finally. Did you see what they were making?\" You did not."
+    ],
+    "giver": "rennick",
+    "offer": [
+      "The old forge on the flats is lit. The wights work the bellows all night. I do not know what they are making.",
+      "I do not want to find out. Eight of them, please."
+    ]
+  },
+  {
+    "id": "pyre_priest",
+    "name": "The Hollow Pyre-Priest",
+    "summary": "The cultists answer to something hollow.",
+    "level": 33,
+    "after": [
+      "wights_at_the_forge"
+    ],
+    "steps": [
+      {
+        "npc": "brother_tamsin",
+        "todo": "Defeat the Hollow Pyre-Priest.",
+        "say": [],
+        "waiting": [
+          "The Pyre-Priest haunts the burned chapel on the flats."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "hollow_pyre_priest",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 15695,
+      "iron_bits": 264,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Tamsin lights a candle. \"He was a kind man once. Thank you.\""
+    ],
+    "giver": "brother_tamsin",
+    "offer": [
+      "The cultists have a priest. He gave away everything he was to keep the fire lit. There is only the robe now.",
+      "Bring him peace. Or bring him down."
+    ]
+  },
+  {
+    "id": "salamander_glands",
+    "name": "Salamander Glands",
+    "summary": "Ilsa needs glands for her best tonic.",
+    "level": 34,
+    "after": [
+      "wisp_light"
+    ],
+    "steps": [
+      {
+        "npc": "ilsa_vane",
+        "todo": "Bring Ilsa six salamander glands.",
+        "say": [],
+        "waiting": [
+          "Salamanders live on the high flats near the foothills."
+        ],
+        "need": {
+          "type": "have",
+          "item": "salamander_gland",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 12130,
+      "iron_bits": 272,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "greater_health_potion",
+          "qty": 2
+        },
+        {
+          "item": "greater_mana_potion",
+          "qty": 2
+        }
+      ]
+    },
+    "done": [
+      "\"Beautiful,\" Ilsa says, and means the glands."
+    ],
+    "giver": "ilsa_vane",
+    "offer": [
+      "Salamander glands hold heat for days. I make a tonic that keeps a person warm in the highwind.",
+      "Six glands. Do not squeeze them."
+    ]
+  },
+  {
+    "id": "the_peak_road",
+    "name": "The Peak Road",
+    "summary": "Rennick sends you to a hermit on the foothills.",
+    "level": 35,
+    "after": [
+      "wights_at_the_forge"
+    ],
+    "steps": [
+      {
+        "npc": "old_cinders",
+        "todo": "Speak to Old Cinders in the Highwrath Foothills.",
+        "say": [],
+        "waiting": [
+          "Old Cinders keeps a fire at the edge of the foothills."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 5240,
+      "iron_bits": 280,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "The hermit does not look up. \"Rennick sends the ones he does not like. Sit.\""
+    ],
+    "giver": "rennick",
+    "offer": [
+      "Old Cinders lives in the foothills. He says he was here before the fires. I say he is a liar. Ask him.",
+      "He knows the peak road better than anyone."
+    ]
+  },
+  {
+    "id": "thralls",
+    "name": "Thralls of Fire",
+    "summary": "The thralls have not stopped walking since the first fire.",
+    "level": 35,
+    "after": [
+      "the_peak_road"
+    ],
+    "steps": [
+      {
+        "npc": "old_cinders",
+        "todo": "Defeat ten thralls of fire.",
+        "say": [],
+        "waiting": [
+          "The thralls walk the lower foothills."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "thrall_of_fire",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 14405,
+      "iron_bits": 280,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Old Cinders lowers his head. \"Ten fewer. There are always more.\""
+    ],
+    "giver": "old_cinders",
+    "offer": [
+      "They were people once. They walk the foothills with burning brands in their hands and no one inside.",
+      "Ten of them, and the path will be safe for a season."
+    ]
+  },
+  {
+    "id": "sparkmother",
+    "name": "The Sparkmother",
+    "summary": "Veyra hatches the things that burn.",
+    "level": 36,
+    "after": [
+      "thralls"
+    ],
+    "steps": [
+      {
+        "npc": "old_cinders",
+        "todo": "Defeat Sparkmother Veyra in the Cinder Crown.",
+        "say": [],
+        "waiting": [
+          "The Cinder Crown is at the top of the foothills."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "sparkmother_veyra",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 28210,
+      "iron_bits": 288,
+      "gold_coins": 3,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "greater_health_potion",
+          "qty": 3
+        },
+        {
+          "item": "greater_mana_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Old Cinders is quiet for a while. \"The hatchlings will thin out now. They will not stop.\""
+    ],
+    "giver": "old_cinders",
+    "offer": [
+      "In the Cinder Crown there is a woman who hatches fire the way a hen hatches eggs. Veyra, the Sparkmother.",
+      "She does not hate. That is the worst of it. Stop her."
+    ]
+  },
+  {
+    "id": "hatchlings",
+    "name": "Hatchlings",
+    "summary": "Phoenix down is worth a fortune.",
+    "level": 38,
+    "after": [
+      "sparkmother"
+    ],
+    "steps": [
+      {
+        "npc": "old_cinders",
+        "todo": "Bring Old Cinders four phoenix down.",
+        "say": [],
+        "waiting": [
+          "Phoenix hatchlings roost on the upper slopes."
+        ],
+        "need": {
+          "type": "have",
+          "item": "phoenix_down",
+          "count": 4
+        }
+      }
+    ],
+    "reward": {
+      "xp": 17890,
+      "iron_bits": 304,
+      "gold_coins": 1,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "He holds the down against his chest. \"Thank you. I will give it to someone who needs it.\""
+    ],
+    "giver": "old_cinders",
+    "offer": [
+      "A phoenix hatchling drops down when it dies. It is the warmest thing you will ever hold.",
+      "Four pieces. Do not keep any for yourself."
+    ]
+  },
+  {
+    "id": "emberjaw",
+    "name": "Emberjaw",
+    "summary": "The cinder wyrm that sleeps under the peak.",
+    "level": 40,
+    "after": [
+      "hatchlings"
+    ],
+    "steps": [
+      {
+        "npc": "old_cinders",
+        "todo": "Defeat Emberjaw, the Cinder Wyrm.",
+        "say": [],
+        "waiting": [
+          "Emberjaw sleeps in the deepest cave of the foothills."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "emberjaw",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 52120,
+      "iron_bits": 320,
+      "gold_coins": 3,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "wyrm_tooth",
+          "qty": 1
+        }
+      ]
+    },
+    "done": [
+      "Old Cinders stands for the first time. \"It is done,\" he says. \"Now go home.\""
+    ],
+    "giver": "old_cinders",
+    "offer": [
+      "Emberjaw is old. Older than me, and I am older than I look. He sleeps under the Highwrath and every few years he turns over.",
+      "When he does, the town burns. Kill him before he wakes."
+    ]
+  },
+  {
+    "id": "past_the_foothills",
+    "name": "Past the Foothills",
+    "summary": "Old Cinders sends you to the garrison above the fires.",
+    "level": 40,
+    "after": [
+      "emberjaw"
+    ],
+    "steps": [
+      {
+        "npc": "edda_hale",
+        "todo": "Speak to Captain Edda Hale at Pass Hold.",
+        "say": [],
+        "waiting": [
+          "Pass Hold sits where the road bends around the Hollow."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 7445,
+      "iron_bits": 320,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Hale reads you from boots to hair. \"Cinders sent you. Then you can fight. Good. I have a list.\""
+    ],
+    "giver": "old_cinders",
+    "offer": [
+      "With the wyrm dead there is a way up. The road bends round his hollow and climbs into the Peaks.",
+      "There is a hold at the bottom of the pass. Captain Hale runs it. Tell her Cinders sent you, and that I am not sorry about the last argument."
+    ]
+  },
+  {
+    "id": "raiders_on_the_pass",
+    "name": "Raiders on the Pass",
+    "summary": "Raiders have been lifting wagons below the Broken Gate.",
+    "level": 40,
+    "after": [
+      "past_the_foothills"
+    ],
+    "steps": [
+      {
+        "npc": "edda_hale",
+        "todo": "Defeat ten pass raiders.",
+        "say": [],
+        "waiting": [
+          "Ten raiders. They hold the road above the hold."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "pass_raider",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 18615,
+      "iron_bits": 320,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Ten,\" Hale says. \"I will write that down so I can enjoy it twice.\""
+    ],
+    "giver": "edda_hale",
+    "offer": [
+      "Raiders. Twenty or so, working out of the Broken Gate. They took two wagons this month and a mule I liked.",
+      "Ten of them dead and the rest start asking what they are doing here."
+    ]
+  },
+  {
+    "id": "horns_for_the_hold",
+    "name": "Horns for the Hold",
+    "summary": "Bram Tindle makes handles from ram horn.",
+    "level": 41,
+    "after": [
+      "past_the_foothills"
+    ],
+    "steps": [
+      {
+        "npc": "bram_tindle",
+        "todo": "Bring Bram six ridge ram horns.",
+        "say": [],
+        "waiting": [
+          "Ridge rams graze on the slopes above the hold."
+        ],
+        "need": {
+          "type": "have",
+          "item": "ram_horn",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 19870,
+      "iron_bits": 328,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "superior_health_potion",
+          "qty": 2
+        }
+      ]
+    },
+    "done": [
+      "Bram knocks one on the anvil. \"Hear that? That is a good horn. Do not tell the ram.\""
+    ],
+    "giver": "bram_tindle",
+    "offer": [
+      "Ridge ram horn does not crack in a forge. I make hammer handles out of it. Nothing else lasts.",
+      "Six horns. Rams are the ones that charge you, in case you wondered."
+    ]
+  },
+  {
+    "id": "feather_pillows",
+    "name": "Feather Pillows",
+    "summary": "Nell wants harrier plumes for her guest beds.",
+    "level": 42,
+    "after": [
+      "raiders_on_the_pass"
+    ],
+    "steps": [
+      {
+        "npc": "nell_quickwater",
+        "todo": "Bring Nell eight harrier plumes.",
+        "say": [],
+        "waiting": [
+          "Gale harriers circle the high ridge."
+        ],
+        "need": {
+          "type": "have",
+          "item": "harrier_plume",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 21170,
+      "iron_bits": 336,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "firescale_stew",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Nell fluffs one against her cheek. \"Oh. Oh, that is the good stuff. Stay, I will make you a bed.\""
+    ],
+    "giver": "nell_quickwater",
+    "offer": [
+      "Guests complain about the beds. I tell them it is a mountain, what do they expect. Then I lie awake feeling bad.",
+      "Harrier plumes are soft and they do not smell. Eight, please. I will pay you in soup."
+    ]
+  },
+  {
+    "id": "the_alpha",
+    "name": "The Alpha",
+    "summary": "A rimstalker the size of a cart has been picking off scouts.",
+    "level": 42,
+    "after": [
+      "raiders_on_the_pass"
+    ],
+    "steps": [
+      {
+        "npc": "edda_hale",
+        "todo": "Defeat Rimstalker Alpha.",
+        "say": [],
+        "waiting": [
+          "The Alpha hunts along the ridge east of the road."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "rimstalker_alpha",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 29635,
+      "iron_bits": 336,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Hale hangs the fang from the gatepost. \"For the scout. Thanks.\""
+    ],
+    "giver": "edda_hale",
+    "offer": [
+      "A rimstalker came down off the ridge last week. A big one. It took a scout from his own watchfire.",
+      "It will come back for the next one. Kill it first."
+    ]
+  },
+  {
+    "id": "broken_gate",
+    "name": "The Broken Gate",
+    "summary": "Captain Voss holds the old gate and calls it his.",
+    "level": 43,
+    "after": [
+      "feather_pillows",
+      "the_alpha"
+    ],
+    "steps": [
+      {
+        "npc": "edda_hale",
+        "todo": "Defeat Captain Voss at the Broken Gate.",
+        "say": [],
+        "waiting": [
+          "The Broken Gate is up the road, past the ridge."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "captain_voss",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 45040,
+      "iron_bits": 344,
+      "gold_coins": 5,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "superior_health_potion",
+          "qty": 3
+        },
+        {
+          "item": "superior_mana_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Hale takes his signet and turns it over. \"I knew him. Not as well as I thought.\""
+    ],
+    "giver": "edda_hale",
+    "offer": [
+      "Voss was a captain here, same as me. He decided the gate and the road were his property. He taxes the wagons with a crossbow.",
+      "I would go myself, but then the hold has no captain. You go."
+    ]
+  },
+  {
+    "id": "glassreach_road",
+    "name": "The Road to Glassreach",
+    "summary": "Hale sends you to a scholar in the Reach.",
+    "level": 44,
+    "after": [
+      "broken_gate"
+    ],
+    "steps": [
+      {
+        "npc": "ione_glass",
+        "todo": "Speak to Sister Ione at Glassreach.",
+        "say": [],
+        "waiting": [
+          "Glassreach is a camp on the glass flats."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 9570,
+      "iron_bits": 352,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Ione does not look up from her notes. \"Hale sent you. She does that. Sit. Do not touch anything.\""
+    ],
+    "giver": "edda_hale",
+    "offer": [
+      "North of the gate the ground turns to glass. Fire fused the sand a long time ago and nothing has told it to stop.",
+      "A scholar named Ione lives there. She counts things. See what she needs."
+    ]
+  },
+  {
+    "id": "scorpion_stingers",
+    "name": "Stingers for the Glassmaker",
+    "summary": "Ione grinds scorpion stingers into her sealing wax.",
+    "level": 44,
+    "after": [
+      "glassreach_road"
+    ],
+    "steps": [
+      {
+        "npc": "ione_glass",
+        "todo": "Bring Ione eight scorpion stingers.",
+        "say": [],
+        "waiting": [
+          "Glass scorpions skitter across the flats."
+        ],
+        "need": {
+          "type": "have",
+          "item": "scorpion_stinger",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 23925,
+      "iron_bits": 352,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Ione weighs them in her palm like coins. \"Fresh. Good.\""
+    ],
+    "giver": "ione_glass",
+    "offer": [
+      "Glass scorpions sting through boots. I use the stingers in my sealing wax. It makes the seal bite.",
+      "Eight stingers. Take them from the back half."
+    ]
+  },
+  {
+    "id": "the_hierophant",
+    "name": "The Glass Hierophant",
+    "summary": "A priest of the old kiln speaks to the glass.",
+    "level": 45,
+    "after": [
+      "scorpion_stingers"
+    ],
+    "steps": [
+      {
+        "npc": "ione_glass",
+        "todo": "Defeat the Glass Hierophant.",
+        "say": [],
+        "waiting": [
+          "The Hierophant stands on the high flats."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "glass_hierophant",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 35530,
+      "iron_bits": 360,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Silence,\" Ione says, and for once she sounds relieved. \"Thank you.\""
+    ],
+    "giver": "ione_glass",
+    "offer": [
+      "The glass hums at night, and a figure stands among it, listening. I think he used to be a priest.",
+      "I would like him to stop. It is distracting my work."
+    ]
+  },
+  {
+    "id": "shard_golems",
+    "name": "Shards from the Quiet",
+    "summary": "Tessaly needs prism shards before the next storm.",
+    "level": 46,
+    "after": [
+      "scorpion_stingers"
+    ],
+    "steps": [
+      {
+        "npc": "tessaly_wren",
+        "todo": "Defeat eight shard golems.",
+        "say": [],
+        "waiting": [
+          "Shard golems walk the middle of the Reach."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "shard_golem",
+          "count": 8
+        }
+      }
+    ],
+    "reward": {
+      "xp": 29580,
+      "iron_bits": 368,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "superior_mana_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Tessaly breathes out. \"Thanks. Tell nobody I was afraid.\""
+    ],
+    "giver": "tessaly_wren",
+    "offer": [
+      "Shard golems. Slow, huge, covered in glass. They walk through the camp when the wind drops.",
+      "Break eight of them. Quietly if you can. I know you cannot."
+    ]
+  },
+  {
+    "id": "vitrix",
+    "name": "Vitrix",
+    "summary": "The Glass Queen keeps a cathedral in the Reach.",
+    "level": 80,
+    "after": [
+      "the_hierophant",
+      "shard_golems"
+    ],
+    "steps": [
+      {
+        "npc": "ione_glass",
+        "todo": "Defeat Vitrix, the Glass Queen, on the third floor of the Glass Cathedral.",
+        "say": [],
+        "waiting": [
+          "The Glass Cathedral is west of Glassreach. You must be level 80 to enter her floor."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "vitrix_glass_queen",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 229460,
+      "iron_bits": 640,
+      "gold_coins": 5,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "superior_health_potion",
+          "qty": 3
+        },
+        {
+          "item": "superior_mana_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Ione sits down hard. \"The humming is gone. I did not know how loud it was.\""
+    ],
+    "giver": "ione_glass",
+    "offer": [
+      "Under the flats there is a cathedral built from the same glass. Vitrix sits in it. She was a queen before the fires, and she has not left her chair since.",
+      "The cathedral has three floors. The Nave is open to level 41, the Choir to level 61. Her chair is on the last floor, and the door only opens for level 80. Clear the first two for the practice. You will need it."
+    ]
+  },
+  {
+    "id": "the_rim_road",
+    "name": "The Rim Road",
+    "summary": "Ione says the Warden at the caldera needs help.",
+    "level": 47,
+    "after": [
+      "the_hierophant",
+      "shard_golems"
+    ],
+    "steps": [
+      {
+        "npc": "warden_korvath",
+        "todo": "Speak to Warden Korvath at Rimwatch.",
+        "say": [],
+        "waiting": [
+          "Rimwatch sits on the edge of the caldera."
+        ],
+        "need": {
+          "type": "none"
+        }
+      }
+    ],
+    "reward": {
+      "xp": 11380,
+      "iron_bits": 376,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "Korvath nods, slowly. \"Ione has good judgement. Come in.\""
+    ],
+    "giver": "ione_glass",
+    "offer": [
+      "South of the Reach the ground rises to a rim. Beyond it is a crater, and in the crater is the thing that has been making all of this.",
+      "Warden Korvath watches the rim. He asked for someone who can finish things."
+    ]
+  },
+  {
+    "id": "prism_wisps",
+    "name": "Prism Wisps",
+    "summary": "The wisps on the rim drag lights across the crater.",
+    "level": 47,
+    "after": [
+      "the_rim_road"
+    ],
+    "steps": [
+      {
+        "npc": "warden_korvath",
+        "todo": "Defeat ten prism wisps.",
+        "say": [],
+        "waiting": [
+          "Prism wisps drift along the rim."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "prism_wisp",
+          "count": 10
+        }
+      }
+    ],
+    "reward": {
+      "xp": 31300,
+      "iron_bits": 376,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": []
+    },
+    "done": [
+      "\"Good,\" Korvath says. \"I can sleep. For an hour.\""
+    ],
+    "giver": "warden_korvath",
+    "offer": [
+      "Prism wisps. They bend the light so my watchers see fires that are not there. We lose sleep.",
+      "Ten of them out and the rim goes quiet."
+    ]
+  },
+  {
+    "id": "heart_embers",
+    "name": "Heart Embers",
+    "summary": "Korvath wants the cores the rim stalkers carry.",
+    "level": 48,
+    "after": [
+      "the_rim_road"
+    ],
+    "steps": [
+      {
+        "npc": "warden_korvath",
+        "todo": "Bring Korvath five heart embers.",
+        "say": [],
+        "waiting": [
+          "Rim stalkers and caldera drakes carry heart embers."
+        ],
+        "need": {
+          "type": "have",
+          "item": "heart_ember",
+          "count": 5
+        }
+      }
+    ],
+    "reward": {
+      "xp": 33075,
+      "iron_bits": 384,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "peakbloom_tonic",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "He weighs them. \"Warm. Good. They will last the winter.\""
+    ],
+    "giver": "warden_korvath",
+    "offer": [
+      "Stalkers and drakes carry a coal in their chests. It never goes out. I need five to light the signal fires.",
+      "Take them gently. Do not drop one in your bag unwrapped."
+    ]
+  },
+  {
+    "id": "drake_scales",
+    "name": "Drake Scales",
+    "summary": "Mara Ashfall pays well for caldera drake scales.",
+    "level": 49,
+    "after": [
+      "the_rim_road"
+    ],
+    "steps": [
+      {
+        "npc": "mara_ashfall",
+        "todo": "Bring Mara six caldera drake scales.",
+        "say": [],
+        "waiting": [
+          "Caldera drakes nest on the rim."
+        ],
+        "need": {
+          "type": "have",
+          "item": "caldera_scale",
+          "count": 6
+        }
+      }
+    ],
+    "reward": {
+      "xp": 34920,
+      "iron_bits": 392,
+      "gold_coins": 2,
+      "favor_tokens": 1,
+      "items": [
+        {
+          "item": "superior_health_potion",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Mara runs a thumb along one. \"Smooth as a cat. Thank you.\""
+    ],
+    "giver": "mara_ashfall",
+    "offer": [
+      "A caldera drake scale will turn a sword, if you hit it right. I sew them into jackets for the watch.",
+      "Six scales. They fight back, so bring a friend."
+    ]
+  },
+  {
+    "id": "ifrit",
+    "name": "Ifrit the Unquenched",
+    "summary": "The one who lives in the peaks and never comes down.",
+    "level": 90,
+    "after": [
+      "drake_scales",
+      "heart_embers"
+    ],
+    "steps": [
+      {
+        "npc": "warden_korvath",
+        "todo": "Defeat Ifrit the Unquenched on the last floor of the Furnace Throne (level 90).",
+        "say": [],
+        "waiting": [
+          "The Furnace Throne is at the end of the Rim Road."
+        ],
+        "need": {
+          "type": "kill",
+          "monster": "ifrit_the_unquenched",
+          "count": 1
+        }
+      }
+    ],
+    "reward": {
+      "xp": 499585,
+      "iron_bits": 720,
+      "gold_coins": 5,
+      "favor_tokens": 2,
+      "items": [
+        {
+          "item": "superior_health_potion",
+          "qty": 5
+        },
+        {
+          "item": "superior_mana_potion",
+          "qty": 5
+        },
+        {
+          "item": "heart_ember",
+          "qty": 3
+        }
+      ]
+    },
+    "done": [
+      "Korvath puts down his spear for the first time. \"It is quiet. I had forgotten what quiet was.\""
+    ],
+    "giver": "warden_korvath",
+    "offer": [
+      "Everything on this mountain burns because of him. Cinders told you not to go looking for him. I am telling you to go.",
+      "The Furnace Throne is at the bottom of the crater, three floors deep. Cinder Hall opens at level 41 and the Slag Gallery at 61. His floor will not open below level 90. Take everything you have."
+    ]
+  }
+]

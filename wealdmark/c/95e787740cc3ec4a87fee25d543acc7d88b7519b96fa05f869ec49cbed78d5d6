@@ -1,0 +1,7 @@
+{
+  "name": "Heroes of the Wealdmark",
+  "contentRevision": 4,
+  "note": "Placeholder content pack. Real data tables (items, monsters, quests) will ship here and patch without a new installer.",
+  "embersApplied": true,
+  "peaksApplied": true
+}

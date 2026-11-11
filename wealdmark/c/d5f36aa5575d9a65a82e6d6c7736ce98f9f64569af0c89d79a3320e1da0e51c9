@@ -1,0 +1,678 @@
+[
+  {
+    "id": "furnace",
+    "name": "Furnace",
+    "kind": "craft",
+    "skill": "smithing",
+    "text": []
+  },
+  {
+    "id": "anvil",
+    "name": "Anvil",
+    "kind": "craft",
+    "skill": "smithing",
+    "text": []
+  },
+  {
+    "id": "range",
+    "name": "Cooking range",
+    "kind": "craft",
+    "skill": "cooking",
+    "text": []
+  },
+  {
+    "id": "bench",
+    "name": "Crafting bench",
+    "kind": "craft",
+    "skill": "crafting",
+    "text": []
+  },
+  {
+    "id": "bellstone",
+    "name": "Resurrection Stone",
+    "kind": "bell",
+    "text": []
+  },
+  {
+    "id": "crown_stand",
+    "name": "The empty stand",
+    "kind": "inspect",
+    "text": [
+      "A cushion of red velvet on a plinth of white stone. Nothing has sat on it for a long time.",
+      "Someone sweeps the stairs every morning. Nobody admits to it."
+    ]
+  },
+  {
+    "id": "notice_board",
+    "name": "Notice board",
+    "kind": "inspect",
+    "text": [
+      "WANTED: strong backs to fell pine for the gate. Ask Hob at the south gate.",
+      "LOST: one brown mare. Do not ask Tam where. He knows.",
+      "The Warden asks that no one go into the Tower after dark. The stairs are old.",
+      "Smiths pay good bits for bronze bars. Copper and tin lie in the Old Quarry, east of the wall."
+    ]
+  },
+  {
+    "id": "sign_north",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "North road: the Mossgate Reach ends at the treeline. Nothing past it has been charted. South: Aldmoor, one hour."
+    ]
+  },
+  {
+    "id": "sign_south",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "South road. West: Rabbit Meadow and the trapper's cabin. East: Mere Pool and the angler's dock. Straight on: the Tumbledown Watch."
+    ]
+  },
+  {
+    "id": "sign_west",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "West road. The Whispering Pines and the woodcutter's lodge lie ahead. The Goblin Warren is north of the pines. Go with food."
+    ]
+  },
+  {
+    "id": "sign_east",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "East road. The bridge over Silverrun Creek is just ahead. Beyond it: the Old Quarry and Hollow Farm."
+    ]
+  },
+  {
+    "id": "sign_warren",
+    "name": "Warning sign",
+    "kind": "inspect",
+    "text": [
+      "GOBLIN WARREN. Pinegrubs and nutcrackers inside, and something larger at the back. Once the big one has you, you cannot run. Four people went in this season and three came back."
+    ]
+  },
+  {
+    "id": "sign_pond",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Mere Pool. Shrimp in the shallows. The dock is for anglers; the lamp is Marl's and he will know if you move it."
+    ]
+  },
+  {
+    "id": "sign_quarry",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Old Quarry. Copper and tin for any back strong enough. Dick buys ore at fair weight."
+    ]
+  },
+  {
+    "id": "sign_farm",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Hollow Farm. Follow the lane south. Shut the field gate behind you."
+    ]
+  },
+  {
+    "id": "sign_ruins",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Tumbledown Watch. A guard post from before the walls. It fell down before anyone now living was born. Mind the stones."
+    ]
+  },
+  {
+    "id": "ruin_stone",
+    "name": "Carved stone",
+    "kind": "inspect",
+    "text": [
+      "A worn block in the middle of the ruin, with a ring of letters round the edge. The weather has taken most of them.",
+      "What is left reads: HERE THE WATCH KEPT THE ROAD. Someone has scratched underneath it: and then it did not."
+    ]
+  },
+  {
+    "id": "dunhollow_board",
+    "name": "Notice board",
+    "kind": "inspect",
+    "text": [
+      "WANTED: hands for the Drainage Cut. Marrow pays in iron bits. Bring birch logs and iron ore to the office.",
+      "REWARD: any word of the second shift. Six went down the Delve and did not come up. Ask Lenny at the mouth.",
+      "Sump rats in the ore store again. Peg will pay a bounty. She does not say how much.",
+      "Smith wants iron bars. Smelt them at the furnace. Smithing level 10."
+    ]
+  },
+  {
+    "id": "signal_stone",
+    "name": "Signal beacon stone",
+    "kind": "inspect",
+    "text": [
+      "A blackened stone basin on the floor of the ruined tower, where the signal fire burned. It has not burned for a long time.",
+      "A rope has been tied to the rim and run out through the gap in the wall, toward the Delve. The knot is a miner's knot."
+    ]
+  },
+  {
+    "id": "sign_downs_north",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "South road to Dunhollow. The Downs are open ground: sump rats, cave bats, and boars that do not wait to be asked. The old signal tower is east, off the road."
+    ]
+  },
+  {
+    "id": "sign_dunhollow",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Dunhollow, one furlong. A mining village. The inn has beds, the office has work, and the smith will buy your bars."
+    ]
+  },
+  {
+    "id": "sign_rocks",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Ironback Rocks. Iron for a level 10 pick, coal for a better one. Keep your back to the wall when the boars come down from the hill."
+    ]
+  },
+  {
+    "id": "sign_delve",
+    "name": "Warning sign",
+    "kind": "inspect",
+    "text": [
+      "DELVE OF THE BLACK SUMP. Flooded workings. Do not go in alone. Rats in the first galleries, bats in the east cave, wretches in the pools. At the bottom, the Foreman. You cannot run from him."
+    ]
+  },
+  {
+    "id": "town_well",
+    "name": "Old well",
+    "kind": "inspect",
+    "text": [
+      "The water is cold and hums a little at night. Everyone in Aldmoor has stopped noticing.",
+      "Lean over the rim long enough and the hum begins to sound like your own name."
+    ]
+  },
+  {
+    "id": "innsharrow_board",
+    "name": "Trade board",
+    "kind": "inspect",
+    "text": [
+      "WANTED: strong lines and steady hands at the piers. The harbormaster pays for trout, a lot of trout.",
+      "NO QUESTIONS ASKED, NO QUESTIONS ANSWERED. Inquire at the Gull's Rest. (Someone has crossed this out. Someone else has written it again.)",
+      "The best trade board in the realm, they say. Look closely at the cargo lists. The weights never add up."
+    ]
+  },
+  {
+    "id": "sign_coast_north",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "COAST ROAD. West along the cut, then south to Gullsend. Far. Take food."
+    ]
+  },
+  {
+    "id": "sign_innsharrow",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "INNSHARROW. Port city. Tavern, quay, piers. Dunes to the east, marsh to the west. Keep to the road after dark."
+    ]
+  },
+  {
+    "id": "sign_innsharrow_west",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "MARSH. Wretches in the shallows. Not a place to walk with a full pack."
+    ]
+  },
+  {
+    "id": "sign_innsharrow_east",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "THE DUNES. Boars root in the sand. They hit harder than they look."
+    ]
+  },
+  {
+    "id": "wargwatch_board",
+    "name": "Hunters' board",
+    "kind": "inspect",
+    "text": [
+      "WANTED: wolves, dead. Pelts paid by the Warden. Heads not wanted.",
+      "FOR SALE: one very good bow, one careful owner. Inquire at the Bowyer.",
+      "WARNING: do not feed the pack. Do not feed anything. (Someone has written \"too late\" under this.)"
+    ]
+  },
+  {
+    "id": "sign_moor_causeway",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "MARSH CAUSEWAY. South shore road to Wargwatch. Keep to the planks. The tide comes in quickly."
+    ]
+  },
+  {
+    "id": "sign_wargwatch",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "WARGWATCH. Hunters' lodge, trapper, bowyer, smokehouse. The mounds are not for climbing."
+    ]
+  },
+  {
+    "id": "sign_cairns",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "THE NAMELESS CAIRNS. Nobody carved the names. Do not carve yours."
+    ]
+  },
+  {
+    "id": "naerwick_board",
+    "name": "Village board",
+    "kind": "inspect",
+    "text": [
+      "WANTED: steady hands for the lamps. Bring your own oil.",
+      "NOTICE: coins in your net belong to the lake. Return them. (Someone has written \"they do not want them back\".)",
+      "LOST: one boat, one dog. The dog came back."
+    ]
+  },
+  {
+    "id": "sign_naerwick",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "NAERWICK. Stilt village on Longmere. Walk the planks. Lanterns burn all night."
+    ]
+  },
+  {
+    "id": "sign_drowned_hall",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "THE DROWNED HALL. No one built it. No one has come back to say who did."
+    ]
+  },
+  {
+    "id": "sign_lake_road",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "LAKE ROAD. South along the shore, then east to Marwick. The marsh is not safe after dark."
+    ]
+  },
+  {
+    "id": "anchor",
+    "name": "Teleport Stone",
+    "kind": "inspect",
+    "text": [
+      "A waystone humming with a faint blue light. Stand beside it to attune it and travel to other anchors."
+    ]
+  },
+  {
+    "id": "egg_hen_grave",
+    "name": "Small gravestone",
+    "kind": "inspect",
+    "text": [
+      "HERE LIES SIR ALWIN PETTIGREW. HE FEARED NOTHING IN THE WEALDMARK.",
+      "Underneath, in smaller letters: and then there was the hen. A second, tinier stone beside it reads: THE HEN. AVENGED."
+    ]
+  },
+  {
+    "id": "lore_page_reach",
+    "name": "Scrap of paper",
+    "kind": "inspect",
+    "text": [
+      "A page torn from a notebook and held down with a pebble. \"First day out of Aldmoor. The streams here hum at night, and I find I hum with them. My landlady says it is only the old forces stirring and I should mind my feet. H. Quaile.\""
+    ]
+  },
+  {
+    "id": "egg_pie",
+    "name": "Pie on a rock",
+    "kind": "inspect",
+    "text": [
+      "A pie cooling on a flat rock, with a note: FOR THE ONE WHO LOOKS. It is still warm, and nobody is anywhere near.",
+      "You decide not to eat it. Then you decide that you will, and find that you cannot pick it up. Some pies can only be admired."
+    ]
+  },
+  {
+    "id": "egg_rod_in_stone",
+    "name": "Rod in a boulder",
+    "kind": "inspect",
+    "text": [
+      "A fishing rod stuck fast in a boulder. A sign reads: WHOEVER PULLS THIS FREE SHALL BE KING OF THE WEALDMARK.",
+      "Beneath, in a tired hand: please do not. The queue is already long."
+    ]
+  },
+  {
+    "id": "secret_whisper_stone",
+    "name": "Whispering stone",
+    "kind": "inspect",
+    "text": [
+      "You put your ear to the stone. Faintly, a piper's tune: half a verse, over and over. Then a voice, quite close, says: \"No. Gullsend is that way.\""
+    ]
+  },
+  {
+    "id": "lore_page_downs",
+    "name": "Scrap of paper",
+    "kind": "inspect",
+    "text": [
+      "A page folded small and wedged in a crack. \"Dunhollow. The miners say the Black Sump took its name from the water, and the water took its color from something else. I asked to be taken below. They laughed, and then they stopped. H. Quaile.\""
+    ]
+  },
+  {
+    "id": "egg_ram_post",
+    "name": "Carved fence post",
+    "kind": "inspect",
+    "text": [
+      "A fence post with DEREK carved into it in very large letters. A smaller scratch beneath: the ram is called Derek. the dog disagrees."
+    ]
+  },
+  {
+    "id": "secret_miners_cache",
+    "name": "Loose stone",
+    "kind": "inspect",
+    "text": [
+      "Behind a loose stone, a miner's lunch tin. Inside are a pasty gone hard as slate and a scrap of paper: \"If I do not come up, Edna gets my good pick. Gaz.\"",
+      "The pasty is not part of the bequest."
+    ]
+  },
+  {
+    "id": "egg_bottle",
+    "name": "Bottle in the reeds",
+    "kind": "inspect",
+    "text": [
+      "A bottle washed up among the reeds. Inside, a note: HELP, I AM STUCK IN A BOTTLE.",
+      "The bottle is empty. The note is very pleased with itself."
+    ]
+  },
+  {
+    "id": "lore_bell",
+    "name": "Small harbor bell",
+    "kind": "inspect",
+    "text": [
+      "A bell on a post, its clapper muffled in sacking. Scratched into the bronze: once for the tide, twice for the families, thrice for trouble.",
+      "The sacking looks new."
+    ]
+  },
+  {
+    "id": "lore_page_moor",
+    "name": "Scrap of paper",
+    "kind": "inspect",
+    "text": [
+      "A page in bottle-green ink. \"The Cairns bear no names. Someone has been at the stones with a chisel, and not so very long ago. One does not scrape a grave unless one fears what it says. H. Quaile.\""
+    ]
+  },
+  {
+    "id": "egg_woodpile",
+    "name": "Neat woodpile",
+    "kind": "inspect",
+    "text": [
+      "A woodpile, very tidy, with a tiny carved wolf on top no bigger than a thumb. Warden Leofric will deny it.",
+      "The hunters call him Softpaws behind his back."
+    ]
+  },
+  {
+    "id": "secret_cairn_stone",
+    "name": "Unscraped stone",
+    "kind": "inspect",
+    "text": [
+      "One stone in the Cairns was missed by the chisel, or spared. The letters are small and deep: HERE ELDRED DID NOT WISH TO BE FOUND.",
+      "Below, in a newer hand: \"Fire, wind, stone and tide. Each has a champion, and none of them is idle. I have the sum of it in my head and I dare not say it aloud. H. Quaile.\""
+    ]
+  },
+  {
+    "id": "lore_lamp_tally",
+    "name": "Chalk slate",
+    "kind": "inspect",
+    "text": [
+      "A slate nailed to a post, crowded with chalk tallies. At the bottom, in another hand: \"Lamps lit tonight: 4,018. Lamps seen below the water: 4,019.\""
+    ]
+  },
+  {
+    "id": "lore_page_lake",
+    "name": "Scrap of paper",
+    "kind": "inspect",
+    "text": [
+      "A page stuck to a post with fish glue. \"Marwick. I have drawn the Hall as well as I can, but the angles will not stay drawn. The lamp-keeper says the lake counts the lamps. I begin to think it counts us too. H. Quaile.\""
+    ]
+  },
+  {
+    "id": "egg_apples",
+    "name": "Hollow under the stones",
+    "kind": "inspect",
+    "text": [
+      "A hollow lined with apples, each one marked in charcoal: NOT SAM'S."
+    ]
+  },
+  {
+    "id": "sign_cinder_causeway",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Cinder road. The causeway runs south along the shore. Ashgate, half a day."
+    ]
+  },
+  {
+    "id": "sign_ashgate",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Ashgate. Visitors report to the Warden. Fire buckets by the gate. Nobody has explained the buckets."
+    ]
+  },
+  {
+    "id": "sign_scorchfield",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Scorchfield. Hounds, crawlers and imps. Keep to the road after dusk."
+    ]
+  },
+  {
+    "id": "sign_blackrock",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Blackrock Quarry. Foreman Quill runs the camp. Beetle season is all year."
+    ]
+  },
+  {
+    "id": "sign_kiln",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Forgotten Kiln. Do not go in. Seriously. Brask is still working."
+    ]
+  },
+  {
+    "id": "sign_flats",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Lava Flats. Walk on the dark ground. The glowing kind is lava."
+    ]
+  },
+  {
+    "id": "sign_foothills",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Highwrath Foothills. The road ends where the fires begin."
+    ]
+  },
+  {
+    "id": "sign_cinder_crown",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Cinder Crown. A nest and a woman. Both hatch things."
+    ]
+  },
+  {
+    "id": "sign_emberjaw",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "EMBERJAW. Whatever you came for, it is not worth it. Go home."
+    ]
+  },
+  {
+    "id": "ashgate_board",
+    "name": "Notice board",
+    "kind": "inspect",
+    "text": [
+      "WANTED: eight hounds for the gate watch. Ask Warden Sael.",
+      "FOR SALE: one slightly burned boat. No questions. Ask Hobb.",
+      "Smith wants sulfur and slag plate. Dunmar pays in bits.",
+      "LOST: a brown goat named Cinder. Answers to nothing."
+    ]
+  },
+  {
+    "id": "flats_board",
+    "name": "Scout notes",
+    "kind": "inspect",
+    "text": [
+      "Lizards at the bend. Wolves at night. The forge on the north side is lit. Rennick says it should not be."
+    ]
+  },
+  {
+    "id": "foothills_board",
+    "name": "Scratched stone",
+    "kind": "inspect",
+    "text": [
+      "Someone has scratched a tally into the rock. It stops at 4,117. The last mark is fresh."
+    ]
+  },
+  {
+    "id": "kiln_log",
+    "name": "Kiln logbook",
+    "kind": "inspect",
+    "text": [
+      "Day 1: lit the main furnace. Day 40: furnace will not go out. Day 90: I do not mind. Day 91: Brask."
+    ]
+  },
+  {
+    "id": "cauldron",
+    "name": "Cauldron",
+    "kind": "craft",
+    "skill": "alchemy",
+    "text": []
+  },
+  {
+    "id": "gem_bench",
+    "name": "Gem bench",
+    "kind": "craft",
+    "skill": "jewelcrafting",
+    "text": []
+  },
+  {
+    "id": "sign_hollow_bypass",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Bypass road. The Hollow is left. Pass Hold is ahead. Keep to the stones."
+    ]
+  },
+  {
+    "id": "sign_cinder_pass",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Cinder Pass. Raiders hold the road above the hold. Travel in groups."
+    ]
+  },
+  {
+    "id": "sign_glasswind",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Glasswind Reach. Do not touch the glass. It is listening."
+    ]
+  },
+  {
+    "id": "sign_caldera",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Caldera Rim. Beyond this sign there is only the crater. Turn back."
+    ]
+  },
+  {
+    "id": "sign_glass_cathedral",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "The Glass Cathedral, third floor. Level 80 and up. Quiet, please. She is listening."
+    ]
+  },
+  {
+    "id": "sign_furnace_throne",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "THE FURNACE THRONE. Level 90 and up. You have made it this far. Turn around."
+    ]
+  },
+  {
+    "id": "pass_hold_board",
+    "name": "Hold notices",
+    "kind": "inspect",
+    "text": [
+      "Raiders on the Broken Gate road. Ten silver a head. Ask the Captain.",
+      "Lost: one mule, answers to Gerald."
+    ]
+  },
+  {
+    "id": "glassreach_board",
+    "name": "Glass-reader notes",
+    "kind": "inspect",
+    "text": [
+      "Pane 14 hummed at three. Pane 22 repeated it at four. Nobody was nearby."
+    ]
+  },
+  {
+    "id": "rimwatch_board",
+    "name": "Watch roster",
+    "kind": "inspect",
+    "text": [
+      "Night watch: Korvath. Day watch: Korvath. Please send more people."
+    ]
+  },
+  {
+    "id": "sign_cathedral_nave",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Glass Cathedral, first floor: the Nave. Level 41 and up. Glass acolytes, shard moths, and a cantor who does not like visitors."
+    ]
+  },
+  {
+    "id": "sign_cathedral_choir",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Glass Cathedral, second floor: the Choir. Level 61 and up. Sentinels and wraiths, and a choirmaster."
+    ]
+  },
+  {
+    "id": "sign_furnace_hall",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Furnace Throne, first floor: Cinder Hall. Level 41 and up. Thralls, hounds, and a brute with a grudge."
+    ]
+  },
+  {
+    "id": "sign_furnace_gallery",
+    "name": "Signpost",
+    "kind": "inspect",
+    "text": [
+      "Furnace Throne, second floor: Slag Gallery. Level 61 and up. Kiln guards, revenants, and Cinderlord Maul."
+    ]
+  }
+]
