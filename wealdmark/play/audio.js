@@ -53,6 +53,70 @@
     master.gain.value = settings.muted ? 0 : settings.master;
     sfx.gain.value = settings.sfx;
     if (mus) mus.gain.value = settings.music;
+    fileVolume();
+  }
+
+  // Real recorded tracks (CC0, see content-src/audio/CREDITS.md). Streamed through an <audio> element so a ten minute
+  // track is not decoded into memory. If a file will not load, the synthesized loops below take over.
+  const FILES = {
+    town: ['faerie-shrine', 'elven-companion'],
+    wilds: ['awakening', 'aural', 'shores-of-yore'],
+    fight: ['akash-chamber'],
+  };
+  const FILE_VOL = 0.6;
+  let fileFailed = false;
+  let wanted = null;
+  const fileTracks = new Set(); // elements still audible, each with its own fade
+  let fileTimer = null;
+  let fileLast = {};
+
+  function fileVolume() {
+    for (const t of fileTracks) t.el.volume = settings.muted ? 0 : Math.min(1, settings.master * settings.music * FILE_VOL * t.fade);
+  }
+
+  function fileFadeStep() {
+    for (const t of fileTracks) {
+      t.fade = Math.min(1, Math.max(0, t.fade + (t.target > t.fade ? 0.07 : -0.07)));
+      if (t.target === 0 && t.fade === 0) {
+        t.el.pause();
+        t.el.removeAttribute('src');
+        fileTracks.delete(t);
+      }
+    }
+    fileVolume();
+    if (!fileTracks.size) {
+      clearInterval(fileTimer);
+      fileTimer = null;
+    }
+  }
+
+  function stopFiles() {
+    for (const t of fileTracks) t.target = 0;
+  }
+
+  function startFile(name) {
+    const list = FILES[name];
+    if (fileFailed || !list) return false;
+    // Pick a different track from the last one played for this place, when there is a choice.
+    const options = list.filter((f) => f !== fileLast[name]);
+    const pick = options[Math.floor(Math.random() * options.length)] || list[0];
+    fileLast[name] = pick;
+    const el = new Audio(`music/${pick}.ogg`);
+    el.loop = true;
+    el.volume = 0;
+    const t = { el, fade: 0, target: 1 };
+    el.addEventListener('error', () => {
+      fileTracks.delete(t);
+      fileFailed = true;
+      const n = wanted;
+      wanted = null;
+      setMusic(n);
+    });
+    fileTracks.add(t);
+    const p = el.play();
+    if (p && p.catch) p.catch(() => {});
+    if (!fileTimer) fileTimer = setInterval(fileFadeStep, 100);
+    return true;
   }
 
   /** A short pitched blip. `to` slides the pitch over the duration. */
@@ -285,8 +349,10 @@
 
   function setMusic(name) {
     if (!name || !TRACKS[name]) name = null;
-    if ((current && current.name) === name) return;
+    if (wanted === name) return;
     if (!ensure()) return;
+    wanted = name;
+    stopFiles();
     if (!mus) {
       mus = ctx.createGain();
       mus.connect(master);
@@ -300,6 +366,10 @@
       setTimeout(() => old.gain.disconnect(), 2200);
     }
     if (!name) {
+      current = null;
+      return;
+    }
+    if (startFile(name)) {
       current = null;
       return;
     }
@@ -338,7 +408,7 @@
         // music must never break the game
       }
     },
-    musicName: () => (current ? current.name : null),
+    musicName: () => wanted,
     tracks: () => Object.keys(TRACKS),
     state: () => (ctx ? ctx.state : 'none'),
   };

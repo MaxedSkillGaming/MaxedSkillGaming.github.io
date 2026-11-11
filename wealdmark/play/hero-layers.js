@@ -32,14 +32,14 @@
   }
 
   const MASK = 'pickmans_bone_mask';
-  const METAL = ['#e8a060', '#c4cad2', '#eef4ff', '#b8e4ff'];
-  const TIER_GEM = ['#e04a4a', '#4a8aff', '#4ae080', '#c85aff'];
+  const METAL = ['#e8a060', '#c4cad2', '#eef4ff', '#b8e4ff', '#6ae8c0', '#ff7a3a'];
+  const TIER_GEM = ['#e04a4a', '#4a8aff', '#4ae080', '#c85aff', '#6affd8', '#ff7a3a'];
   const GEM = { topaz: '#f0b43a', amethyst: '#a860e0', emerald: '#3ac870', ruby: '#e03a4a', sapphire: '#3a78e0' };
   const RARITY_GLINT = ['', '#bcd8ff', '#ffe27a', '#ff9a50'];
   /** Trousers take the colour family of the legs armor: [tint, strength]. */
-  const LEG_TINT = { soft: ['#c08a52', 0.28], hard: ['#2a1608', 0.38], chain: ['#aab0bc', 0.5], mithril: ['#6ab8ff', 0.5] };
+  const LEG_TINT = { soft: ['#c08a52', 0.28], hard: ['#2a1608', 0.38], chain: ['#aab0bc', 0.5], mithril: ['#6ab8ff', 0.5], skyiron: ['#6ae8c0', 0.5], wyrmplate: ['#ff7a3a', 0.5] };
   const legFamily = (id) => (id ? id.split('_')[0] : '');
-  const tierOf = (n) => Math.max(0, Math.min(3, (n | 0) - 1));
+  const tierOf = (n) => Math.max(0, Math.min(5, (n | 0) - 1));
   const ringGem = (id, t) => {
     for (const g in GEM) if (id.indexOf(g) >= 0) return GEM[g];
     return TIER_GEM[t];
@@ -100,6 +100,51 @@
     return c;
   }
 
+  /** Hue and saturation for gear above tier 4: Skyiron is teal, Wyrmforged is ember orange. The sheet has no cells for them, so they recolour the tier 4 art. */
+  const TIER_RECOLOR = { 5: [165 / 360, 1], 6: [14 / 360, 1.15] };
+  const recolorCache = new Map();
+
+  function hsvToRgb(h, s, v) {
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+    return [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][i % 6];
+  }
+
+  /** One sheet cell with every pixel moved to the tier's hue. Greys take the metal colour too, so plate stays readable. Null if pixels can't be read. */
+  function recolored(image, cat, cell, tier) {
+    const spec = TIER_RECOLOR[tier];
+    if (!spec) return null;
+    const key = cell[0] + ',' + cell[1] + ',' + tier;
+    if (recolorCache.has(key)) return recolorCache.get(key);
+    let out = null;
+    try {
+      const c = document.createElement('canvas');
+      c.width = c.height = cat.cell;
+      const g = c.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 0, 0, cat.cell, cat.cell);
+      const d = g.getImageData(0, 0, cat.cell, cat.cell);
+      const px = d.data;
+      for (let i = 0; i < px.length; i += 4) {
+        if (px[i + 3] === 0) continue;
+        const r = px[i] / 255, gg = px[i + 1] / 255, b = px[i + 2] / 255;
+        const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b);
+        const sat = mx === 0 ? 0 : (mx - mn) / mx;
+        const [nr, ng, nb] = hsvToRgb(spec[0], sat < 0.12 ? 0.45 : Math.min(1, sat * spec[1]), mx);
+        px[i] = nr * 255;
+        px[i + 1] = ng * 255;
+        px[i + 2] = nb * 255;
+      }
+      g.putImageData(d, 0, 0);
+      out = c;
+    } catch (e) {
+      out = null;
+    }
+    recolorCache.set(key, out);
+    return out;
+  }
+
   /** The cells for one figure, back to front, or null when any part has no cell. */
   function plan(look, held, catalog) {
     const cat = catalog || root.HERO_CATALOG;
@@ -149,7 +194,7 @@
         warnOnce('weapon', held.weapon);
         return null;
       }
-      out.push(tiers[Math.max(1, Math.min(4, held.wt | 0)) - 1]);
+      out.push(tiers[Math.max(1, Math.min(4, held.wt | 0)) - 1]); // tiers 5 and 6 reuse the tier 4 cell; the glint below marks them
     }
     if (!held.offPistol && held.shield && !item('shield', held.oid)) return null;
     return out;
@@ -229,7 +274,7 @@
     if (!cells) return null;
     const image = sheet(cat);
     if (!image) return null;
-    const key = JSON.stringify(cells) + '|' + step + '|' + overlayKey(held) + '|' + (held.best | 0);
+    const key = JSON.stringify(cells) + '|' + step + '|' + overlayKey(held) + '|' + (held.best | 0) + '|' + [held.bt, held.ht, held.ct, held.ot, held.wt].map((t) => (t >= 5 ? t : 0)).join('');
     const hit = cache.get(key);
     if (hit) return hit;
     const c = document.createElement('canvas');
@@ -243,8 +288,19 @@
     const body_n = cells.length - held_n;
     const dy = step === 1 ? 1 : 2;
     const lt = LEG_TINT[legFamily(held.lid)];
-    const draw = (cell) => {
-      if (lt && cell === cat.legs) g.drawImage(tinted(image, cat, cell, lt[0], lt[1]), 2, dy);
+    // Tier of each worn piece, found from the catalog cell the planner chose. The weapon is the first held cell.
+    const pieceTier = new Map();
+    const note = (table, id, tier) => id && cat[table] && cat[table][id] && pieceTier.set(cat[table][id], tier | 0);
+    note('armor', held.bid, held.bt);
+    note('helm', held.hid, held.ht);
+    note('cloak', held.cid, held.ct);
+    note('shield', held.oid, held.ot);
+    const weaponAt = weaponCell(held) ? body_n : -1;
+    const draw = (cell, at) => {
+      const tier = at === weaponAt ? held.wt | 0 : pieceTier.get(cell) || 0;
+      const shifted = tier >= 5 ? recolored(image, cat, cell, tier) : null;
+      if (shifted) g.drawImage(shifted, 2, dy);
+      else if (lt && cell === cat.legs) g.drawImage(tinted(image, cat, cell, lt[0], lt[1]), 2, dy);
       else g.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, cat.cell, cat.cell, 2, dy, cat.cell, cat.cell);
     };
     if (step === 2) {
@@ -252,7 +308,7 @@
       g.translate(20, 0);
       g.scale(-1, 1);
     }
-    for (let i = 0; i < body_n; i++) draw(cells[i]);
+    for (let i = 0; i < body_n; i++) draw(cells[i], i);
     const ov = overlays(held);
     const rects = (list, ox, oy) => {
       for (const [x, y, w, h, col] of list) {
@@ -264,7 +320,7 @@
     rects(ov.face, 0, 0);
     rects(ov.hand, 0, 0);
     if (step === 2) g.restore();
-    for (let i = body_n; i < cells.length; i++) draw(cells[i]);
+    for (let i = body_n; i < cells.length; i++) draw(cells[i], i);
     if (held.weapon === 'pistol') rects(pistolRects(held.wt).map(([x, y, w, h, c]) => [x + 1, y + 10, w, h, c]), 0, 0);
     if (held.offPistol) rects(pistolRects(held.ot || held.wt).map(([x, y, w, h, c]) => [x + 13, y + 10, w, h, c]), 0, 0);
     if (cache.size > 400) cache.clear();
@@ -467,10 +523,10 @@
       ctx.drawImage(image, cell[0] * cat.stride, cell[1] * cat.stride, C, C, x + snap(lean) * s, y + snap(dyTorso) * s, C * s, C * s);
       ctx.restore();
       // Glint on tier 3 and 4 weapons, element glow on staves.
-      const tier = Math.max(1, Math.min(4, held.wt | 0));
+      const tier = Math.max(1, Math.min(6, held.wt | 0));
       if (tier >= 3 || held.element) {
         const tw = (Math.sin(t / 240 + seed) + 1) / 2;
-        const col = held.element ? ELEMENT_GLOW[held.element] || '#8fd8ff' : tier === 4 ? '#ffe6a0' : '#ffffff';
+        const col = held.element ? ELEMENT_GLOW[held.element] || '#8fd8ff' : tier === 6 ? '#ffb070' : tier === 5 ? '#a0ffe0' : tier === 4 ? '#ffe6a0' : '#ffffff';
         const dxp = 0, dyp = 2 - pv[1];
         const gx = pv[0] + dxp * Math.cos(ang) - dyp * Math.sin(ang) + lean;
         const gy = pv[1] + dxp * Math.sin(ang) + dyp * Math.cos(ang) + dyTorso;

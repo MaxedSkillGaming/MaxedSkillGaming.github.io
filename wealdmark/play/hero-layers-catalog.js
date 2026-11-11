@@ -1,7 +1,7 @@
 /**
  * Which cell of the Kenney Roguelike Characters sheet (hero-layers.png) draws what.
  * Cells are [column, row]. scripts/hero-contact-sheet.py draws the labelled grid these were read from.
- * Tier 1 to 4 shows by choosing a different cell, so there is no tint code.
+ * Tier 1 to 4 shows by choosing a different cell, so there is no tint code. Tiers 5 and 6 reuse the tier 4 cell.
  */
 (typeof window !== 'undefined' ? window : globalThis).HERO_CATALOG = {
   sheet: 'hero-layers.png',
@@ -28,6 +28,8 @@
     hard_leather_head: [30, 2],
     chain_head: [28, 0],
     mithril_head: [28, 1],
+    skyiron_head: [28, 1],
+    wyrmplate_head: [28, 1],
     foremans_hardhat: [30, 3],
   },
   armor: {
@@ -35,12 +37,16 @@
     hard_leather_body: [9, 4],
     chain_body: [10, 5],
     mithril_body: [10, 0],
+    skyiron_body: [10, 0],
+    wyrmplate_body: [10, 0],
   },
   cloak: {
     soft_leather_cloak: [10, 6],
     hard_leather_cloak: [6, 1],
     chain_cloak: [14, 6],
     mithril_cloak: [10, 1],
+    skyiron_cloak: [10, 1],
+    wyrmhide_cloak: [10, 1],
   },
   shield: {
     soft_leather_offhand: [34, 0],
@@ -50,6 +56,8 @@
     briar_shield: [38, 1],
     briar_bulwark: [38, 6],
     mithril_offhand: [38, 6],
+    skyiron_offhand: [38, 6],
+    wyrmplate_offhand: [38, 6],
     nutcracker_buckler: [33, 0],
     tidal_aegis: [38, 7],
   },

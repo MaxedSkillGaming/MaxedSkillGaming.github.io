@@ -22,7 +22,7 @@
   const MAX_LEVEL = 100;
   const PANELS = ['panel-skills', 'panel-bag', 'panel-equip', 'panel-stats', 'panel-look', 'panel-sound', 'panel-journal', 'panel-loot', 'panel-world', 'panel-trades', 'panel-tasks', 'panel-store', 'panel-belt', 'panel-party', 'panel-merc', 'panel-dungeon'];
   /** Iron bits each hero pays to enter a dungeon run. Matches the server's default. */
-  const DUNGEON_FEE = 25;
+  const DUNGEON_FEE = 100;
   const TOWN_PANELS = ['dialog', 'panel-shop', 'panel-storage', 'panel-station', 'panel-perks', 'panel-anchor'];
   const ROW_LEVELS = [1, 8, 16, 24, 32, 40];
   const TREE_NAMES = ['melee', 'range', 'magic', 'passives'];
@@ -80,7 +80,7 @@
   const BASIC_ATTACKS = ['punch', 'slash', 'shot', 'fireball'];
   const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8, kiln_warden_brask: 1.6, sparkmother_veyra: 1.6, emberjaw: 1.8, cragmaw_the_unburned: 1.4, hollow_pyre_priest: 1.4 };
 const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder', 'exhaust', 'dust_choked', 'blinded']);
-  const TIER_LEVELS = [1, 10, 20, 30];
+  const TIER_LEVELS = [1, 10, 20, 30, 40, 50];
   /** Procedural 24px icons for abilities and statuses, drawn once and cached as data URLs. */
   const poly = (c, pts) => {
     c.beginPath();
@@ -208,6 +208,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     party_full: 'The party is full.',
     unknown_hero: 'No hero by that name is online.',
     no_dungeon: 'There is no dungeon gate near you.',
+    level_too_low: 'You are not high enough level for this floor.',
+    missing_key: 'You need a gate key to open this floor.',
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1084,9 +1086,143 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     },
   };
 
+/* Kenney Tiny Dungeon creature tiles (rows 8 to 11, CC0, kenney.nl). Monsters draw from these with a hue, saturation and light shift. */
+  const KENNEY_SHEET_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAABACAYAAABMbHjfAAAUaklEQVR42u1dfUxc15X/4RBrW+WPjWK7JU3qhKSGOCXGowwG7MVOVhmozSrLqmAV3Di7ykZp4mCUtRs5EjOaQVprQzdySDBW7G5N1lgCVvVSDS4Mcuuk4ctY4AlrG7MpjpNNUDDWplKUVE5Y7x/Dvdx337333fcxDNhcCfHm3Xfe5znnnnPu75ybBqZtXrP+BgTtnfGRNNxiTfQuFup7kH03q0aexw09oQ0GMgAAt+1sAADMNFcbjuX3R2KTtu9H1e/0+ml2XqIOA1idx+oci51+sTB/slq4pR0AEKoqF+5fO34A5eHepFy7PbQRF9bUKK/P70/nX+KONS8ZDjg2/prhZasYQOdjqM7hlN4OE7DHWp2HaBVWY7i9vtcamL3X4XXPAwB88YPC49l+XgM7pWdHATuMWh7uRXtoI93HCwXbZ9XPn8vO+0tnd+xY8xKOjb9mEAKyTQSBPKyKCTasvB3F61cYLtY9Mo3Bq19rMdHbex7Fqux7DfRTYx/jqV+cNdGLXn7p3jr4c7MBAEPnxuDPzcbQuTFE62ulwmR1/xtW3i68fzca2K325unJM6/9dqbw+NvWJPpn4uLzOaXXEQLyHYiGDrfU4IJBQ9cYjr9gGlnk/fy5hs6NaSuPdJm25xsRDitNLmIeAIl9jBDImoj5AWBV9r14ew+oEIi0CgA0f1lCP6Tp4+6tgy9+EDkFmdJh2On9p0oDQ/DhZ+IT1OYlbaa5GsNfJvp9CiZ1Qy9rwUAGhjUZ06sWDGQI3xHfTCNA3toc6cF5a3+FMxdGlYJCmKewIh99bQN0f2FFPoABDFrc1AfvfyIUANJn1Xzxg0Bug1TDybSfF/efKg1MnDz/7PZbw0V4FsCzTz+X+H30EH45U4RniWLIbQBi5Z7Sq8wdAED/QSrApO38dhfdbv6yRNpn1c/3ESXXrlB0QgHIW5ujZHAiIMfG1Q+dYJa5/4b9sRNJkfjycC+CgQzkFGTiAqNtiPlDtnM0Xkoq7j+ZGjhVjbXLcwoygX7jyLWT6efN052cTa/qZ/sID/D+hpYAnLkwis+fvBNdWWXCg9+8dCfOdIxqMc+6n72LeFMR3c//1qEHgHhTkWGbZ0DW/ozEJhHe2YChc2M4fOAA/rFmzm48fOAAUFODUH2vMqLj9v6dNrca+GRNpdE8+4cf462jh+jPT061InSqlZp5fCP0pXvr8MmpViH9kO+HiNbXCul5Wz/c0g6MHzD06ZgkblskNon2gkxhBEhkgpl8gFLUKRgQKBlXa8CpsY+pCTM19rGpz6qF9kUR3l+KeFMR+toGENoXRdNjK1BYkY/QvqhlPBoAdmUN4/Ds/6mRDmzIvheHAVTc6EDUIpzp9v4XSuPDfbptzzPbEK2vFdKTPqcj9Hw1O1GhdH5HtL4Wu46UId5UhMFvVWIQwFtHK7Hhq+MoeeaEZTz8qV+cxdt7gJ7d9xts+Z7dcgeWbYNXvzYwenh/KUL7ougeiVo60OTDv73nUTQ9tpza8B+8/wmaHluudX3V/Vv5IKwJI3RiFSaMWw3uVduS5TMEBMg34ftk0Shf/CCGMGvr59a4Eka3QsBrfl/8IFWAJIhjCl/tWPMSdvz8Mt685MOurGHG/PHhLzv+1+AfiEKB4ZZ2DJ0bM0Uyhtc9D39utuFlyOhnmqvRPTJteqitB45r0YuuT8wMK/quI2UI7YsKI0GFFfkmJcDOhLJRGqENr4jisGFWqyY6VjfqITuW7Dt9aRhbsnxoXb3c0L/9ynXax9Kz74Bo3dH+CYPDK4rKzUdjTR7iGLOjkWEeoOtIwu4/9ipw7NX74Q9lYxDZzEMA/93RT48reeaEKQ5NJM6fm22KxPiZYwgTyugJs/MMpEtPoj3sRyaTWip68mzh/aUGRmf7uo6U0T6W3q0NX7x+hWWEzMmxdts7Z/8IAPjOw3n47PwZuo0r79E+q0YcXiIE8xn+lEUGcwoy9Uwgp63rSBnw1XG8ecknlfihc2PYlTVsYCIR/dWRaRSj2jSRtnKdnD4YyKBallyfFaiZ5mo6Mog0IGFw4gN0HSmjJhRxjNk+/vpexa5TTT/TXE3P852H86R9VrZ3JDYJxGpRurdOenyywqC8SR8FqGPM+yJUAI69ej91hBMPWWA62bHx14BXX1K+xGh9LXySlxSNTWLXkTJLetFLLl6/ApFZ/8SKHnvr4OdMkOF1zyvvjfUBggGjrU8EIRKbRNcR8RzFW//2H7jn/V8DAO4BABht+Hve/zVO1iT6/+eRvzPR/3KmiNJbtQR9a1LpH/c/YFJAMnrWDOIZTOU0s98iGquV9ln18306Tjgxf+mNs5AHsv2DUEIIpqY/x58aLxr6VJNhvPPE/9axcWUOsk67q3AbAOBaX6fwt+717dw/8V1EDMNOsIl8ERG9Vch0PugfT08Iwe+++aOUng2GLDRgng6GKp1IL2FonvkB4E+NF4VwCRkehnxsYqfyv3XpTQKgSV/9wtOJ6MMsw/O/vbx/3g+gPsxOZ3MBbucSvKR/h+x3wFhwAU60A4d2i8695XD+S80dc87XOXghsHt9Xfo0r2/AbV7BQs4HuJUSg7xICHJ6DreJWXbol4mIRSeQ7XcC75Udp5sP4DYfwSm9zjtYaEzs5J75eRW3AmTnHCxd6d46A63d7xsMZBhmhEX06SoGEGXRWCXFsJNREKAdZbOCXuYTbFh5O8L7Sw1oTjv0JHTH5hSwEQ03ST1uE4qcalGd7ybL7nLL/E7mAdjwKTt3AwchYRUgbpmO5IVb2g03JBshwMT7CbOw/3VehAqPrwMBCAYyKPOzaM7i9Su04uTsc7IoUr4vGSNQMswXp0zs1bVTPQkGu1ggEjKEJLxoFUpU0UNzlhOwh8fnmYowP0uvSq2UMSU/AuhqVDYjTaQUdITQDX2qmF/HCljwAlCwMV/60Qs25iNqIQCEnmhL/r9Oc4rHZ0cIs/Ak9qkwN+w9VtzoAEY6Eu8i7UnDMVaM6M/NNsXU/TsbENV8fpb52VEoisXTFgPzC51gcDN4/H+dVnGjA4cPHEDFjQ76R37bzQcAg8fXHT0A4Ge/v47CinzD+Qor8qVzDCzjVdzowKrse+kfCwq0A+y6bWeD69j8UpvnEcCLloARX+ZSG8nvs0nNJ6BC9Pt35UAti7TGVV8NC/Ih3jVAG+ZLg6YKSem2Retrbc/ALygBcGPCEMZhGVY3m8ptPgF/PSJQ5Pdo/4Ql423IMtLTe//qOAa/Val9D7rQhGQ5obwZ4iQSBBfFsog5TMzmZF/bSVkdQ10gWfEg1rHxz4akRE4koS+pEplLZxFuaUe4pdKS/il6/bPS4kaqj8lGgFghkuH8eYZhcyFY+jcv+QCMaWlvHoxnxyYOVZWbHFi7YUCW3m8jjOhWgKzmWXSFIFqfQJI6cf6BBHCxdfVy/N+la9h+5bp8BLCqq6P6gLKHTRU9G/nhzaXG5jh+cOeLKKy4TB1pnn5X1jBC+6JY+XTQRN+W9iSuHo0gvL/UlFUkg+C60Z4yhtVloFBVOQ37OsnFdSpAC4Ge0r5SBSvFTl84sdfIsOXPzUZD41EACTAZYcD+3gGhXZdq+i4GJt3XNoCJD38CYK7SBQDs+Plleows4YWMFKxjTZCd4f2lJnq7VeLmEwrAC4Dda4sEyM4IMN/0ssp+EQmIUpoTHAxkYCYOvHAHsWWH4Zs9kVWcP9X0Jc+cQDCQQesbTX/5CvLW/vNs32sGRlfRg8kjKMZB2scmyiQLL+SVrexE86uqvM0HFsrN9XUq1PHnEBK4xdOnmp6vbwqNynfQzEfgs8kWS8VoN0jMZILRUk2/TLSz+oWnKYZe9Js94UKj55lfVelORM8zv8ppXsjoUPJssndsdwSyc47FRJ8236EoN5Whrc7j5dC9mNYHuFlGILdgQCdQ9rRU1Kr3urz4QlrfYInpvVVeXvKQ6LppXtlgvPfO43j62gaEtjNL17p6OY3Ztq5eTqsSfHb+jGE/G9flHR8e8amKAOhGEdxEMm52G1pFowrDypQXG7Jk6UWhTFldKFkYWDshxo2EBwMZePyNTiE8QQVHJox9eusmU1Em0n966yZsv3Jd2M8Wd2IT0oOBDMN1VQk/rB/A3yvrGzh9Rws94ccLegKlD7e0UyzUXYXbTJB6FXxaFK8PVZVj6NyYKUFGlx46UAj2ZGsv/bvhwAtZP9WazSusyMef/1Anx+hI0JxEq285+Z6UwbecfM9wrCzsJ3Jc+ehNstY3EFUpHu2fsB2SXKz0IuwSCWCoEK0sfLp0bx36eweQU/B5Igr4hc+AUhYlyKjoVdgvIRYovSci3PfNE0HtFygCrsnq/otMIGL6WB0j+2ii1l6QafkxT1Q+CiKi3y/9Ed3/UfS3wEP34e7X+5eM/Xlqc7gtn0t6B2C48Y8uwy0i9C/+qhZZP3wCl/6rRzoqiEygl4cGhcec3rqJjhAiIcixYHAqIAoBOHTxw7lKcN2/mXuenITwlkB/Eqp0tjSgTuGmm40eiw0Ozdt33zwRpCMBu21lBrFwZp1RgTeBXh4aNEAO2PbyLERBNgLoSLzVMV6uD0DMAaeJLIuRnqwP0NB41DR3YzdJho7mPc7un9IrFJ7JCf50d4H0YFkfKzwsZPnPf6hDvKmIan+2vLjIoWpdvZza3yxWh2wXr18h9Q9E51L9tmO6QTMfQZaLq1vZgO1L74mgbtVF1K26aFI+OvSnt27C5pbXsbnldZzeusk2fd6pYXR+9wF0fvcB5J0a1naEydoC1/o6cbKmEidrEujfUFW5EtUZqiqfE7j6Wlzr68Ro/wRG+ydwra+T0soKK6joLUcAYbkI5qWLfAIyCvClxfvaBqRYmcKKfHRVQFhdmZo1VyaBmBFzwxejlZlA3SPTVIC2X7luYLztVeUIZs2VLLRa3yDeVGQAxfXsXqe1Rpksd0InlZJVNN8X7NP1P2RRNBUs2BCi/Kc25An2bf7XCls4HKuKgCIELAu5t6pQwodBVfRaPkB6TwSI/tZgBomEQeQME5AZgSTLqi+LGBpIVCI+/fBczN/QPxs5YucGcOU9kxANXv0axQzDsS+hdG8dED9oudTpp7sL0Nh8FkDcgAZtbI7jROWjuFuxXrCXObEfMd/BSRMFEOy0+pMfwO26x7wJIntfOjBwfr9KiFKaEjk19jEKK/KxYSRqghCr/AMrbWVlwhAB62sbQDCQgdtys+Hnkkpm4lCubxAMZOC52UgQ0bZEexHzjw2nzkeG1c0RxXGHAtXF+jhBFCzjHV92mE3viRi0/92v91uGQokPQBifNSNUKY2fnT9Dtb9oqCb7yXFIQm3+Bx/5Hg5d/NAwgfbp7gLK/IcufogHH/meZX0hkaljJ6tJZOrYCb/K3p9uE5k6KvNH5YSqwtLQBEd61S8dAfihi4/6sOaQTAJZu5+kHhIbsK9tgNreMv+AzPASTa8aAUQfk63hL2PQSGwSQQwo1yiOxCaBh+7Dcw/dR5keAJ576L5Zej0tJmN4qw9I6GUMr0svY3hdehnD22EwOyPAgkiKNzzc6r+xdSKK/YmdoIxPTIVgIIMu68Mep/vRZH2qYW+muZqWJJma/hx3dQa1k0fKjp+lPkUEidnhspFpDGokmbhNKFns9F4uizof9GnJQADyICQdUJQKfmwFTRaB4dh6PKQ6Q0RzfQHd+1+y/1Nf3hzJKo+eyjr0Kg2kU28+1WjKpZZ6AdBdmyDlCTFui8V6mRPgVU7BEvOnXgHpJjSle3kDTgoTQTJRpML1iyaV+GvzK4WT8tiy67ulv9XzAUSt4W9/BQCo/s+/dyRIZAb6zF/7XFWoVs0NpDvFilvV11dVNxYxkX82bt/QeBQv3DFswHKM9k8gGMhA4xc+ii+JSq5NGJevB6+qEe+W3svCUEv03hTW0q2OvUx2UVYD8trQblErwuBW5RUJhkS0Snz3yDSu9XWapJln3vJwr5BR2X0sjVt6KOYV2kMb0R7a6Gj93puB3s36xU7p7Sb0pPMRFGJqjPZPUMZn47lWM6GqYq6qhAjRMCWLI4uO5TW0zISRNZ7ebWnCpZbaxipbFQ4rnZeyYCAD3SPThhm8nIJMbGCAZqKV1mVMytpgqiGJjBwNjUdRfMcwRBlZH8yaQKp6kbKkmPbQRkOugMoXEQkxyTjSWSYJSIRhL5DtNQBi5baXLF3M9IncjFe0KnJLocz/ss0xfbS+Flc11neWrg+wsvIN4XayGoG5XuvrROMXPmr2EHOo8QsfNYFkoww7VBIoLA+JVQ2n/PJI7J8K6SlTAITWyeix2OnLw730++n4Tl7Rs0qJRSNoJ8XnFGSieP0KXD3+It139fiLKF6/QorrENlWJDGa39bxIYgfQB6A2P8q5mNfEsvwkdgkIrFJuo/PCxbRswwfra81rG/GjjxWoTZ/brZBWHVnYsl2V+AGugI3HNPvOd+NPee7HdNPlWzDVMk2x/Q6DGiHHvOxPgAxE9o5ZpfhYFROB6s5ROaPiJb4CeyDExiFyIdQTZxFYpOmqA7/W0Ufra814dCtSsgvNe8awXXpmNxyM2xCTwByCjJRHu5NMAijMfkTssfwGl+XKXSOffyNTvzuxW10O5Llc4T/IM+hG0ngfQu20gDmeZ0skhNwN1KbE7AZqZlEcxI94r+9lf+wjDcByP+cgkxqPhDThz9GZ2VAVvPzdV1UUZYtDMNv4ZhfJDzhlnZDASWRUBBTSHT/4ZZ2g8aXrZfm1Ca+FZtdOLROUTKvR4BlMruMZRIZw+ssmG0V/eHPwQoQEUCZRiW074yPpG3xP5hG/steJq9RdOlly0QtwSKsNbBbSLSbStx0BNDNB/BiKjxaX2vKxLLq43H0ssJHonxQWMT2eYcYLta6tbtUj5OlfeAwCQaaEHJb5oiDJJiFYv/r5iSkeb0yOGFSkc0sYm67YDavMEnJBsUtFjgwbvH1BdKSgf4TmTwiu9kKlCbC6y82QBiWEKELWoD/H2kMnL88sL87AAAAAElFTkSuQmCC';
+  // monster id: [tile, hue shift in degrees, saturation x, light x, grey tint]
+  const KENNEY_MON = {"moss_imp":[112,95,1,1],"glowcap_crawler":[122,240,1.3,1.1],"gnasher":[123,0,0.5,1],"pinegrub_goblin":[112,110,0.8,0.8],"nutcracker_goblin":[112,0,1,1],"mind_goblin":[111,230,1.2,1],"sump_rat":[123,-10,0.6,0.8],"cave_bat":[120,0,0.3,0.9],"bog_wretch":[108,0,1,0.8],"stone_boar":[124,0,0.6,0.9],"foreman_below":[109,0,0.8,0.9],"skrit":[123,20,0.8,1],"harl_dunmarsh":[86,0,1,1],"wisp_hound":[124,190,1.2,1.1],"dire_wolf":[124,0,0.4,0.8],"grave_wolf":[124,0,0.3,0.7],"barrow_wight":[121,0,1,0.8],"ghashul":[121,100,1,1,"#78c878"],"ethelgar":[84,0,1,1],"morwenna_pickman":[111,260,1,1],"mere_eel":[108,190,1,1],"drowned_sailor":[121,0,1,0.9,"#78a8d8"],"drowned_voice":[121,0,1,1,"#58c8c8"],"nyth_ael":[121,0,1,1.1,"#c8b8f0"],"ambrose_silt":[87,0,0.8,1],"prince_elrenor":[98,200,1,1],"thorn_sprite":[108,60,1.2,1.2],"feral_ram":[124,20,0.8,1],"quarry_golem":[109,0,0.4,0.9],"bandit_cutthroat":[88,0,1,0.9],"crypt_spider":[122,0,0.5,0.8],"salt_crab":[110,170,0.8,1.1],"ember_hound":[124,-15,1.5,1.1],"ash_crawler":[122,0,0.2,0.8],"cinder_imp":[112,-20,1.5,1],"char_stalker":[124,0,0.3,0.55],"scorch_vulture":[120,-15,1.4,1],"slag_beetle":[110,0,0.5,0.6],"obsidian_golem":[109,260,0.3,0.55],"magma_snake":[123,-5,1.6,1.1],"pyre_cultist":[111,-15,1.5,1],"quarry_wraith":[121,0,1,0.7,"#a89888"],"lava_lizard":[123,5,1.5,1.2],"flame_wisp":[121,0,1,1.1,"#ff9a3a"],"ember_wolf":[124,-10,1.6,1.2],"forge_wight":[121,0,1,0.8,"#d86a3a"],"salamander":[123,0,1.8,1.3],"thrall_of_fire":[85,-15,1.5,1],"ash_wraith":[121,0,1,0.9,"#b0a8a8"],"magma_elemental":[109,-10,1.6,1.1],"phoenix_hatchling":[120,10,1.8,1.3],"drake_of_the_peak":[110,-15,1.4,1.1],"kiln_warden_brask":[97,-10,1.2,0.9],"sparkmother_veyra":[84,-20,1.5,1.1],"emberjaw":[124,-15,1.6,1],"cragmaw_the_unburned":[109,0,0.6,0.8],"hollow_pyre_priest":[84,-10,1.4,0.9],"pass_raider":[88,0,0.9,0.9],"ridge_ram":[124,30,0.7,1],"gale_harrier":[120,170,1.2,1.1],"ash_gargoyle":[121,0,1,0.55,"#808890"],"glass_scorpion":[123,180,1.3,1.2],"obsidian_hawk":[120,260,0.3,0.6],"shard_golem":[109,180,0.7,1.3],"prism_wisp":[121,0,1,1.2,"#a8e8f8"],"rim_stalker":[124,10,1.2,0.8],"caldera_drake":[110,-10,1.8,1],"rimstalker_alpha":[124,0,1.4,0.75],"captain_voss":[96,0,1,1],"glass_hierophant":[84,180,0.8,1.3],"vitrix_glass_queen":[99,180,0.8,1.3],"ifrit_the_unquenched":[109,-15,2,1.2],"glass_acolyte":[88,180,0.8,1.2],"shard_moth":[120,180,0.6,1.2],"lens_eyed_cantor":[84,200,1,1.3],"cinder_thrall":[85,-10,1.4,1],"furnace_hound":[124,-15,1.6,1.1],"slagmaw_brute":[109,-15,1.8,1.1],"prism_sentinel":[109,180,0.7,1.3],"lens_wraith":[121,0,1,1.2,"#a8e8f8"],"choirmaster_of_glass":[84,190,1,1.3],"kiln_guard":[109,-10,1.5,1],"flame_revenant":[121,0,1,1,"#ff9a3a"],"cinderlord_maul":[110,-15,1.6,1.1],"glass_regent_guard":[109,185,0.7,1.25],"shattered_choir":[121,0,1,1.2,"#c8f0ff"],"throne_ember":[85,-15,1.6,1.1],"molten_warden":[109,-10,1.6,1.1]}
+
+
+  // Beasts and wisps in the Kenney Tiny Dungeon look (flat tones, dark outline, 16x16); the pack's own wolf tile does not read at this size.
+  function beast(o) {
+    return (r, step) => {
+      const l1 = step === 1 ? 1 : 0, l2 = step === 2 ? 1 : 0;
+      r(1, 5, 2, 2, o.body);
+      r(0, 4, 1, 2, o.shade);
+      r(3, 6, 9, 5, o.body);
+      r(3, 6, 9, 1, o.hi);
+      r(4, 10, 8, 1, o.shade);
+      r(4, 11 - l1, 2, 3 + l1, o.shade);
+      r(7, 11 - l2, 2, 3 + l2, o.body);
+      r(9, 11 - l1, 2, 3 + l1, o.body);
+      r(11, 11 - l2, 2, 3 + l2, o.shade);
+      r(11, 4, 4, 5, o.body);
+      r(11, 4, 4, 1, o.hi);
+      r(14, 7, 2, 2, o.body);
+      r(15, 7, 1, 1, '#1a1010');
+      r(11, 2, 1, 2, o.shade);
+      r(13, 2, 1, 2, o.shade);
+      r(13, 5, 1, 1, o.eye || '#ffffff');
+      if (o.tusk) r(14, 9, 1, 2, '#f0ead8');
+      if (o.horn) {
+        r(10, 2, 3, 1, o.horn);
+        r(9, 3, 1, 3, o.horn);
+        r(13, 2, 2, 1, o.horn);
+      }
+      if (o.wool) {
+        r(2, 5, 10, 6, o.wool);
+        r(2, 5, 10, 1, '#ffffff');
+        r(3, 10, 8, 1, o.shade);
+      }
+    };
+  }
+  function wisp(o) {
+    return (r, step) => {
+      const w = step === 1 ? 1 : 0;
+      r(7, 1 + w, 2, 2, o.hi);
+      r(6, 3, 4, 1, o.body);
+      r(5, 4, 6, 1, o.body);
+      r(4, 5, 8, 5, o.body);
+      r(4, 5, 8, 1, o.hi);
+      r(5, 10, 6, 1, o.body);
+      r(6, 11, 4, 1, o.shade);
+      r(7, 12 + w, 2, 2, o.shade);
+      r(6, 7, 1, 2, '#1a1010');
+      r(9, 7, 1, 2, '#1a1010');
+      r(7, 5, 2, 2, '#ffffff');
+    };
+  }
+  const REDRAW = {
+    stone_boar: beast({ body: '#7a6650', hi: '#9a8468', shade: '#54463a', tusk: true }),
+    wisp_hound: beast({ body: '#6a8ac8', hi: '#8ab0e8', shade: '#46629a', eye: '#d8f4ff' }),
+    dire_wolf: beast({ body: '#6a6a74', hi: '#8c8c98', shade: '#46464e' }),
+    grave_wolf: beast({ body: '#4a4a56', hi: '#6a6a78', shade: '#2c2c36', eye: '#78ff98' }),
+    feral_ram: beast({ body: '#8a6a3a', hi: '#a88a5a', shade: '#5a4426', wool: '#d8d0b8', horn: '#c8a85a' }),
+    ridge_ram: beast({ body: '#6a5a44', hi: '#8a7a64', shade: '#463a2a', wool: '#bcb09a', horn: '#8a6a3a' }),
+    ember_hound: beast({ body: '#b04a2a', hi: '#d86a3a', shade: '#7a2e1a', eye: '#ffd23a' }),
+    char_stalker: beast({ body: '#2e2a2a', hi: '#4a4444', shade: '#1a1616', eye: '#ff9a3a' }),
+    ember_wolf: beast({ body: '#c8561e', hi: '#f08040', shade: '#8a3210', eye: '#ffe08a' }),
+    rim_stalker: beast({ body: '#8a4a2e', hi: '#b06a44', shade: '#5a2e1c', eye: '#ffd23a' }),
+    rimstalker_alpha: beast({ body: '#6a2e1e', hi: '#8a4a34', shade: '#3e1a10', eye: '#ff5a3a' }),
+    emberjaw: beast({ body: '#a82a1a', hi: '#d8503a', shade: '#6a160e', eye: '#ffe08a', horn: '#2a1410' }),
+    flame_wisp: wisp({ body: '#ff9a3a', hi: '#ffe08a', shade: '#c8561e' }),
+    prism_wisp: wisp({ body: '#78d8f0', hi: '#e0faff', shade: '#4a98c8' }),
+  };
+
+  let kenneyImg = null;
+  const kenneyCache = new Map();
+
+  function kenneyTile(mon, step) {
+    if (!KENNEY_MON[mon]) return null;
+    if (!kenneyImg) {
+      kenneyImg = new Image();
+      kenneyImg.src = KENNEY_SHEET_URL;
+    }
+    if (!kenneyImg.complete || !kenneyImg.naturalWidth) return null;
+    const key = `${mon}|${step}`;
+    let c = kenneyCache.get(key);
+    if (c) return c;
+    const [tile, hue, sat, lit, tint] = KENNEY_MON[mon];
+    c = document.createElement('canvas');
+    c.width = c.height = 20;
+    const g = c.getContext('2d');
+    // Sheet holds tiles 84 to 131: 12 per row, first row is tile 84.
+    const i = tile - 84;
+    g.drawImage(kenneyImg, (i % 12) * 16, Math.floor(i / 12) * 16, 16, 16, 2, 2 - (step === 1 ? 1 : 0), 16, 16);
+    const id = g.getImageData(0, 0, 20, 20);
+    const d = id.data;
+    const tr = tint ? [parseInt(tint.slice(1, 3), 16), parseInt(tint.slice(3, 5), 16), parseInt(tint.slice(5, 7), 16)] : null;
+    for (let k = 0; k < d.length; k += 4) {
+      if (!d[k + 3]) continue;
+      let r = d[k] / 255, gg = d[k + 1] / 255, b = d[k + 2] / 255;
+      const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b);
+      let l = (mx + mn) / 2, h = 0, sv = 0;
+      if (mx !== mn) {
+        const dd = mx - mn;
+        sv = l > 0.5 ? dd / (2 - mx - mn) : dd / (mx + mn);
+        h = mx === r ? ((gg - b) / dd + (gg < b ? 6 : 0)) : mx === gg ? (b - r) / dd + 2 : (r - gg) / dd + 4;
+        h *= 60;
+      }
+      if (tr && sv < 0.2) {
+        // Grey pixels take the tint, keeping their light.
+        d[k] = Math.min(255, tr[0] * l * 1.6 * lit);
+        d[k + 1] = Math.min(255, tr[1] * l * 1.6 * lit);
+        d[k + 2] = Math.min(255, tr[2] * l * 1.6 * lit);
+        continue;
+      }
+      h = (h + hue + 360) % 360;
+      sv = Math.min(1, sv * sat);
+      l = Math.min(1, l * lit);
+      const q = l < 0.5 ? l * (1 + sv) : l + sv - l * sv, p = 2 * l - q;
+      const f = (t) => {
+        t = (t + 360) % 360 / 360;
+        return t < 1 / 6 ? p + (q - p) * 6 * t : t < 0.5 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p;
+      };
+      d[k] = f(h + 120) * 255;
+      d[k + 1] = f(h) * 255;
+      d[k + 2] = f(h - 120) * 255;
+    }
+    g.putImageData(id, 0, 0);
+    const solid = (x, y) => x >= 0 && y >= 0 && x < 20 && y < 20 && d[(y * 20 + x) * 4 + 3] > 0;
+    g.fillStyle = OUTLINE;
+    for (let y = 0; y < 20; y++) for (let x = 0; x < 20; x++) if (!solid(x, y) && (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1))) g.fillRect(x, y, 1, 1);
+    kenneyCache.set(key, c);
+    return c;
+  }
+
   /** Monsters in the same 16x16 tile, rounder and shaded like the people. */
   function drawMonster(ctx, mon, x, y, s, step, bob) {
-    const c = sprite(`m|${mon}|${step}`, (r) => {
+    const kc = REDRAW[mon] ? null : kenneyTile(mon, step);
+    const c = kc || (REDRAW[mon] && sprite(`m|${mon}|${step}`, (r) => REDRAW[mon](r, step))) || sprite(`m|${mon}|${step}`, (r) => {
       if (mon === 'moss_imp') {
         r(4, 13 - (step === 1 ? 1 : 0), 3, 2, '#2c4a24');
         r(9, 13 - (step === 2 ? 1 : 0), 3, 2, '#2c4a24');
@@ -2150,6 +2286,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       at: (itemDef(g.a) || {}).tier || 1,
       nt: (itemDef(g.n) || {}).tier || 1,
       ot: (o && o.tier) || 1,
+      bt: (itemDef(g.b) || {}).tier || 1,
+      ht: (itemDef(g.h) || {}).tier || 1,
+      ct: (itemDef(g.c) || {}).tier || 1,
       lid: itemDef(g.l) ? g.l : '',
       kid: itemDef(g.k) ? g.k : '',
       aid: itemDef(g.a) ? g.a : '',
@@ -3178,6 +3317,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         f.marks = (f.marks || []).concat(ev.tiles.map((t) => ({ owner: ev.owner, x: t.x, y: t.y })));
         addLog(`${who(ev.owner)} raises its weapon: the marked ground will be crushed ${f.rt ? 'in a moment' : 'on its next turn'}. Step off it.`, 'bad');
         break;
+      case 'unmark':
+        f.marks = (f.marks || []).filter((m) => m.owner !== ev.owner);
+        break;
       case 'turn':
         f.marks = (f.marks || []).filter((m) => m.owner !== ev.actor);
         f.turnActor = ev.actor;
@@ -3764,6 +3906,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const done = () => (f.rt ? undefined : sendFight({ t: 'end' }));
     if (!h || foes.length === 0) return done();
 
+    // Marked ground crushes a quarter of max health: step off it first, onto the nearest clear tile that stays close to a foe.
+    const marked = (p) => (f.marks || []).some((m) => m.x === p.x && m.y === p.y);
+    if (marked(h.pos) && o.reach && o.reach.length) {
+      const near = [...foes].sort((p, q) => manhattan(p.pos, h.pos) - manhattan(q.pos, h.pos))[0];
+      const clear = o.reach.filter((t) => !marked(t)).sort((p, q) => manhattan(p, near.pos) - manhattan(q, near.pos))[0];
+      if (clear) return sendFight({ t: 'move', to: { x: clear.x, y: clear.y } });
+    }
     if (!o.acted) {
       const pct = h.hp / h.maxHp;
       const self = autoSelf(o, h, foes);
@@ -3813,7 +3962,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       f.options = null;
     }
     renderFightUi();
-    window.wealdmark.send({ t: 'fight', action });
+    window.wealdmark.send({ t: 'fight', action, auto: !!G.auto });
   }
 
   const basicOf = (options) => (options.abilities.find((a) => BASIC_ATTACKS.includes(a.id)) || options.abilities[0] || {}).id || null;
@@ -5887,37 +6036,45 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     { l: '#c4cad2', m: '#9aa0aa', d: '#656c78' }, // iron
     { l: '#eef4ff', m: '#c8d4e4', d: '#8494ac' }, // steel
     { l: '#b8e4ff', m: '#6ab8ff', d: '#3a78c0' }, // mithril
+    { l: '#d8ffe8', m: '#6ae8c0', d: '#2a9a80' }, // skyiron
+    { l: '#ffd8a0', m: '#ff7a3a', d: '#b8341a' }, // wyrmforged
   ];
   const LEATHERS = [
     { l: '#c08a52', m: '#9a6a3a', d: '#6a4424' }, // soft leather
     { l: '#a2683c', m: '#7a4a2a', d: '#4e2e18' }, // hardened leather
     { l: '#c4cad2', m: '#9aa0aa', d: '#656c78' }, // chain
     { l: '#b8e4ff', m: '#6ab8ff', d: '#3a78c0' }, // mithril
+    { l: '#d8ffe8', m: '#6ae8c0', d: '#2a9a80' }, // drakehide
+    { l: '#ffd8a0', m: '#ff7a3a', d: '#b8341a' }, // wyrmhide
   ];
   const WOODS = [
     { l: '#e8cc8c', m: '#c8a868', d: '#8a6c38' }, // pine, hazel
     { l: '#f6ecd0', m: '#e0d4b4', d: '#a89c7c' }, // birch, rowan
     { l: '#bc9058', m: '#9a7040', d: '#684a28' }, // oak, yew
     { l: '#a0c078', m: '#7a9a58', d: '#4e6a38' }, // willow, elder
+    { l: '#8ad0b8', m: '#5aa890', d: '#34705e' }, // highyew
+    { l: '#e09a6a', m: '#b8643a', d: '#7a3a1e' }, // heartwood
   ];
-  const ORBS = ['#ff9a5a', '#ffe66a', '#7ae87a', '#c88aff'];
+  const ORBS = ['#ff9a5a', '#ffe66a', '#7ae87a', '#c88aff', '#6affd8', '#ff6a3a'];
   const AMULETS = [
     { l: '#f0b090', m: '#c87850', d: '#8a4a30' }, // copper
     { l: '#f4f4fc', m: '#c4c8d8', d: '#8a90a8' }, // silver
     { l: '#fff0a0', m: '#f0c030', d: '#b07818' }, // gold
     { l: '#e8f8ff', m: '#a8d8ff', d: '#6a9ad0' }, // moonsilver
+    { l: '#e0fff4', m: '#7af0c8', d: '#38a888' }, // skyglass
+    { l: '#fff0c8', m: '#ff9a4a', d: '#c04a20' }, // heartfire
   ];
-  const GEMS = ['#e04a4a', '#4a8aff', '#4ae080', '#c85aff'];
+  const GEMS = ['#e04a4a', '#4a8aff', '#4ae080', '#c85aff', '#6affd8', '#ff7a3a'];
 
-  const LOG_COLORS = { pine: '#a0743c', birch: '#e4dcc8', oak: '#8a5a2c', willow: '#b8a070', cinderwood: '#4a3a34' };
-  const ORE_COLORS = { copper: '#c8803c', tin: '#b8c0d0', iron: '#8a6a58', moonsilver: '#bfe4ff', coal: '#38343c' };
-  const BAR_METAL = { bronze: 0, iron: 1, steel: 2, moonsilver: 3 };
-  const HIDE_COLORS = { soft_leather: '#b88a5a', hard_leather: '#8a5a34', stagskin: '#a07a4a', shadowhide: '#4a3a5a' };
-  const FISH_COLORS = { shrimp: '#f08a7a', trout: '#8aa890', salmon: '#f09060', tuna: '#6a88a8' };
+  const LOG_COLORS = { pine: '#a0743c', birch: '#e4dcc8', oak: '#8a5a2c', willow: '#b8a070', cinderwood: '#4a3a34', yew: '#5a8a70', heartwood: '#a8441e' };
+  const ORE_COLORS = { copper: '#c8803c', tin: '#b8c0d0', iron: '#8a6a58', moonsilver: '#bfe4ff', coal: '#38343c', skyiron: '#6ae8c0' };
+  const BAR_METAL = { bronze: 0, iron: 1, steel: 2, moonsilver: 3, skyiron: 4, wyrm: 5 };
+  const HIDE_COLORS = { soft_leather: '#b88a5a', hard_leather: '#8a5a34', stagskin: '#a07a4a', shadowhide: '#4a3a5a', drakehide: '#2a6a5a', wyrmhide: '#a8381a' };
+  const FISH_COLORS = { shrimp: '#f08a7a', trout: '#8aa890', salmon: '#f09060', tuna: '#6a88a8', firescale: '#ff9a4a' };
 
   /** Tools, materials, and the food that is not a plain roll. Returns true when it drew something. */
   function paintWorkItem(r, def) {
-    const t = Math.max(0, Math.min(3, (def.tier || 1) - 1));
+    const t = Math.max(0, Math.min(5, (def.tier || 1) - 1));
     const id = def.id;
     if (def.kind === 'tool') {
       const m = METALS[t];
@@ -5992,8 +6149,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         r(8, 6, 1, 1, tint(col, 1.4));
         return true;
       }
-      if (id.endsWith('_bar')) {
-        const m = METALS[BAR_METAL[id.replace('_bar', '')] || 0];
+      if (id.endsWith('_bar') || id.endsWith('_ingot')) {
+        const m = METALS[BAR_METAL[id.replace(/_(bar|ingot)$/, '')] || 0];
         r(2, 8, 12, 5, m.m);
         r(4, 6, 9, 2, m.l);
         r(2, 8, 12, 1, m.l);
@@ -6546,7 +6703,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** The lesser potions are smaller bottles; the full ones carry a gold cap. */
   // ---- icons for the five newer trades: herbs, seeds, crops, gems, rings, relics and brews
 
-  const GEM_COLOR = { topaz: '#f0b43a', amethyst: '#a860e0', emerald: '#3ac870', ruby: '#e03a4a', sapphire: '#3a78e0' };
+  const GEM_COLOR = { topaz: '#f0b43a', amethyst: '#a860e0', emerald: '#3ac870', ruby: '#e03a4a', sapphire: '#3a78e0', diamond: '#d8f4ff' };
   const gemShape = (col) => (r) => {
     r(5, 3, 6, 1, tint(col, 1.45));
     r(3, 4, 10, 2, col);
@@ -6776,11 +6933,34 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   Object.keys(BREW).forEach((id, i) => {
     UNIQUE_ICONS[id] = brewShape(id, i);
   });
+  // Peaks rings: skyiron (metal 4) and wyrmforged (metal 5) settings
+  for (const gem of ['emerald', 'ruby', 'diamond']) UNIQUE_ICONS[`skyiron_${gem}_ring`] = ringShape(METALS[4], GEM_COLOR[gem], 5);
+  for (const gem of ['sapphire', 'ruby', 'diamond']) UNIQUE_ICONS[`wyrmforged_${gem}_ring`] = ringShape(METALS[5], GEM_COLOR[gem], 6);
+  // Peaks drops and plants: a few flat blocks each, same 16px grid as the rest
+  const blocks = (list) => (r) => list.forEach(([x, y, w, h, c]) => r(x, y, w, h, c));
+  Object.assign(UNIQUE_ICONS, {
+    raider_sigil: blocks([[3, 3, 10, 10, '#5a4a3a'], [4, 4, 8, 8, '#8a7050'], [7, 5, 2, 6, '#e8d8a0'], [5, 7, 6, 2, '#e8d8a0']]),
+    ram_horn: blocks([[3, 9, 4, 4, '#d8c8a0'], [5, 6, 5, 4, '#e8dab4'], [8, 3, 4, 4, '#f0e6c8'], [10, 2, 3, 2, '#b8a678'], [3, 12, 4, 1, '#8a7a56']]),
+    harrier_plume: blocks([[7, 1, 2, 13, '#c8d8e8'], [5, 3, 2, 8, '#a8bcd0'], [9, 3, 2, 8, '#e4eef8'], [7, 13, 2, 2, '#6a5a4a']]),
+    gargoyle_chip: blocks([[3, 5, 10, 8, '#6a6670'], [5, 3, 6, 2, '#6a6670'], [3, 5, 4, 1, '#98949e'], [10, 8, 3, 5, '#46424e'], [6, 7, 2, 2, '#ff6a3a']]),
+    scorpion_stinger: blocks([[4, 11, 6, 3, '#4a3a4a'], [8, 5, 3, 7, '#6a5a6a'], [9, 2, 2, 4, '#b8f0e8'], [10, 1, 1, 2, '#ffffff'], [4, 11, 6, 1, '#8a7a8a']]),
+    hawk_talon: blocks([[4, 2, 4, 3, '#2a2230'], [6, 5, 4, 4, '#2a2230'], [8, 9, 3, 3, '#2a2230'], [10, 12, 2, 2, '#2a2230'], [4, 2, 1, 5, '#7a6a90']]),
+    prism_shard: blocks([[6, 1, 4, 3, '#c8f4ff'], [4, 4, 8, 8, '#8ad8f0'], [5, 12, 6, 2, '#5ab0d0'], [6, 3, 2, 8, '#ffffff'], [10, 6, 2, 5, '#4a98b8']]),
+    wisp_prism: blocks([[6, 2, 4, 2, '#ffe8ff'], [4, 4, 8, 6, '#e8a8ff'], [5, 10, 6, 3, '#a878e8'], [7, 6, 2, 2, '#ffffff'], [3, 13, 3, 1, '#7a58b8']]),
+    stalker_fang: blocks([[5, 1, 6, 4, '#f4eedc'], [6, 5, 4, 5, '#e8dfc4'], [7, 10, 2, 4, '#c8b898'], [5, 1, 6, 1, '#d8502a'], [5, 1, 1, 6, '#ffffff']]),
+    caldera_scale: blocks([[6, 1, 4, 2, '#5a1a0a'], [3, 3, 10, 7, '#d8501a'], [5, 10, 6, 3, '#a8340e'], [3, 3, 10, 1, '#ffa05a'], [4, 4, 1, 5, '#ff8a3a'], [8, 5, 2, 3, '#ff8a3a']]),
+    heart_ember: blocks([[5, 4, 6, 8, '#ff7a1a'], [6, 3, 4, 2, '#ffb04a'], [6, 12, 4, 2, '#b8341a'], [7, 6, 2, 4, '#fff0a0'], [4, 6, 1, 4, '#d8501a'], [11, 6, 1, 4, '#d8501a']]),
+    starmetal_fragment: blocks([[4, 4, 8, 8, '#3a3a58'], [6, 2, 4, 2, '#3a3a58'], [5, 5, 2, 2, '#a8b4ff'], [9, 8, 2, 2, '#a8b4ff'], [4, 4, 8, 1, '#6a6a98'], [7, 7, 1, 1, '#ffffff']]),
+    peakbloom: blocks([[7, 7, 2, 7, '#4a8a5a'], [5, 3, 6, 5, '#a8f0d8'], [6, 2, 4, 1, '#d8fff0'], [4, 5, 2, 3, '#78d8b8'], [10, 5, 2, 3, '#78d8b8'], [7, 4, 2, 2, '#ffe86a']]),
+    skyroot: blocks([[6, 1, 4, 3, '#78a890'], [5, 4, 6, 6, '#a8c8b8'], [7, 10, 2, 4, '#5a7a68'], [4, 8, 2, 4, '#78a890'], [10, 8, 2, 4, '#78a890'], [5, 4, 1, 5, '#d8f0e4']]),
+    skyroot_seed: blocks([[6, 5, 4, 6, '#98c0a8'], [7, 4, 2, 1, '#b8d8c8'], [6, 5, 1, 4, '#d8f0e4'], [9, 8, 1, 3, '#587868']]),
+    firescale_stew: blocks([[2, 7, 12, 6, '#5a4a44'], [3, 13, 10, 1, '#3a2e2a'], [2, 7, 12, 1, '#8a7a74'], [3, 6, 10, 2, '#ff8a2a'], [4, 6, 3, 1, '#ffc060'], [9, 7, 2, 1, '#ffe08a'], [6, 3, 1, 3, '#cfd6e4']]),
+  });
 
   function potionIcon(def) {
     const mana = Boolean(def.mana);
     const small = /^minor_/.test(def.id);
-    const greater = /^greater_/.test(def.id);
+    const greater = /^(greater|superior)_/.test(def.id);
     const liquid = mana ? '#4a7fd8' : '#d84a4a';
     const light = mana ? '#8ab4f0' : '#f08a8a';
     return (r) => {
@@ -6811,7 +6991,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function paintItem(r, def) {
     const unique = UNIQUE_ICONS[def.id] || (def.kind === 'potion' ? potionIcon(def) : null);
     if (unique) return unique(r);
-    const t = Math.max(0, Math.min(3, (def.tier || 1) - 1));
+    const t = Math.max(0, Math.min(5, (def.tier || 1) - 1));
     if (paintWorkItem(r, def)) return;
     if (def.kind === 'potion') {
       const liquid = def.mana ? '#4a7fd8' : '#d84a4a';
@@ -7209,7 +7389,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   // Up to three windows stay open at once. A fourth closes the one opened longest ago.
   const MAX_WINDOWS = 3;
-  const WORK_CAP = 30;
+  const WORK_CAP = 40;
   const openOrder = [];
   let zTop = 20;
 
