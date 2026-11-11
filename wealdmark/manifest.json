@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://films-domestic-clarity-pubmed.trycloudflare.com",
-  "authUrl": "https://deny-brain-hook-trek.trycloudflare.com",
+  "server": "wss://mating-marker-ultram-gratuit.trycloudflare.com",
+  "authUrl": "https://wanna-wrap-awarded-buck.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -168,5 +168,5 @@
       "url": "c/b6ea01d31a7bff6e7f710a37c8619c5f554b7e563bdcff153fbbb6aca2964f64"
     }
   ],
-  "signature": "Z+Ym+4SJBDEZdQCXs6k2ArvhH8YWp1IsYVUkBsbguCvqZlUBFpQYF82/37Lgf2YyhQwRTJwVaZcr1J2+g5AhDA=="
+  "signature": "uhwAdQnTsF2xIlL7XTzKsl9SzjxDp//5hs8epEW8teXw3zkfzq4kJDlhplLWp+K5P7xMbyQR8bWC73CB237DAg=="
 }
