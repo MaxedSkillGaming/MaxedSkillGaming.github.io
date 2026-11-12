@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://sponsor-wilderness-pounds-alter.trycloudflare.com",
-  "authUrl": "https://expects-mount-luis-humanitarian.trycloudflare.com",
+  "server": "wss://occasionally-operational-calibration-cad.trycloudflare.com",
+  "authUrl": "https://rail-mortality-connected-filling.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 448636,
-      "sha256": "a50da750c29f8715a1a3de89e10efaaf49ec54bf949cfa1637e8333e70826f1e",
-      "url": "c/a50da750c29f8715a1a3de89e10efaaf49ec54bf949cfa1637e8333e70826f1e"
+      "size": 449713,
+      "sha256": "98fa7c9672ae9cd4fb85056222d83450a244c8bc2a568b54368a46fbb3bbe7ae",
+      "url": "c/98fa7c9672ae9cd4fb85056222d83450a244c8bc2a568b54368a46fbb3bbe7ae"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 21345,
-      "sha256": "ef8b57a1eaab3f1c831a1481f1ae54b3e4d7f98f6b10ab868cdbdb3090bb34f2",
-      "url": "c/ef8b57a1eaab3f1c831a1481f1ae54b3e4d7f98f6b10ab868cdbdb3090bb34f2"
+      "size": 22032,
+      "sha256": "0aa75e90f1583f39e9bb33c605b74788e2638b14862c60cca5876e619064d610",
+      "url": "c/0aa75e90f1583f39e9bb33c605b74788e2638b14862c60cca5876e619064d610"
     },
     {
       "path": "ui/music/akash-chamber.ogg",
@@ -163,10 +163,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 86044,
-      "sha256": "05bdb30e83cfa981c38f54b2d1ad66ae5dcc2c407d013cc6325597ec9521f57b",
-      "url": "c/05bdb30e83cfa981c38f54b2d1ad66ae5dcc2c407d013cc6325597ec9521f57b"
+      "size": 87713,
+      "sha256": "48e1db9c55dd72bc77cd02c933093709b5968e9bed852f032cedbf4a1253e77b",
+      "url": "c/48e1db9c55dd72bc77cd02c933093709b5968e9bed852f032cedbf4a1253e77b"
     }
   ],
-  "signature": "K3owjeA2ilrs9wnYe2tdfdSw67towJuQhCmCFRpYjS3/Y7DQgahGT+FQDGG9LQgBZUrSR2xoOkGZr9j1kEI/CQ=="
+  "signature": "f0NoB30iJacMUsiRCz0YZSbDZvIdNYC4wZMHo0/KvhbUX+Ba/zcZRBrFxukNO8bgLThLveUk+xtCc+NKdcxaCg=="
 }
