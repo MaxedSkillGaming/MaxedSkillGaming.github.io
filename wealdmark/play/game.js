@@ -88,6 +88,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     c.closePath();
     c.fill();
   };
+  const stroke = (c, w, pts) => {
+    c.lineWidth = w;
+    c.beginPath();
+    pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+    c.stroke();
+  };
+  const dot = (c, x, y, r) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); };
+  const ring = (c, x, y, r) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.stroke(); };
   const ICON_SHAPES = {
     sword: (c) => { poly(c, [[5, 19], [15, 5], [19, 5], [19, 9], [7, 21]]); poly(c, [[3, 15], [9, 21], [8, 22], [2, 16]]); },
     arrow: (c) => { c.lineWidth = 3; c.beginPath(); c.moveTo(4, 20); c.lineTo(15, 9); c.stroke(); poly(c, [[21, 3], [21, 13], [11, 3]]); },
@@ -102,24 +110,67 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     fist: (c) => { c.fillRect(5, 9, 14, 11); for (let i = 0; i < 4; i++) c.fillRect(5 + i * 4, 5, 3, 5); },
     burst: (c) => { c.lineWidth = 2.5; c.beginPath(); c.arc(12, 12, 6, 0, Math.PI * 2); c.stroke(); for (let i = 0; i < 8; i++) { const a = (i * Math.PI) / 4; c.beginPath(); c.moveTo(12 + Math.cos(a) * 8.5, 12 + Math.sin(a) * 8.5); c.lineTo(12 + Math.cos(a) * 11, 12 + Math.sin(a) * 11); c.stroke(); } },
     eye: (c) => { c.beginPath(); c.moveTo(2, 12); c.quadraticCurveTo(12, 2, 22, 12); c.quadraticCurveTo(12, 22, 2, 12); c.fill(); c.fillStyle = '#0c0912'; c.beginPath(); c.arc(12, 12, 3.5, 0, Math.PI * 2); c.fill(); },
+    nut: (c) => { c.beginPath(); c.ellipse(12, 14, 6, 7, 0, 0, Math.PI * 2); c.fill(); stroke(c, 3, [[8, 6], [16, 6]]); stroke(c, 2, [[12, 2], [12, 6]]); },
+    pick: (c) => { c.lineWidth = 3; c.beginPath(); c.arc(12, 14, 9, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); stroke(c, 3, [[12, 5], [12, 21]]); },
+    fang: (c) => { poly(c, [[4, 3], [11, 3], [7.5, 14]]); poly(c, [[13, 3], [20, 3], [16.5, 14]]); stroke(c, 2, [[3, 18], [21, 18]]); },
+    hammer: (c) => { c.fillRect(3, 3, 13, 8); stroke(c, 3.5, [[10, 11], [19, 21]]); },
+    cloud: (c) => { dot(c, 8, 14, 5); dot(c, 14, 11, 6); dot(c, 18, 15, 4); c.fillRect(8, 15, 10, 4); },
+    wing: (c) => { c.beginPath(); c.moveTo(3, 18); c.quadraticCurveTo(4, 5, 21, 4); c.quadraticCurveTo(15, 9, 17, 12); c.quadraticCurveTo(12, 12, 13, 16); c.quadraticCurveTo(9, 15, 9, 19); c.closePath(); c.fill(); },
+    tusk: (c) => { c.beginPath(); c.moveTo(6, 21); c.bezierCurveTo(4, 8, 14, 3, 20, 4); c.bezierCurveTo(13, 9, 12, 15, 12, 21); c.closePath(); c.fill(); },
+    crossed: (c) => { stroke(c, 3, [[4, 4], [20, 20]]); stroke(c, 3, [[20, 4], [4, 20]]); stroke(c, 2, [[3, 9], [9, 3]]); stroke(c, 2, [[21, 9], [15, 3]]); },
+    axe: (c) => { stroke(c, 3, [[6, 21], [16, 5]]); c.beginPath(); c.moveTo(13, 4); c.quadraticCurveTo(22, 4, 21, 13); c.lineTo(16, 11); c.closePath(); c.fill(); },
+    claw: (c) => { stroke(c, 2.5, [[4, 3], [8, 21]]); stroke(c, 2.5, [[10, 3], [14, 21]]); stroke(c, 2.5, [[16, 3], [20, 21]]); },
+    crackshield: (c) => { ICON_SHAPES.shield(c); c.strokeStyle = '#17112a'; stroke(c, 2, [[12, 3], [10, 9], [14, 13], [11, 21]]); },
+    horn: (c) => { poly(c, [[3, 10], [9, 10], [19, 4], [19, 20], [9, 14], [3, 14]]); stroke(c, 2, [[21, 9], [21, 15]]); },
+    spiral: (c) => { c.lineWidth = 2.5; c.beginPath(); for (let t = 0; t < 12; t += 0.3) { const r = 1 + t * 0.8; c.lineTo(12 + Math.cos(t) * r, 12 + Math.sin(t) * r); } c.stroke(); },
+    skull: (c) => { dot(c, 12, 10, 8); c.fillRect(8, 15, 8, 6); c.fillStyle = '#17112a'; dot(c, 9, 10, 2); dot(c, 15, 10, 2); },
+    arrows3: (c) => { for (const x of [5, 12, 19]) { stroke(c, 2, [[x, 20], [x, 7]]); poly(c, [[x, 3], [x + 3, 9], [x - 3, 9]]); } },
+    target: (c) => { c.lineWidth = 2; ring(c, 12, 12, 8); ring(c, 12, 12, 4); dot(c, 12, 12, 1.5); stroke(c, 2, [[12, 1], [12, 5]]); stroke(c, 2, [[12, 19], [12, 23]]); stroke(c, 2, [[1, 12], [5, 12]]); stroke(c, 2, [[19, 12], [23, 12]]); },
+    arrowdrop: (c) => { stroke(c, 2.5, [[4, 14], [14, 6]]); poly(c, [[21, 3], [19, 11], [11, 4]]); dot(c, 16, 19, 3); },
+    net: (c) => { for (const i of [5, 12, 19]) { stroke(c, 2, [[i, 3], [i, 21]]); stroke(c, 2, [[3, i], [21, i]]); } },
+    rain: (c) => { for (const x of [6, 12, 18]) { stroke(c, 2, [[x + 2, 2], [x - 1, 14]]); poly(c, [[x - 1, 20], [x - 4, 13], [x + 2, 14]]); } },
+    boot: (c) => poly(c, [[8, 3], [15, 3], [15, 12], [21, 16], [21, 21], [6, 21], [6, 14]]),
+    fireball: (c) => { dot(c, 15, 9, 6); stroke(c, 3, [[3, 21], [10, 14]]); stroke(c, 2, [[3, 14], [8, 10]]); },
+    nova: (c) => { poly(c, [[12, 2], [15, 12], [12, 22], [9, 12]]); poly(c, [[2, 12], [12, 9], [22, 12], [12, 15]]); },
+    manashield: (c) => { ICON_SHAPES.shield(c); c.strokeStyle = '#17112a'; ring(c, 12, 11, 3.5); },
+    chain: (c) => { stroke(c, 2.5, [[4, 5], [13, 9], [7, 15], [19, 20]]); dot(c, 4, 5, 3); dot(c, 13, 9, 2.5); dot(c, 7, 15, 2.5); dot(c, 19, 20, 3); },
+    surge: (c) => poly(c, [[12, 2], [14, 10], [22, 12], [14, 14], [12, 22], [10, 14], [2, 12], [10, 10]]),
+    bash: (c) => { c.lineWidth = 2; c.beginPath(); [[10, 4], [18, 7], [17, 15], [10, 20], [5, 15], [4, 7]].forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); c.stroke(); stroke(c, 2, [[17, 3], [21, 7]]); stroke(c, 2, [[21, 3], [17, 7]]); },
+    tower: (c) => poly(c, [[5, 20], [5, 9], [8, 9], [8, 6], [10, 6], [10, 9], [14, 9], [14, 6], [16, 6], [16, 9], [19, 9], [19, 20]]),
+    gust: (c) => { c.lineWidth = 2.5; for (const y of [6, 12, 18]) { c.beginPath(); c.moveTo(3, y); c.quadraticCurveTo(9, y - 4, 14, y); c.quadraticCurveTo(18, y + 3, 21, y - 1); c.stroke(); } },
+    parry: (c) => { c.lineWidth = 3; ring(c, 12, 12, 8); stroke(c, 3, [[3, 21], [21, 3]]); },
+    rock: (c) => poly(c, [[2, 20], [9, 6], [13, 13], [16, 9], [22, 20]]),
+    retort: (c) => { c.lineWidth = 3; c.beginPath(); c.moveTo(5, 7); c.lineTo(15, 7); c.arc(15, 12, 5, -Math.PI / 2, Math.PI / 2); c.lineTo(8, 17); c.stroke(); poly(c, [[3, 17], [9, 13], [9, 21]]); },
+    gem: (c) => { poly(c, [[12, 2], [21, 10], [12, 22], [3, 10]]); c.strokeStyle = '#17112a'; c.lineWidth = 1.5; stroke(c, 1.5, [[3, 10], [21, 10]]); stroke(c, 1.5, [[8, 10], [12, 2], [16, 10], [12, 22]]); },
+    slam: (c) => { stroke(c, 3, [[3, 19], [21, 19]]); stroke(c, 2.5, [[12, 19], [10, 12], [13, 8], [11, 3]]); stroke(c, 2.5, [[7, 19], [5, 14]]); stroke(c, 2.5, [[17, 19], [19, 14]]); },
+    bomb: (c) => { dot(c, 11, 14, 7); stroke(c, 2.5, [[16, 9], [20, 5]]); dot(c, 21, 4, 1.8); },
+    paw: (c) => { dot(c, 12, 15, 5); dot(c, 5, 10, 2.2); dot(c, 10, 5, 2.2); dot(c, 14, 5, 2.2); dot(c, 19, 10, 2.2); },
+    arrow2: (c) => { for (const y of [7, 17]) { stroke(c, 2.5, [[3, y], [15, y]]); poly(c, [[21, y], [14, y - 5], [14, y + 5]]); } },
+    pistol: (c) => poly(c, [[3, 7], [21, 7], [21, 12], [14, 12], [11, 21], [6, 21], [8, 12], [3, 12]]),
+    hourglass: (c) => { poly(c, [[6, 3], [18, 3], [12, 12]]); poly(c, [[6, 21], [18, 21], [12, 12]]); },
+    stars: (c) => { dot(c, 12, 6, 2.5); dot(c, 6, 16, 2.5); dot(c, 18, 16, 2.5); },
+    bubble: (c) => { c.lineWidth = 2; ring(c, 9, 15, 4); ring(c, 16, 9, 3); ring(c, 8, 5, 2); },
+    crack: (c) => stroke(c, 3, [[12, 2], [8, 9], [15, 13], [9, 22]]),
+    blind: (c) => { ICON_SHAPES.eye(c); stroke(c, 2.5, [[3, 21], [21, 3]]); },
   };
   /** [shape, colour] per ability; anything not listed gets a plain burst. */
   const ABILITY_ICON = {
-    punch: ['fist', '#e0b48c'], slash: ['sword', '#cfd6e4'], pine_nut_throw: ['drop', '#b08a52'], pick_throw: ['arrow', '#b0b6c4'],
-    wretch_bite: ['drop', '#7bd88f'], crushing_strike: ['fist', '#e07070'], dust_cloud: ['burst', '#c8b090'], wing_buffet: ['burst', '#9aa0c0'], gore: ['sword', '#d8c8a0'],
-    multi_strike: ['sword', '#f0a070'], power_strike: ['sword', '#f0c860'], rend: ['sword', '#e05a5a'], sunder_strike: ['shield', '#e05a5a'], war_cry: ['up', '#f0c860'],
-    whirlwind: ['burst', '#cfd6e4'], execute: ['sword', '#ff6a6a'], shot: ['arrow', '#9ad87b'], multi_shot: ['arrow', '#c8e87b'], aimed_shot: ['arrow', '#f0c860'],
-    poison_arrow: ['arrow', '#7bd88f'], snare: ['down', '#9ad8e8'], rain_of_arrows: ['burst', '#9ad87b'], backstep: ['up', '#7ab0f0'], deadeye: ['eye', '#f0c860'],
-    fireball: ['flame', '#ff9a4a'], ice_storm: ['snow', '#8ae0ff'], heal: ['cross', '#7bd88f'], mana_shield: ['shield', '#6a9ef0'], chain_lightning: ['bolt', '#ffe36a'],
-    arcane_surge: ['bolt', '#c08aff'], shield_bash: ['shield', '#cfd6e4'], fortify: ['shield', '#7ab0f0'], second_wind: ['cross', '#9ae8c0'], parry: ['shield', '#f0c860'],
-    stoneskin: ['shield', '#a8a8b8'], retaliate: ['burst', '#ff9a4a'], unbreakable: ['shield', '#f0c860'], summon_familiar: ['burst', '#c08aff'],
-    ground_slam: ['burst', '#d8b070'], explosive_shot: ['burst', '#ff9a4a'], frost_nova: ['snow', '#8ae0ff'],
+    extra_shot: ['arrow2', '#c8e87b'], execute_shot: ['pistol', '#ff6a6a'],
+    punch: ['fist', '#e0b48c'], slash: ['sword', '#cfd6e4'], pine_nut_throw: ['nut', '#b08a52'], pick_throw: ['pick', '#b0b6c4'],
+    wretch_bite: ['fang', '#7bd88f'], crushing_strike: ['hammer', '#e07070'], dust_cloud: ['cloud', '#c8b090'], wing_buffet: ['wing', '#9aa0c0'], gore: ['tusk', '#d8c8a0'],
+    multi_strike: ['crossed', '#f0a070'], power_strike: ['axe', '#f0c860'], rend: ['claw', '#e05a5a'], sunder_strike: ['crackshield', '#e05a5a'], war_cry: ['horn', '#f0c860'],
+    whirlwind: ['spiral', '#cfd6e4'], execute: ['skull', '#ff6a6a'], shot: ['arrow', '#9ad87b'], multi_shot: ['arrows3', '#c8e87b'], aimed_shot: ['target', '#f0c860'],
+    poison_arrow: ['arrowdrop', '#7bd88f'], snare: ['net', '#9ad8e8'], rain_of_arrows: ['rain', '#9ad87b'], backstep: ['boot', '#7ab0f0'], deadeye: ['eye', '#f0c860'],
+    fireball: ['fireball', '#ff9a4a'], ice_storm: ['snow', '#8ae0ff'], heal: ['cross', '#7bd88f'], mana_shield: ['manashield', '#6a9ef0'], chain_lightning: ['chain', '#ffe36a'],
+    arcane_surge: ['surge', '#c08aff'], shield_bash: ['bash', '#cfd6e4'], fortify: ['tower', '#7ab0f0'], second_wind: ['gust', '#9ae8c0'], parry: ['parry', '#f0c860'],
+    stoneskin: ['rock', '#a8a8b8'], retaliate: ['retort', '#ff9a4a'], unbreakable: ['gem', '#f0c860'], summon_familiar: ['paw', '#c08aff'],
+    ground_slam: ['slam', '#d8b070'], explosive_shot: ['bomb', '#ff9a4a'], frost_nova: ['nova', '#8ae0ff'],
   };
   const STATUS_ICON = {
-    stagger: ['down', '#e0b48c'], slow: ['down', '#9ad8e8'], bleed: ['drop', '#e05a5a'], poison: ['drop', '#7bd88f'], burn: ['flame', '#ff9a4a'], sunder: ['shield', '#e05a5a'],
-    exhaust: ['down', '#e07070'], dust_choked: ['burst', '#c8b090'], blinded: ['eye', '#e07070'], war_cry: ['up', '#f0c860'], deadeye: ['eye', '#f0c860'],
-    mana_shield: ['shield', '#6a9ef0'], arcane_surge: ['bolt', '#c08aff'], fortify: ['shield', '#7ab0f0'], retaliate: ['burst', '#ff9a4a'], parry: ['shield', '#f0c860'],
-    stoneskin: ['shield', '#a8a8b8'], unbreakable: ['shield', '#f0c860'], stunned: ['bolt', '#f0e060'], stun_immune: ['shield', '#c8c0e0'],
+    stagger: ['stars', '#e0b48c'], slow: ['hourglass', '#9ad8e8'], bleed: ['drop', '#e05a5a'], poison: ['bubble', '#7bd88f'], burn: ['flame', '#ff9a4a'], sunder: ['crack', '#e05a5a'],
+    exhaust: ['down', '#e07070'], dust_choked: ['cloud', '#c8b090'], blinded: ['blind', '#e07070'], war_cry: ['horn', '#f0c860'], deadeye: ['eye', '#f0c860'],
+    mana_shield: ['manashield', '#6a9ef0'], arcane_surge: ['surge', '#c08aff'], fortify: ['tower', '#7ab0f0'], retaliate: ['retort', '#ff9a4a'], parry: ['parry', '#f0c860'],
+    stoneskin: ['rock', '#a8a8b8'], unbreakable: ['gem', '#f0c860'], stunned: ['bolt', '#f0e060'], stun_immune: ['shield', '#c8c0e0'],
   };
   const iconCache = new Map();
   function iconUrl([shape, color]) {
@@ -2957,7 +3008,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   const play = (name, arg) => window.wealdmarkAudio && window.wealdmarkAudio.play(name, arg);
   const reducedMotion = () => Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   // Short screen shake and kill bursts. Crits, kills and boss hits only, so normal hits stay quiet.
+  const shakeOn = { on: !readPref('wealdmark.noShake') };
   function shake(amp, dur) {
+    if (!shakeOn.on) return;
     if (reducedMotion()) return;
     G.shake = { t0: performance.now(), amp, dur };
   }
@@ -4149,10 +4202,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     let cur = null;
     const place = (ev) => {
       // The tip is zoomed with the rest of the UI, so measure it on screen and give left and top back in its own units.
+      // It sits above the hovered element so it never covers what is under the pointer, and drops below only when there is no room above.
       const box = tip.getBoundingClientRect();
       const z = uiScale();
       const x = Math.min(ev.clientX + 14, window.innerWidth - box.width - 6);
-      const y = ev.clientY + 18 + box.height > window.innerHeight ? ev.clientY - box.height - 10 : ev.clientY + 18;
+      const r = cur ? cur.getBoundingClientRect() : { top: ev.clientY, bottom: ev.clientY };
+      const above = r.top - box.height - 6;
+      const y = above >= 4 ? above : r.bottom + 6 + box.height > window.innerHeight ? ev.clientY - box.height - 10 : r.bottom + 6;
       tip.style.left = `${Math.max(4, x) / z}px`;
       tip.style.top = `${Math.max(4, y) / z}px`;
     };
@@ -4252,7 +4308,20 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   /** A box the player can move and resize, remembered between visits. */
   /** The hotbar plate stops short of the map and the toolbar, wherever the map was dragged to. */
+  /** The journal tracker hangs under the map, on the map's right edge, wherever the map sits. */
+  function placeJournal() {
+    const q = $('qtrack');
+    const m = $('mapbox');
+    if (!q || !m || !m.offsetWidth) return;
+    const z = parseFloat(getComputedStyle(q).zoom) || 1;
+    const mr = m.getBoundingClientRect();
+    q.style.left = 'auto';
+    q.style.right = `${(window.innerWidth - mr.right) / z}px`;
+    q.style.top = `${(mr.bottom + 8) / z}px`;
+  }
+
   function fitHud() {
+    placeJournal();
     const hud = $('bhud');
     if (!hud) return;
     if (window.matchMedia('(pointer: coarse), (max-width: 760px)').matches) {
@@ -5445,6 +5514,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     $('bar-l').replaceChildren(barSwitcher(style));
     $('bar-r').replaceChildren(barSwitcher(style));
     right.append(swap);
+    const town = el('button', 'sslot town');
+    town.type = 'button';
+    town.append(el('b', '', 'TOWN'), el('span', 'hk', 'T'));
+    town.title = 'Teleport to town (T). Free. Not allowed in a fight.';
+    town.addEventListener('click', goToTown);
+    right.append(town);
 
     for (const q of QUICK) {
       const slot = document.querySelector(`.qslot[data-q="${q.id}"]`);
@@ -7602,6 +7677,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     $('mute').checked = s.muted;
     $('hide-others').checked = hideOthers.on;
     $('hide-roofs').checked = hideRoofs.on;
+    $('screen-shake').checked = shakeOn.on;
   }
 
   // ---- talking, shopping, storage, crafting, and the journal
@@ -7767,7 +7843,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (c.poor) b.classList.add('poor');
       b.append(iconCanvas(c.def));
       if (c.badge) b.append(el('span', 'shop-qty', String(c.badge)));
-      b.addEventListener('click', () => {
+      b.addEventListener('click', (ev) => {
+        if (sell && ev.shiftKey) {
+          play('click');
+          window.wealdmark.send({ t: 'sell', slot: c.key, qty: c.ref.qty });
+          return;
+        }
         G.shopSel = c.key;
         play('click');
         renderShop();
@@ -8110,7 +8191,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function drawGatherBar(ctx, def, x, y, px, s) {
     const b = G.busy;
     const frac = Math.min(1, (b.done + Math.min(1, (performance.now() - G.busyAt) / G.tickMs)) / b.of);
-    const w = Math.round(px * 1.5);
+    const act = { tree: 'Chopping', rock: 'Mining', fish: 'Fishing', warren: 'Trapping', herb: 'Picking', dig: 'Digging' }[def.art] || def.name;
+    ctx.font = 'bold 11px sans-serif';
+    // Wide enough for the label on a small node like a clover patch.
+    const w = Math.max(Math.round(px * 1.5), Math.ceil(ctx.measureText(act).width) + 12);
     const h = 16;
     const bx = Math.round(x + (px - w) / 2);
     const by = Math.round(y - h);
@@ -8119,12 +8203,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     ctx.fillStyle = '#6a9a4a';
     ctx.fillRect(bx, by, Math.round(w * frac), h);
     // The action (Chopping, Mining, Fishing, Trapping) sits inside the bar so the whole thing is one rectangle that fits under any roof line.
-    ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#000';
-    const act = { tree: 'Chopping', rock: 'Mining', fish: 'Fishing', warren: 'Trapping', herb: 'Picking', dig: 'Digging' }[def.art] || def.name;
     ctx.strokeText(act, bx + w / 2, by + h / 2 + 1);
     ctx.fillStyle = '#fff';
     ctx.fillText(act, bx + w / 2, by + h / 2 + 1);
@@ -8370,6 +8452,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       if (prog) d.appendChild(el('div', ready ? 'ok' : 'short', prog));
       body.appendChild(d);
     }
+    placeJournal();
   }
 
   function onQuests(msg) {
@@ -8799,6 +8882,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       drawPortal(ctx, po.x, po.y, k, now, offX, offY, px);
     }
     const list = renderables(now);
+    let gatherBarArgs = null;
     const rows = new Map();
     for (const r of list) {
       const row = Math.round(r.y);
@@ -8840,7 +8924,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
               // Sit above whichever of tree and hero stands higher, clear of the hero's name tag.
               const who = list.find((o) => o.self);
               const high = who && who.y < r.y;
-              drawGatherBar(ctx, def, offX + r.x * px, offY + (high ? who.y * px - 22 : r.y * px - Math.round(px * 0.5) - 8), px, s);
+              // Drawn after the roofs so a building edge never hides part of the label.
+              gatherBarArgs = [def, offX + r.x * px, offY + (high ? who.y * px - 22 : r.y * px - Math.round(px * 0.5) - 8), px, s];
             }
           }
           else if (def) drawStation(ctx, r.ref, offX + r.x * px, offY + r.y * px, s, now);
@@ -8900,6 +8985,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     }
 
     drawRoofs(ctx, offX, offY, px);
+    if (gatherBarArgs) drawGatherBar(ctx, ...gatherBarArgs);
 
     // Names, health bars, speech, and floating numbers on top.
     ctx.textAlign = 'center';
@@ -10442,6 +10528,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     on($('hide-roofs'), 'change', (e) => {
       hideRoofs.on = e.target.checked;
       writePref('wealdmark.hideRoofs', hideRoofs.on);
+    });
+    on($('screen-shake'), 'change', (e) => {
+      shakeOn.on = e.target.checked;
+      writePref('wealdmark.noShake', !shakeOn.on);
     });
 
     for (const m of early.splice(0)) handle(m);

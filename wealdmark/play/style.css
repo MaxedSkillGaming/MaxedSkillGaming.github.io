@@ -376,7 +376,9 @@ button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
 #gear-stats dt { color: var(--muted); white-space: nowrap; }
 #gear-stats dd { margin: 0; text-align: right; }
 #gear-stats p { margin: 4px 0 0; color: #9fd8ff; font-style: italic; }
-#bag-grid { display: grid; grid-template-columns: repeat(4, 52px); justify-content: center; gap: 5px; margin-top: 6px; }
+#bag-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+#bag-grid button.slot { height: auto; aspect-ratio: 1; }
+#bag-grid button.slot canvas.icon { width: 78%; height: auto; aspect-ratio: 1; }
 button.slot {
   position: relative;
   margin: 0;
@@ -1213,7 +1215,7 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
 #hl, #hmid { display: flex; align-items: center; gap: 4px; min-width: 0; }
 #hotrow #side-l, #hotrow #side-r, #hotrow #qpots { flex-direction: row; align-items: center; height: auto; margin: 0; gap: 4px; }
 #hotrow .qslot, #hotrow .sslot { width: var(--slot); height: var(--slot); }
-#hotrow .sslot.auto, #hotrow .sslot.swap, #hotrow .sslot.guard { width: 48px; }
+#hotrow .sslot.auto, #hotrow .sslot.swap, #hotrow .sslot.guard, #hotrow .sslot.town { width: 48px; }
 #hotrow .bslot { width: var(--slot); height: var(--slot); max-width: none; }
 #hotrow .barsw { width: 24px; height: var(--slot); }
 #hotrow .barsw button { font-size: 10px; line-height: 1; }
@@ -1344,8 +1346,8 @@ button.slot.legendary:hover:not(:disabled) { background: rgba(255, 120, 30, 0.68
   .wide-hud #menu-list, .wide-hud #menu-list.hidden { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 4px; padding: 4px; height: 100%; box-sizing: border-box; }
   .wide-hud #toolbar button { height: 100%; min-height: 0; padding: 0 4px; }
   .wide-hud #toolbar .grp { height: 100%; min-width: 0; }
-  .wide-hud #bhud { --slot: 40px; left: calc(max(8px, calc(8px / var(--ui, 1))) + min(380px, calc(var(--vw, 100vw) * 0.34)) + 8px); right: calc(max(8px, calc(8px / var(--ui, 1))) + 324px); bottom: max(8px, calc(8px / var(--ui, 1))); height: 88px; justify-content: stretch; align-items: stretch; }
-  .wide-hud #hotcol { flex: 1 1 auto; display: flex; flex-direction: column; height: 88px; }
+  .wide-hud #bhud { --slot: 40px; left: calc(max(8px, calc(8px / var(--ui, 1))) + min(380px, calc(var(--vw, 100vw) * 0.34)) + 8px); right: calc(max(8px, calc(8px / var(--ui, 1))) + 324px); bottom: max(8px, calc(8px / var(--ui, 1))); min-height: 88px; justify-content: stretch; align-items: stretch; }
+  .wide-hud #hotcol { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 88px; }
   .wide-hud #hotcol .meter.xp { height: 10px; margin: 0 0 2px; flex: none; }
   .wide-hud #hotcol .pbar.vit { height: 24px; flex: none; }
   .wide-hud #hotrow { flex: 1 1 auto; justify-content: center; padding: 4px 8px; align-items: center; }
@@ -1396,3 +1398,7 @@ button.slot.rare:not(.empty)::before, button.slot.legendary:not(.empty)::before 
 }
 @keyframes slot-sheen { 0%, 60% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
 @media (prefers-reduced-motion: reduce) { button.slot.rare:not(.empty)::before, button.slot.legendary:not(.empty)::before { animation: none; } }
+
+/* Vitals live in the hotbar plate, so the top-left hero frame is gone. The journal rides under the map on the right (placed by fitHud). */
+#vitals { display: none !important; }
+@media (pointer: fine) and (min-width: 761px) { #gameview > #qtrack { zoom: var(--ui, 1); left: auto; } }
