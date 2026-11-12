@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://pierce-audit-northwest-bracelet.trycloudflare.com",
-  "authUrl": "https://wells-boutique-pan-overall.trycloudflare.com",
+  "server": "wss://sponsor-wilderness-pounds-alter.trycloudflare.com",
+  "authUrl": "https://expects-mount-luis-humanitarian.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -85,9 +85,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 430047,
-      "sha256": "59b84f12875696896ee18c11a725b5f7931326d76dc3096c392f735a9c12fa9e",
-      "url": "c/59b84f12875696896ee18c11a725b5f7931326d76dc3096c392f735a9c12fa9e"
+      "size": 448636,
+      "sha256": "a50da750c29f8715a1a3de89e10efaaf49ec54bf949cfa1637e8333e70826f1e",
+      "url": "c/a50da750c29f8715a1a3de89e10efaaf49ec54bf949cfa1637e8333e70826f1e"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +115,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 21245,
-      "sha256": "2cc7b8e834c9008497b0b5677a8deb62d1b2efa1072fd1786f957c3cbd116830",
-      "url": "c/2cc7b8e834c9008497b0b5677a8deb62d1b2efa1072fd1786f957c3cbd116830"
+      "size": 21345,
+      "sha256": "ef8b57a1eaab3f1c831a1481f1ae54b3e4d7f98f6b10ab868cdbdb3090bb34f2",
+      "url": "c/ef8b57a1eaab3f1c831a1481f1ae54b3e4d7f98f6b10ab868cdbdb3090bb34f2"
     },
     {
       "path": "ui/music/akash-chamber.ogg",
@@ -163,10 +163,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 87005,
-      "sha256": "b6ea01d31a7bff6e7f710a37c8619c5f554b7e563bdcff153fbbb6aca2964f64",
-      "url": "c/b6ea01d31a7bff6e7f710a37c8619c5f554b7e563bdcff153fbbb6aca2964f64"
+      "size": 86044,
+      "sha256": "05bdb30e83cfa981c38f54b2d1ad66ae5dcc2c407d013cc6325597ec9521f57b",
+      "url": "c/05bdb30e83cfa981c38f54b2d1ad66ae5dcc2c407d013cc6325597ec9521f57b"
     }
   ],
-  "signature": "pZCg4S72baHR9rfY6JyvWr6mfT2DkHYczCQRZBAxYE3CATGtgHVwl/z8HnQaxwXJWB8A21dToDCXxQ+8FWi1CQ=="
+  "signature": "K3owjeA2ilrs9wnYe2tdfdSw67towJuQhCmCFRpYjS3/Y7DQgahGT+FQDGG9LQgBZUrSR2xoOkGZr9j1kEI/CQ=="
 }
