@@ -122,6 +122,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     claw: (c) => { stroke(c, 2.5, [[4, 3], [8, 21]]); stroke(c, 2.5, [[10, 3], [14, 21]]); stroke(c, 2.5, [[16, 3], [20, 21]]); },
     crackshield: (c) => { ICON_SHAPES.shield(c); c.strokeStyle = '#17112a'; stroke(c, 2, [[12, 3], [10, 9], [14, 13], [11, 21]]); },
     horn: (c) => { poly(c, [[3, 10], [9, 10], [19, 4], [19, 20], [9, 14], [3, 14]]); stroke(c, 2, [[21, 9], [21, 15]]); },
+    portal: (c) => { c.lineWidth = 2.5; c.beginPath(); c.ellipse(12, 12, 6, 10, 0, 0, Math.PI * 2); c.stroke(); c.lineWidth = 1.5; c.beginPath(); c.ellipse(12, 12, 2.5, 5.5, 0, 0, Math.PI * 2); c.stroke(); },
     spiral: (c) => { c.lineWidth = 2.5; c.beginPath(); for (let t = 0; t < 12; t += 0.3) { const r = 1 + t * 0.8; c.lineTo(12 + Math.cos(t) * r, 12 + Math.sin(t) * r); } c.stroke(); },
     skull: (c) => { dot(c, 12, 10, 8); c.fillRect(8, 15, 8, 6); c.fillStyle = '#17112a'; dot(c, 9, 10, 2); dot(c, 15, 10, 2); },
     arrows3: (c) => { for (const x of [5, 12, 19]) { stroke(c, 2, [[x, 20], [x, 7]]); poly(c, [[x, 3], [x + 3, 9], [x - 3, 9]]); } },
@@ -5516,8 +5517,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     right.append(swap);
     const town = el('button', 'sslot town');
     town.type = 'button';
-    town.append(el('b', '', 'TOWN'), el('span', 'hk', 'T'));
-    town.title = 'Teleport to town (T). Free. Not allowed in a fight.';
+    const portal = new Image();
+    portal.src = iconUrl(['portal', '#7fd0ff']);
+    portal.alt = '';
+    portal.className = 'icon';
+    town.append(portal, el('span', 'hk', 'T'));
+    town.title = 'Town portal (T). Free teleport to town. Not allowed in a fight.';
     town.addEventListener('click', goToTown);
     right.append(town);
 
@@ -7380,11 +7385,14 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     renderGear(inv.gear);
     const grid = $('bag-grid');
     grid.textContent = '';
-    inv.items.forEach((ref, i) => {
+    const off = (G.bagTab || 0) * 28;
+    document.querySelectorAll('#bag-tabs button').forEach((b) => b.classList.toggle('on', Number(b.dataset.tab) === (G.bagTab || 0)));
+    inv.items.slice(off, off + 28).forEach((ref, k) => {
+      const i = off + k;
       grid.appendChild(
         slotButton(ref, (ev) => {
           const def = G.data && G.data.items.get(ref.id);
-          if (!def) return;
+          if (!def || def.kind === 'material') return;
           if (def.kind === 'food' || def.kind === 'potion') {
             if (G.fight) {
               if (isMyTurn() && !G.fight.options.acted) sendFight({ t: 'eat', slot: i });
@@ -7491,10 +7499,12 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const tb = $('toolbar');
     const mb = $('mapbox');
     const tr = tb && tb.offsetWidth ? tb.getBoundingClientRect() : null;
-    const topPx = mb && mb.offsetWidth ? mb.getBoundingClientRect().bottom : pr.top + 8 * z;
+    const qt = $('qtrack');
+    let topPx = mb && mb.offsetWidth ? mb.getBoundingClientRect().bottom : pr.top + 8 * z;
+    if (qt && qt.offsetWidth) topPx = Math.max(topPx, qt.getBoundingClientRect().bottom);
     const gap = 6 * zw;
     const slot = Math.max(0, openOrder.indexOf(el.id));
-    const W = tr ? tr.width / zw : 264;
+    const W = el.id === 'panel-bag' ? 348 : tr ? tr.width / zw : 264;
     const rightPx = tr ? pr.right - tr.right : Math.max(10, 12 * z);
     let bottomPx = tr ? tr.top - gap : pr.bottom - 56 * z;
     // Windows to the left of the menu column stop above the hotbar plate instead of covering its bars.
@@ -8447,9 +8457,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       const giver = G.data.npcs.get(step.npc);
       const d = el('div', 'tq');
       d.appendChild(el('b', '', q.name));
-      d.appendChild(el('div', '', ready && giver ? `Report to ${giver.name}.` : step.todo));
       const prog = progressText(step.need, st);
-      if (prog) d.appendChild(el('div', ready ? 'ok' : 'short', prog));
+      if (ready && giver) d.appendChild(el('div', 'ok', `Report to ${giver.name}.`));
+      else if (prog) d.appendChild(el('div', 'short', prog));
       body.appendChild(d);
     }
     placeJournal();
@@ -8729,7 +8739,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (r.kind === 'node') {
       const def = G.data && G.data.nodes.get(r.ref);
       if (!def) return r.name;
-      return r.depleted ? `${r.name} (spent)` : `${r.name} (${SKILL_LABEL[def.skill]} ${def.level})`;
+      return r.depleted ? `${r.name} (spent)` : r.name;
     }
     if (r.title) return `${r.name}, ${r.title}`;
     return r.name;
@@ -9404,13 +9414,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       m.appendChild(b);
     };
     const verb = node.kind === 'station' ? 'use' : def && def.verb ? def.verb : 'gather';
-    add(`${verb[0].toUpperCase()}${verb.slice(1)} ${stationName(node)}`, () => {
+    const verbText = `${verb[0].toUpperCase()}${verb.slice(1)}`;
+    add(node.kind === 'station' ? `${verbText} ${stationName(node)}` : verbText, () => {
       G.dest = null;
       G.workId = node.id;
       window.wealdmark.send({ t: 'interact', target: node.id });
     });
     add('Walk here', () => requestMove(Math.round(node.x), Math.round(node.y)));
-    add('Examine', () => inspectTile({ x: Math.round(node.x), y: Math.round(node.y) }));
+    add('Examine', () => {
+      inspectTile({ x: Math.round(node.x), y: Math.round(node.y) });
+      if (node.kind === 'node' && def) addLog(`${node.name} needs ${SKILL_LABEL[def.skill]} ${def.level}.`, skillLevel(def.skill) < def.level ? 'bad' : undefined);
+    });
     m.classList.remove('hidden');
     const w = m.offsetWidth;
     const h = m.offsetHeight;
@@ -10451,6 +10465,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       });
     }
     on($('btn-store'), 'click', () => togglePanel('panel-store'));
+    document.querySelectorAll('#bag-tabs button').forEach((b) => on(b, 'click', () => { G.bagTab = Number(b.dataset.tab); renderBag(); }));
     on($('btn-sort'), 'click', () => (G.fight ? toast("You can't sort your bag in a fight.") : window.wealdmark.send({ t: 'sort' })));
     on($('btn-belt'), 'click', () => togglePanel('panel-belt'));
     on($('qt-min'), 'click', () => {
