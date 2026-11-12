@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://mating-marker-ultram-gratuit.trycloudflare.com",
-  "authUrl": "https://wanna-wrap-awarded-buck.trycloudflare.com",
+  "server": "wss://pierce-audit-northwest-bracelet.trycloudflare.com",
+  "authUrl": "https://wells-boutique-pan-overall.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -168,5 +168,5 @@
       "url": "c/b6ea01d31a7bff6e7f710a37c8619c5f554b7e563bdcff153fbbb6aca2964f64"
     }
   ],
-  "signature": "uhwAdQnTsF2xIlL7XTzKsl9SzjxDp//5hs8epEW8teXw3zkfzq4kJDlhplLWp+K5P7xMbyQR8bWC73CB237DAg=="
+  "signature": "pZCg4S72baHR9rfY6JyvWr6mfT2DkHYczCQRZBAxYE3CATGtgHVwl/z8HnQaxwXJWB8A21dToDCXxQ+8FWi1CQ=="
 }
