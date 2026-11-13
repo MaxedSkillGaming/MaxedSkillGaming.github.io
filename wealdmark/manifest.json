@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://occasionally-operational-calibration-cad.trycloudflare.com",
-  "authUrl": "https://rail-mortality-connected-filling.trycloudflare.com",
+  "server": "wss://bizrate-relevant-singles-benefits.trycloudflare.com",
+  "authUrl": "https://vendors-growth-prep-pounds.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -37,9 +37,9 @@
     },
     {
       "path": "data/npcs.json",
-      "size": 58024,
-      "sha256": "e7e56bb4b75e8748814b7bd17d09c7fc76cfcd4852d98792167fee2785e2dac4",
-      "url": "c/e7e56bb4b75e8748814b7bd17d09c7fc76cfcd4852d98792167fee2785e2dac4"
+      "size": 66739,
+      "sha256": "8db0c4d157dde8c6cc3af022b74ba4682640984c0cb2397292254f4a016df599",
+      "url": "c/8db0c4d157dde8c6cc3af022b74ba4682640984c0cb2397292254f4a016df599"
     },
     {
       "path": "data/quests.json",
@@ -55,9 +55,15 @@
     },
     {
       "path": "data/shops.json",
-      "size": 19130,
-      "sha256": "c0c258d8f4d47ce6333fa904e2ba768aa9d898af66c23a234502ed42930e7799",
-      "url": "c/c0c258d8f4d47ce6333fa904e2ba768aa9d898af66c23a234502ed42930e7799"
+      "size": 20381,
+      "sha256": "6444e947fc669056ce0cd3f3f3a3562fe0321e0d661d223aa418a24efe9c7d97",
+      "url": "c/6444e947fc669056ce0cd3f3f3a3562fe0321e0d661d223aa418a24efe9c7d97"
+    },
+    {
+      "path": "data/shortcuts.json",
+      "size": 1880,
+      "sha256": "d58d9005f0eb9f1201de1f36dcfd963e92144db4212f22054fb37d3c24024434",
+      "url": "c/d58d9005f0eb9f1201de1f36dcfd963e92144db4212f22054fb37d3c24024434"
     },
     {
       "path": "data/stations.json",
@@ -67,9 +73,9 @@
     },
     {
       "path": "maps/mossgate.json",
-      "size": 1143600,
-      "sha256": "a05fcd62bd6de6a9017ab22abec290ae55da93bf008357d70d5334f860907706",
-      "url": "c/a05fcd62bd6de6a9017ab22abec290ae55da93bf008357d70d5334f860907706"
+      "size": 1143977,
+      "sha256": "1de203ec06bd448b884da976fcf86c438eb114931927125d553afc4f42fc6f7e",
+      "url": "c/1de203ec06bd448b884da976fcf86c438eb114931927125d553afc4f42fc6f7e"
     },
     {
       "path": "tiles/placeholder.png",
@@ -85,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 449713,
-      "sha256": "98fa7c9672ae9cd4fb85056222d83450a244c8bc2a568b54368a46fbb3bbe7ae",
-      "url": "c/98fa7c9672ae9cd4fb85056222d83450a244c8bc2a568b54368a46fbb3bbe7ae"
+      "size": 447065,
+      "sha256": "b1135ee9ac6e6e6d4b6b82103c865c15f9c80cbdddd2708a21c1c47e5e77b867",
+      "url": "c/b1135ee9ac6e6e6d4b6b82103c865c15f9c80cbdddd2708a21c1c47e5e77b867"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -115,9 +121,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 22032,
-      "sha256": "0aa75e90f1583f39e9bb33c605b74788e2638b14862c60cca5876e619064d610",
-      "url": "c/0aa75e90f1583f39e9bb33c605b74788e2638b14862c60cca5876e619064d610"
+      "size": 22007,
+      "sha256": "3c18472af0fc01f23f89da4809f7d5105ef24fea36659d5d01bbfe2f23259108",
+      "url": "c/3c18472af0fc01f23f89da4809f7d5105ef24fea36659d5d01bbfe2f23259108"
     },
     {
       "path": "ui/music/akash-chamber.ogg",
@@ -163,10 +169,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 87713,
-      "sha256": "48e1db9c55dd72bc77cd02c933093709b5968e9bed852f032cedbf4a1253e77b",
-      "url": "c/48e1db9c55dd72bc77cd02c933093709b5968e9bed852f032cedbf4a1253e77b"
+      "size": 89392,
+      "sha256": "6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d",
+      "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
     }
   ],
-  "signature": "f0NoB30iJacMUsiRCz0YZSbDZvIdNYC4wZMHo0/KvhbUX+Ba/zcZRBrFxukNO8bgLThLveUk+xtCc+NKdcxaCg=="
+  "signature": "XEbUDpqJqwOGaJdPNlKHzm1ugFFif0mgxFKg84u5+BCq8KD6g2PLyX0XBNV1rOOHmY5MdaKReNsqlzzFrARsCg=="
 }

@@ -1,0 +1,130 @@
+[
+  {
+    "id": "quarry_cut",
+    "name": "Quarry cutting",
+    "a": {
+      "x": 88,
+      "y": 40
+    },
+    "b": {
+      "x": 88,
+      "y": 295
+    },
+    "skill": "mining",
+    "level": 20
+  },
+  {
+    "id": "pine_bridge",
+    "name": "Pine rope bridge",
+    "a": {
+      "x": 6,
+      "y": 70
+    },
+    "b": {
+      "x": 6,
+      "y": 339
+    },
+    "skill": "forestry",
+    "level": 25,
+    "build": {
+      "gold": 60,
+      "items": [
+        {
+          "id": "pine_logs",
+          "qty": 30
+        }
+      ]
+    }
+  },
+  {
+    "id": "smuggler_ford",
+    "name": "Smuggler's ford",
+    "a": {
+      "x": 76,
+      "y": 391
+    },
+    "b": {
+      "x": 94,
+      "y": 721
+    },
+    "skill": "fishing",
+    "level": 35
+  },
+  {
+    "id": "drover_cutting",
+    "name": "Drover's cutting",
+    "a": {
+      "x": 89,
+      "y": 590
+    },
+    "b": {
+      "x": 90,
+      "y": 850
+    },
+    "skill": "forestry",
+    "level": 45,
+    "build": {
+      "gold": 200,
+      "items": [
+        {
+          "id": "oak_logs",
+          "qty": 40
+        },
+        {
+          "id": "iron_bar",
+          "qty": 10
+        }
+      ]
+    }
+  },
+  {
+    "id": "slag_lift",
+    "name": "Slag lift",
+    "a": {
+      "x": 4,
+      "y": 776
+    },
+    "b": {
+      "x": 5,
+      "y": 1050
+    },
+    "skill": "mining",
+    "level": 55,
+    "build": {
+      "gold": 500,
+      "items": [
+        {
+          "id": "iron_bar",
+          "qty": 20
+        },
+        {
+          "id": "steel_bar",
+          "qty": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": "glass_ladder",
+    "name": "Glasswind ladder",
+    "a": {
+      "x": 90,
+      "y": 1101
+    },
+    "b": {
+      "x": 91,
+      "y": 1359
+    },
+    "skill": "mining",
+    "level": 70,
+    "build": {
+      "gold": 1200,
+      "items": [
+        {
+          "id": "steel_bar",
+          "qty": 20
+        }
+      ]
+    }
+  }
+]
