@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://bizrate-relevant-singles-benefits.trycloudflare.com",
-  "authUrl": "https://vendors-growth-prep-pounds.trycloudflare.com",
+  "server": "wss://kim-ward-car-archives.trycloudflare.com",
+  "authUrl": "https://encyclopedia-enb-consumption-gene.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -174,5 +174,5 @@
       "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
     }
   ],
-  "signature": "XEbUDpqJqwOGaJdPNlKHzm1ugFFif0mgxFKg84u5+BCq8KD6g2PLyX0XBNV1rOOHmY5MdaKReNsqlzzFrARsCg=="
+  "signature": "TI9CdWBcHvbuvJm1ilMy6wDjITjRGyoTZIeNEP54AcDHYwMDf0qpZuIWBv/r7s8SdiwjQYwZWV5R2km4bic7BQ=="
 }
