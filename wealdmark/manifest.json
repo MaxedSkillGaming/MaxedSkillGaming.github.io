@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://kim-ward-car-archives.trycloudflare.com",
-  "authUrl": "https://encyclopedia-enb-consumption-gene.trycloudflare.com",
+  "server": "wss://cms-entitled-travelling-inner.trycloudflare.com",
+  "authUrl": "https://providence-font-constraint-downloadable.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -174,5 +174,5 @@
       "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
     }
   ],
-  "signature": "TI9CdWBcHvbuvJm1ilMy6wDjITjRGyoTZIeNEP54AcDHYwMDf0qpZuIWBv/r7s8SdiwjQYwZWV5R2km4bic7BQ=="
+  "signature": "mKgArR+Gxpu6nBHjQCGFR+IZCZ3AfDiYNV/Y6FZQZnMs0nzubTomJXXiaIm9K7UqJuCrx2mvaFMWQkhuTd0nDg=="
 }
