@@ -376,7 +376,7 @@ button.act.selected { outline: 3px solid var(--gold); background: #7560aa; }
 #gear-stats dt { color: var(--muted); white-space: nowrap; }
 #gear-stats dd { margin: 0; text-align: right; }
 #gear-stats p { margin: 4px 0 0; color: #9fd8ff; font-style: italic; }
-#bag-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
+#bag-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
 #panel-bag { resize: none; }
 #bag-tabs { display: flex; gap: 4px; margin-top: 8px; }
 #bag-tabs button { flex: 1 1 0; min-height: 32px; margin: 0; justify-content: center; }
@@ -1406,3 +1406,46 @@ button.slot.rare:not(.empty)::before, button.slot.legendary:not(.empty)::before 
 /* Vitals live in the hotbar plate, so the top-left hero frame is gone. The journal rides under the map on the right (placed by fitHud). */
 #vitals { display: none !important; }
 @media (pointer: fine) and (min-width: 761px) { #gameview > #qtrack { zoom: var(--ui, 1); left: auto; } }
+
+/* Bag: hint text moves to tooltips so seven rows fit. */
+#panel-bag > p.muted { display: none; }
+#panel-bag .bag-btns { margin-top: 6px; }
+#panel-bag #btn-sort, #panel-bag #btn-belt { min-height: 32px; }
+
+/* Compact HUD: more room for the world. Menu is one slim row, chat folds to two lines when idle, the map is smaller, the journal starts folded. */
+@media (pointer: fine) and (min-width: 761px) {
+  .wide-hud #gameview > #toolbar { width: 400px; height: 36px; }
+  .wide-hud #menu-list, .wide-hud #menu-list.hidden, .wide-hud.narrow-hud #menu-list, .wide-hud.narrow-hud #menu-list.hidden { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: 1fr; gap: 4px; padding: 0; }
+  .wide-hud #toolbar button, .wide-hud.narrow-hud #toolbar button { font-size: 12px !important; padding: 0 4px; white-space: nowrap; letter-spacing: 0; }
+  .wide-hud #bhud { right: calc(max(8px, calc(8px / var(--ui, 1))) + 404px); }
+  #chat { transition: height 160ms; }
+  #chat:not(:hover):not(:focus-within) { height: 104px !important; min-height: 0; }
+  #mapbox { width: 112px; height: 156px; }
+}
+
+/* Parchment map of the teleport stones. */
+.pmap { position: relative; width: 100%; aspect-ratio: 16 / 11; margin-top: 8px; background: #d9c79a; border: 3px solid #3a2d1a; overflow: hidden; }
+.pmap .pland { position: absolute; inset: 14px; background: #cdb888; border: 3px solid #7a5f33; border-radius: 30px 60px 24px 50px; }
+.pmap .priver { position: absolute; left: 36%; top: 0; width: 12px; height: 100%; background: #8aa6a8; opacity: 0.55; transform: skewX(-14deg); }
+.pnode { position: absolute; transform: translate(-50%, -50%); width: 34px; height: 34px; min-height: 0; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; border: 2px solid #3a2d1a; border-radius: 6px; color: #2a1f10; }
+.pnode.ok { background: #f0d36a; }
+.pnode.lock { background: #8a8272; color: #4a4436; }
+.pnode.here { background: #9fe39a; box-shadow: 0 0 0 3px #3b9a3b; }
+.pnode:disabled { opacity: 1; }
+.pnode:not(:disabled):hover { background: #ffe58a; }
+.pnode span { position: absolute; top: 38px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; color: #2a1f10; background: rgba(240, 228, 190, 0.88); padding: 0 4px; pointer-events: none; }
+.plegend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.plegend svg { vertical-align: -3px; }
+.plegend .pk-ok { color: #c9a227; }
+.plegend .pk-lock { color: #8a8272; }
+.plegend .pk-here { color: #5fbf6a; }
+@media (pointer: fine) and (min-width: 761px) {
+  #panel-anchor { top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%); width: 560px; height: auto; max-height: calc(var(--vh, 100vh) - 24px); overflow-y: auto; resize: none; }
+}
+.pnode { width: 32px; height: 32px; }
+.pnode span { top: 36px; font-size: 11px; }
+@media (max-width: 760px) {
+  .pmap { aspect-ratio: 3 / 4; }
+  .pnode span { max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
+}
+#world-scroll { background: #d9c79a; border-color: #3a2d1a; }

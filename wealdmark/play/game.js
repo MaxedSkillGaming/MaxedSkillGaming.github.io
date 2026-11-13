@@ -2147,7 +2147,15 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   function paintStation(r, id, phase) {
-    if (id === 'anchor') {
+    if (id === 'shortcut') {
+      r(1, 3, 2, 12, '#6a4426');
+      r(13, 3, 2, 12, '#6a4426');
+      r(1, 2, 14, 2, '#8a5a2c');
+      r(3, 4, 10, 11, '#2c2418');
+      r(4, 6, 1, 8, '#c8b078');
+      r(7, 5, 1, 9, '#c8b078');
+      r(11, 6, 1, 8, '#c8b078');
+    } else if (id === 'anchor') {
       r(2, 13, 12, 2, '#4a4a56');
       r(3, 11, 10, 3, '#6a6a76');
       r(3, 11, 10, 1, '#8a8a96');
@@ -3134,6 +3142,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       case 'tasks':
         G.tasks = msg;
         return renderTasks();
+      case 'shortcuts':
+        G.shortcuts = msg.list;
+        return;
       case 'anchors':
         G.anchors = msg.list;
         if (G.town && G.town.kind === 'anchor') renderAnchor();
@@ -4489,7 +4500,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       $('tf-lv').textContent = `Lv ${foe.level}`;
       $('tf-fill').style.width = `${Math.max(0, Math.min(100, (foe.hp / foe.maxHp) * 100))}%`;
       $('tf-text').textContent = `HP ${foe.hp}/${foe.maxHp}`;
-      $('tf-hit').textContent = `Hit chance ${pctText(foeHitChance(foe))}`;
       const tb = $('tf-buffs');
       tb.textContent = '';
       fillBuffIcons(tb, foe.statuses || []);
@@ -4532,16 +4542,16 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       MM.base.width = map.width;
       MM.base.height = map.height;
       const b = MM.base.getContext('2d');
-      b.fillStyle = '#0c0912';
+      b.fillStyle = '#d9c79a';
       b.fillRect(0, 0, map.width, map.height);
       for (let y = 0; y < map.height; y++) {
         for (let x = 0; x < map.width; x++) {
-          b.fillStyle = map.blocked[y][x] === '1' ? '#2a2236' : '#4d7a52';
+          b.fillStyle = map.blocked[y][x] === '1' ? '#a38b5e' : '#cdb888';
           b.fillRect(x, y, 1, 1);
         }
       }
       for (const z of map.zones) {
-        b.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.22)' : 'rgba(224,90,90,0.12)';
+        b.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.30)' : 'rgba(150,60,40,0.14)';
         b.fillRect(z.x, z.y, z.w, z.h);
       }
     }
@@ -4551,9 +4561,15 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const ox = Math.round(me.x) - half;
     const oy = Math.round(me.y) - half;
     c.imageSmoothingEnabled = false;
-    c.fillStyle = '#0c0912';
+    c.fillStyle = '#d9c79a';
     c.fillRect(0, 0, cv.width, cv.height);
     c.drawImage(MM.base, ox, oy, MM.span, MM.span, 0, 0, MM.span * MM.px, MM.span * MM.px);
+    for (const a of G.anchors || []) {
+      const x = a.x - ox;
+      const y = a.y - oy;
+      if (x < 0 || y < 0 || x >= MM.span || y >= MM.span) continue;
+      drawStoneMark(c, a, (x + 0.5) * MM.px, (y + 0.5) * MM.px, 14, false);
+    }
     for (const e of G.entities.values()) {
       if (hidden(e)) continue;
       const col = e.id === G.selfId ? '#ffffff' : e.kind === 'player' ? '#6ab0ff' : e.kind === 'monster' ? '#ff6a6a' : e.kind === 'npc' ? '#f0c860' : null;
@@ -4684,17 +4700,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     b.width = map.width;
     b.height = map.height;
     const c = b.getContext('2d');
-    c.fillStyle = '#0c0912';
+    c.fillStyle = '#d9c79a';
     c.fillRect(0, 0, b.width, b.height);
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
         const gid = map.layers.ground[y * map.width + x];
-        c.fillStyle = gid === 4 ? '#2c5a8a' : map.blocked[y][x] === '1' ? '#2a2236' : '#4d7a52';
+        c.fillStyle = gid === 4 ? '#8aa6a8' : map.blocked[y][x] === '1' ? '#a38b5e' : '#cdb888';
         c.fillRect(x, y, 1, 1);
       }
     }
     for (const z of map.zones) {
-      c.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.22)' : z.kind === 'dungeon' ? 'rgba(224,90,90,0.16)' : 'rgba(224,90,90,0.10)';
+      c.fillStyle = z.kind === 'safe' ? 'rgba(240,200,96,0.30)' : z.kind === 'dungeon' ? 'rgba(150,60,40,0.22)' : 'rgba(150,60,40,0.07)';
       c.fillRect(z.x, z.y, z.w, z.h);
     }
     WV.base = b;
@@ -4704,9 +4720,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     c.font = `bold ${size}px Tahoma, Verdana, sans-serif`;
     c.textAlign = 'center';
     c.lineWidth = 3;
-    c.strokeStyle = '#000';
+    c.strokeStyle = 'rgba(240,228,190,0.92)';
     c.strokeText(t, x, y);
-    c.fillStyle = col;
+    c.fillStyle = col === '#ffffff' ? '#7a1f1f' : '#2a1f10';
     c.fillText(t, x, y);
   }
 
@@ -4718,7 +4734,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const c = cv.getContext('2d');
     const { s, ox, oy, w, h } = WV;
     c.setTransform(WV.dpr, 0, 0, WV.dpr, 0, 0);
-    c.fillStyle = '#0c0912';
+    c.fillStyle = '#d9c79a';
     c.fillRect(0, 0, w, h);
     c.imageSmoothingEnabled = false;
     const x0 = Math.max(0, Math.floor(-ox / s));
@@ -4761,6 +4777,52 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
           c.fillText(p.k === 'quest' ? p.mark : k.badge, px, py + r * 0.45);
         }
       }
+    }
+
+    // Parchment icons: castle for towns, skull for dungeons, and a framed marker for every teleport stone.
+    for (const z of map.zones) {
+      if (!z.name || (z.kind !== 'dungeon' && !(z.kind === 'safe' && z.w * z.h >= 600))) continue;
+      const px = ox + (z.x + z.w / 2) * s;
+      const py = oy + (z.y + z.h / 2) * s;
+      if (!inView(px, py, 24)) continue;
+      const sz = Math.max(14, Math.min(26, s * 6));
+      drawParchIcon(c, z.kind === 'dungeon' ? 'dungeon' : 'town', px, py - 12, sz, z.kind === 'dungeon' ? '#7a1f1f' : '#3a2d1a');
+    }
+    c.save();
+    c.lineWidth = 2;
+    c.setLineDash([6, 5]);
+    for (const q of G.shortcuts || []) {
+      const ax = ox + (q.ax + 0.5) * s;
+      const ay = oy + (q.ay + 0.5) * s;
+      const bx = ox + (q.bx + 0.5) * s;
+      const by = oy + (q.by + 0.5) * s;
+      c.strokeStyle = q.built ? '#2f6b3a' : '#8a8272';
+      c.beginPath();
+      const bow = (by - ay) * 0.3 * (ax + bx > WV.w ? -1 : 1);
+      c.moveTo(ax, ay);
+      c.quadraticCurveTo((ax + bx) / 2 + bow, (ay + by) / 2, bx, by);
+      c.stroke();
+    }
+    c.restore();
+    for (const q of G.shortcuts || []) {
+      for (const [x, y] of [[q.ax, q.ay], [q.bx, q.by]]) {
+        const px = ox + (x + 0.5) * s;
+        const py = oy + (y + 0.5) * s;
+        if (!inView(px, py, 12)) continue;
+        c.fillStyle = q.built ? '#2f6b3a' : '#8a8272';
+        c.fillRect(px - 5, py - 5, 10, 10);
+        c.strokeStyle = '#3a2d1a';
+        c.lineWidth = 1.5;
+        c.strokeRect(px - 5, py - 5, 10, 10);
+      }
+    }
+    const hereId = G.town && G.town.kind === 'anchor' ? G.town.id : null;
+    for (const a of G.anchors || []) {
+      if (a.x == null) continue;
+      const px = ox + (a.x + 0.5) * s;
+      const py = oy + (a.y + 0.5) * s;
+      if (!inView(px, py, 24)) continue;
+      drawStoneMark(c, a, px, py, Math.max(16, Math.min(26, s * 6)), a.id === hereId);
     }
 
     // Place names, biggest first, and skip any that would sit on top of one already placed.
@@ -7504,7 +7566,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (qt && qt.offsetWidth) topPx = Math.max(topPx, qt.getBoundingClientRect().bottom);
     const gap = 6 * zw;
     const slot = Math.max(0, openOrder.indexOf(el.id));
-    const W = el.id === 'panel-bag' ? 348 : tr ? tr.width / zw : 264;
+    const W = tr ? tr.width / zw : 264;
     const rightPx = tr ? pr.right - tr.right : Math.max(10, 12 * z);
     let bottomPx = tr ? tr.top - gap : pr.bottom - 56 * z;
     // Windows to the left of the menu column stop above the hotbar plate instead of covering its bars.
@@ -7519,7 +7581,17 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     // The bag is only as tall as its grid, so no empty space sits under the tool belt.
     if (el.id === 'panel-bag') {
       el.style.height = 'auto';
-      el.style.maxHeight = px(Math.max(160, (bottomPx - topPx - gap) / zw));
+      const avail = Math.max(160, (bottomPx - topPx - gap) / zw);
+      // Four across, seven down, all visible: the slots shrink (32px at the least) when the window is short.
+      const g = $('bag-grid');
+      el.style.maxHeight = 'none';
+      g.style.width = px(4 * 32 + 12);
+      // Chrome = everything except the grid, measured with the grid at its smallest and the panel unclamped.
+      const chrome = (el.getBoundingClientRect().height - g.getBoundingClientRect().height) / zw;
+      const s = Math.max(32, Math.min(55, Math.floor((avail - chrome - 8 - 6 * 4) / 7)));
+      g.style.width = px(4 * s + 12);
+      g.style.marginInline = 'auto';
+      el.style.maxHeight = px(avail);
     }
   }
 
@@ -7651,6 +7723,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     } catch {
       /* nothing saved */
     }
+    // The chat folds to two lines when idle; keep the newest lines in view after it folds or opens.
+    for (const ev of ['mouseenter', 'mouseleave', 'focusin', 'focusout']) $('chat').addEventListener(ev, () => setTimeout(() => { $('chatlog').scrollTop = $('chatlog').scrollHeight; }, 200));
     $('chat-grip').addEventListener('pointerdown', (ev) => {
       if (ev.button !== 0) return;
       ev.preventDefault();
@@ -8115,6 +8189,100 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   }
 
   /** The anchor window: attune this anchor, then travel between the ones you have attuned. */
+  /** Where each stone sits on the parchment (percent of the map) and what kind of place it is. */
+  const PARCH_ICONS = {
+    town: '<path d="M2 14V6h2V4h2v2h4V4h2v2h2v8zM7 14v-3h2v3"/>',
+    dungeon: '<path d="M3 7a5 5 0 0110 0v3H3zM5 10v3h6v-3"/><circle cx="6" cy="8" r="1"/><circle cx="10" cy="8" r="1"/>',
+    mining: '<path d="M2 7a8 8 0 0112 0M8 5v10"/>',
+    fishing: '<path d="M2 8c3-4 7-4 10 0-3 4-7 4-10 0zM12 8l3-3v6z"/>',
+    fort: '<path d="M3 3l10 10M13 3L3 13M2 12l2 2M12 14l2-2"/>',
+    camp: '<path d="M1 14L8 3l7 11zM8 14V9"/>',
+    fire: '<path d="M8 2c1 3 4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 2 2 1 0-2-1-3 0-5z"/>',
+    peak: '<path d="M1 14L6 5l3 5 2-3 4 7z"/>',
+    gem: '<path d="M3 6l2-3h6l2 3-5 8zM3 6h10"/>',
+    frost: '<path d="M8 1v14M2 4l12 8M14 4L2 12"/>',
+  };
+  const PARCH_KINDS = [['town', 'Town'], ['dungeon', 'Dungeon'], ['mining', 'Mining'], ['fishing', 'Fishing'], ['fort', 'Fort'], ['camp', 'Camp']];
+  const PARCH_SPOTS = {
+    bellstone_plaza: [20, 12, 'town'], warren_gate: [8, 26, 'dungeon'], quarry_camp: [34, 26, 'mining'], dunhollow: [22, 42, 'town'],
+    black_sump: [12, 56, 'dungeon'], innsharrow: [34, 58, 'fishing'], wargwatch: [55, 48, 'fort'], nameless_cairns: [64, 30, 'dungeon'],
+    naerwick: [80, 20, 'town'], drowned_hall: [84, 42, 'dungeon'], ashgate: [70, 62, 'fire'], blackrock_camp: [50, 76, 'mining'],
+    flats_watch: [28, 84, 'camp'], hermits_fire: [88, 70, 'fire'], pass_hold: [74, 86, 'peak'], glassreach: [56, 92, 'gem'], rimwatch: [92, 90, 'frost'],
+  };
+
+  /** Parchment map of the stones. In travel mode attuned stones are buttons; otherwise they only show their state. */
+  function parchmentMap(list, hereId, onPick) {
+    const wrap = el('div', 'pmap');
+    wrap.appendChild(el('div', 'pland'));
+    wrap.appendChild(el('div', 'priver'));
+    for (const a of list) {
+      const spot = PARCH_SPOTS[a.id];
+      if (!spot) continue;
+      const here = a.id === hereId;
+      const b = el('button', `pnode ${here ? 'here' : a.attuned || a.free ? 'ok' : 'lock'}`);
+      b.type = 'button';
+      b.style.left = `${12 + spot[0] * 0.78}%`;
+      b.style.top = `${6 + spot[1] * 0.84}%`;
+      b.title = `${a.name}${here ? ' (you are here)' : a.attuned ? '' : a.free ? ' (free to attune)' : ' (needs a Teleport Crystal)'}`;
+      b.innerHTML = `<svg viewBox="0 0 16 16" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${PARCH_ICONS[spot[2]]}</svg>`;
+      b.appendChild(el('span', '', a.name));
+      b.disabled = !onPick || here || !a.attuned;
+      if (onPick) b.addEventListener('click', () => onPick(a));
+      wrap.appendChild(b);
+    }
+    return wrap;
+  }
+
+  function parchmentLegend() {
+    const lg = el('div', 'plegend');
+    for (const [k, label] of PARCH_KINDS) {
+      const sp = el('span');
+      sp.innerHTML = `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${PARCH_ICONS[k]}</svg> ${label}`;
+      lg.appendChild(sp);
+    }
+    lg.appendChild(el('span', 'pk-ok', 'Gold: attuned'));
+    lg.appendChild(el('span', 'pk-lock', 'Grey: needs a crystal'));
+    lg.appendChild(el('span', 'pk-here', 'Green: you are here'));
+    return lg;
+  }
+
+  /** Draw one of the parchment icons on a canvas, centred on (cx, cy), `size` pixels wide. */
+  const PARCH_PATH2D = {};
+  function drawParchIcon(c, kind, cx, cy, size, color) {
+    let parts = PARCH_PATH2D[kind];
+    if (!parts) {
+      const src = PARCH_ICONS[kind] || PARCH_ICONS.town;
+      parts = [...src.matchAll(/<path d="([^"]+)"\/>/g)].map((m) => new Path2D(m[1]));
+      for (const m of src.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"\/>/g)) {
+        const q = new Path2D();
+        q.arc(+m[1], +m[2], +m[3], 0, Math.PI * 2);
+        parts.push(q);
+      }
+      PARCH_PATH2D[kind] = parts;
+    }
+    c.save();
+    c.translate(cx - size / 2, cy - size / 2);
+    c.scale(size / 16, size / 16);
+    c.strokeStyle = color;
+    c.lineWidth = 1.5;
+    c.lineJoin = 'round';
+    c.lineCap = 'round';
+    for (const q of parts) c.stroke(q);
+    c.restore();
+  }
+  /** A parchment marker (framed square plus icon) for a teleport stone. */
+  function drawStoneMark(c, a, x, y, size, here) {
+    const spot = PARCH_SPOTS[a.id];
+    if (!spot) return;
+    const fill = here ? '#9fe39a' : a.attuned || a.free ? '#f0d36a' : '#8a8272';
+    c.fillStyle = fill;
+    c.strokeStyle = '#3a2d1a';
+    c.lineWidth = 2;
+    c.fillRect(Math.round(x - size / 2), Math.round(y - size / 2), size, size);
+    c.strokeRect(Math.round(x - size / 2) + 1, Math.round(y - size / 2) + 1, size - 2, size - 2);
+    drawParchIcon(c, spot[2], x, y, size * 0.7, '#2a1f10');
+  }
+
   function renderAnchor() {
     const list = G.anchors || [];
     const here = list.find((a) => a.id === G.town.id);
@@ -8142,27 +8310,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     } else if (here) {
       box.appendChild(el('p', 'muted', 'This anchor is attuned.'));
     }
-    box.appendChild(el('h3', '', 'Your anchors'));
-    for (const a of list) {
-      const row = el('div', 'perk');
-      row.appendChild(el('span', 'name', `Teleport Stone (${a.name})`));
-      const b = el('button', 'act');
-      b.type = 'button';
-      if (a.attuned) {
-        b.textContent = here && here.id === a.id ? 'You are here' : 'Travel';
-        b.disabled = !here || !here.attuned || here.id === a.id;
-        b.addEventListener('click', () => {
-          G.anchorTravel = a.name;
-          window.wealdmark.send({ t: 'anchor_travel', to: a.id });
-          closeTown(false);
-        });
-      } else {
-        b.textContent = a.free ? 'Free to attune' : 'Needs crystal';
-        b.disabled = true;
-      }
-      row.appendChild(b);
-      box.appendChild(row);
-    }
+    box.appendChild(parchmentMap(list, here && here.id, (a) => {
+      if (!here || !here.attuned) return;
+      G.anchorTravel = a.name;
+      window.wealdmark.send({ t: 'anchor_travel', to: a.id });
+      closeTown(false);
+    }));
+    box.appendChild(parchmentLegend());
   }
 
   /** Redraw whichever town panel is open after your bag or purse changed. */
@@ -8437,9 +8591,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** The pinned journal: tracked jobs on the left of the screen. It can be minimized, and Open shows the full journal. */
   const qtMin = () => {
     try {
-      return localStorage.getItem('wealdmark.qtmin') === '1';
+      return localStorage.getItem('wealdmark.qtmin') !== '0';
     } catch {
-      return false;
+      return true;
     }
   };
   function renderPinned(tracked, states) {
@@ -8813,8 +8967,10 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         shY = Math.cos(now * 0.13) * amp;
       }
     }
-    const offX = Math.round(w / 2 - (cam.x * TILE + TILE / 2) * s + shX);
-    const offY = Math.round(h / 2 - (cam.y * TILE + TILE / 2) * s + shY);
+    // Keep the view inside the map so no black void shows past the edge; a map smaller than the view is centred.
+    const fitOff = (o, view, size) => (size >= view ? Math.max(view - size, Math.min(0, o)) : Math.round((view - size) / 2));
+    const offX = Math.round(fitOff(w / 2 - (cam.x * TILE + TILE / 2) * s, w, map.width * TILE * s) + shX);
+    const offY = Math.round(fitOff(h / 2 - (cam.y * TILE + TILE / 2) * s, h, map.height * TILE * s) + shY);
     // The button only shows once the hero has left the screen.
     const rc = $('recenter');
     if (rc) {
@@ -8938,7 +9094,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
               gatherBarArgs = [def, offX + r.x * px, offY + (high ? who.y * px - 22 : r.y * px - Math.round(px * 0.5) - 8), px, s];
             }
           }
-          else if (def) drawStation(ctx, r.ref, offX + r.x * px, offY + r.y * px, s, now);
+          else if (def || r.ref === 'shortcut') drawStation(ctx, r.ref, offX + r.x * px, offY + r.y * px, s, now);
           ctx.globalAlpha = 1;
           continue;
         }
