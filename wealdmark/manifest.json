@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://cms-entitled-travelling-inner.trycloudflare.com",
-  "authUrl": "https://providence-font-constraint-downloadable.trycloudflare.com",
+  "server": "wss://steering-eng-barcelona-newark.trycloudflare.com",
+  "authUrl": "https://glasgow-introducing-accessing-computational.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -174,5 +174,5 @@
       "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
     }
   ],
-  "signature": "mKgArR+Gxpu6nBHjQCGFR+IZCZ3AfDiYNV/Y6FZQZnMs0nzubTomJXXiaIm9K7UqJuCrx2mvaFMWQkhuTd0nDg=="
+  "signature": "1JGAtlgu4sI9oF+Pw2Q/yuCMdGndGqg7yBa86OOtXLkSLwPYZl454V2N5yyCGS5rM9Zr1iWrx+hWJRsSiXaLAw=="
 }
