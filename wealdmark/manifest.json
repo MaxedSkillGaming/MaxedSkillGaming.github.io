@@ -91,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 447065,
-      "sha256": "b1135ee9ac6e6e6d4b6b82103c865c15f9c80cbdddd2708a21c1c47e5e77b867",
-      "url": "c/b1135ee9ac6e6e6d4b6b82103c865c15f9c80cbdddd2708a21c1c47e5e77b867"
+      "size": 459696,
+      "sha256": "92be01be3d2cf1c5553ee0b4ed9152c9cd8bc185bb3c4360588ab17e84181c01",
+      "url": "c/92be01be3d2cf1c5553ee0b4ed9152c9cd8bc185bb3c4360588ab17e84181c01"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -174,5 +174,5 @@
       "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
     }
   ],
-  "signature": "Ll5xFu55hK6X2lVYFPoz4ZAGv0sC/ziziMvCFAVhWap4LhfEzARYG2s6u6MPX+AYA60x85cz4B0benwUmndVDQ=="
+  "signature": "1uWd19Q45KV2SRGnxtBuDH1iF4gUi65iRVGH/rcTIX0Ed5YoB4h+15hUbUsETVrEcYq3VrHfnFS1u0DRGDsMAQ=="
 }
