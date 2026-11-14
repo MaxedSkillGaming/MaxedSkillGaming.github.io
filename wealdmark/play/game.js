@@ -78,7 +78,7 @@
   const ABILITY_NAMES = Object.fromEntries(Object.entries(ABILITY_INFO).map(([k, v]) => [k, v[0]]));
   /** The attack every hero has for their weapon, used when nothing else is selected. */
   const BASIC_ATTACKS = ['punch', 'slash', 'shot', 'fireball'];
-  const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8, kiln_warden_brask: 1.6, sparkmother_veyra: 1.6, emberjaw: 1.8, cragmaw_the_unburned: 1.4, hollow_pyre_priest: 1.4 };
+  const BOSS_SCALE = { mind_goblin: 1.7, foreman_below: 1.6, skrit: 1.5, harl_dunmarsh: 1.5, ghashul: 1.5, ethelgar: 1.6, morwenna_pickman: 1.7, drowned_voice: 1.3, nyth_ael: 1.6, ambrose_silt: 1.6, prince_elrenor: 1.8, kiln_warden_brask: 1.6, sparkmother_veyra: 1.6, emberjaw: 1.8, cragmaw_the_unburned: 1.4, hollow_pyre_priest: 1.4, ifrit_the_unquenched: 3.2 };
 const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn', 'sunder', 'exhaust', 'dust_choked', 'blinded']);
   const TIER_LEVELS = [1, 10, 20, 30, 40, 50];
   /** Procedural 24px icons for abilities and statuses, drawn once and cached as data URLs. */
@@ -1208,6 +1208,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     emberjaw: beast({ body: '#a82a1a', hi: '#d8503a', shade: '#6a160e', eye: '#ffe08a', horn: '#2a1410' }),
     flame_wisp: wisp({ body: '#ff9a3a', hi: '#ffe08a', shade: '#c8561e' }),
     prism_wisp: wisp({ body: '#78d8f0', hi: '#e0faff', shade: '#4a98c8' }),
+    ifrit_the_unquenched: (r, step) => {
+      const pal = { K: '#1a141e', N: '#6a5662', n: '#3e303c', H: '#8a96b4', L: '#b4bfd6', S: '#5a6486', B: '#4a2418', b: '#7a3a28', P: '#3a2a4a', Q: '#5a3a6a', R: '#e8301c', O: '#ff8a2a', Y: '#ffd23a', r: '#ff5a2a', E: '#ffe04a' };
+      const rows = step === 1 ? ["......L...R..R...L......", ".....NNNR.R.OR.RNNN.....", ".....nN.RRORYRRR.Nn.....", ".....NN..ROYOORR.NN.....", "......NN.ROOOORRNN......", "......NNNNLLLLNNNN......", "........NnHHHHnN........", "........HREnnERH........", "....rr..HHHHHHHH..rr....", "...rHHLLLBBnnBBSSSHHr...", "...LSHLLLLBbBBSSSSHLS...", "...rSSSSSSBBbBSLLLLLr...", "..RLHHHHHHBBBBSHHHHHSR..", "..rOrrLLHHHBBHHHSSrrOr..", "..rrrrHHHHHBBHHHHHrrrr..", "..rrrrHHnOOBBOOnHHrrrr..", "........nnnnnnnn........", ".........PQQQQPP........", ".........PQQQQPP........", ".........PrQQQr.........", ".........PQQQQP.........", ".........rPQQQP.........", "..........PQOPPP........", ".............r.........."] : ["......L..R.R..R..L......", ".....NNN.R.RORR.NNN.....", ".....nN.RRORYRR..Nn.....", ".....NN..ROYOOR..NN.....", "......NN.ROOOORRNN......", "......NNNNLLLLNNNN......", "........NnHHHHnN........", "........HREnnERH........", "....rr..HHHHHHHH..rr....", "...rHHLLLBBnnBBSSSHHr...", "...LSHLLLLBbBBSSSSHLS...", "...rSSSSSSBBbBSLLLLLr...", "..RLHHHHHHBBBBSHHHHHSR..", "..rOrrLLHHHBBHHHSSrrOr..", "..rrrrHHHHHBBHHHHHrrrr..", "..rrrrHHnOOBBOOnHHrrrr..", "........nnnnnnnn........", ".........PQQQQPP........", ".........PQQQQPP........", ".........PrQQQr.........", ".........PQQQPP.........", ".........rPQPP..........", "..........OQPP..........", "...........r............"];
+      rows.forEach((row, y) => {
+        for (let x = 0; x < 24; x++) if (row[x] !== '.') r(x, y, 1, 1, pal[row[x]]);
+      });
+    },
   };
 
   let kenneyImg = null;
@@ -1274,7 +1281,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** Monsters in the same 16x16 tile, rounder and shaded like the people. */
   function drawMonster(ctx, mon, x, y, s, step, bob) {
     const kc = REDRAW[mon] ? null : kenneyTile(mon, step);
-    const c = kc || (REDRAW[mon] && sprite(`m|${mon}|${step}`, (r) => REDRAW[mon](r, step))) || sprite(`m|${mon}|${step}`, (r) => {
+    const c = kc || (REDRAW[mon] && sprite(`m|${mon}|${step}`, (r) => REDRAW[mon](r, step), mon === 'ifrit_the_unquenched' ? 28 : 20)) || sprite(`m|${mon}|${step}`, (r) => {
       if (mon === 'moss_imp') {
         r(4, 13 - (step === 1 ? 1 : 0), 3, 2, '#2c4a24');
         r(9, 13 - (step === 2 ? 1 : 0), 3, 2, '#2c4a24');
