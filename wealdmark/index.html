@@ -4,9 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://*.trycloudflare.com; base-uri 'none'; form-action 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="theme-color" content="#120d1a" />
   <title>Heroes of the Wealdmark: Free Pixel RPG, Open Beta</title>
-  <meta name="description" content="Heroes of the Wealdmark is a free pixel RPG, now in open beta. Real-time fights, quests, crafting and skill training." />
+  <meta name="description" content="Heroes of the Wealdmark is a free pixel RPG, now in open beta. Real-time fights, 76 quests, 12 trades and a world of 88 monsters and bosses." />
   <link rel="canonical" href="https://maxedskillgaming.github.io/wealdmark/" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="icon" href="icon.png" />
@@ -27,9 +29,7 @@
   <meta name="twitter:image" content="https://maxedskillgaming.github.io/wealdmark/shots/og.jpg" />
 
   <link rel="preload" as="image" href="shots/fight.jpg" fetchpriority="high" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="fonts/fonts.css" />
 
   <script type="application/ld+json">
   {
@@ -54,7 +54,7 @@
         "@type": "VideoGame",
         "@id": "https://maxedskillgaming.github.io/wealdmark/#game",
         "name": "Heroes of the Wealdmark",
-        "description": "A free pixel-art RPG, now in open beta, with real-time fights, quests, crafting, gathering and skill training.",
+        "description": "A free pixel-art RPG, now in open beta, with real-time fights, 76 quests, 12 trades, 88 monsters and bosses, and 17 teleport waystones.",
         "url": "https://maxedskillgaming.github.io/wealdmark/",
         "image": "https://maxedskillgaming.github.io/wealdmark/shots/og.jpg",
         "screenshot": [
@@ -185,10 +185,45 @@
     .cta p { color: var(--dim); margin-bottom: 1.75rem; }
     .cta .buttons { justify-content: center; }
 
+
+    /* top bar play button */
+    .bar .btn.mini { font-size: .95rem; padding: .45rem 1rem; min-height: 2.4rem; border-width: 2px; box-shadow: 3px 3px 0 var(--gold-deep); }
+    .bar a.btn.mini { color: #1a1205; }
+    .eyebrow { font: 500 .85rem var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+
+    /* stats strip */
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 3px solid var(--line); background: var(--panel); margin-block: calc(var(--gap) / 2); }
+    .stats div { padding: 1rem .75rem; text-align: center; }
+    .stats div + div { border-left: 3px solid var(--line); }
+    .stats b { display: block; font: 700 clamp(1.6rem, 4vw, 2.4rem)/1.1 var(--display); color: var(--gold); }
+    .stats span { color: var(--dim); font-size: 1rem; }
+
+    /* feature cards */
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card { background: var(--panel); border: 3px solid var(--line); padding: 1.25rem; }
+    .card h3 { font-size: 1.25rem; color: var(--gold); margin-bottom: .5rem; }
+    .card p { color: var(--parchment); font-size: 1.1rem; line-height: 1.5; }
+
+    /* thanks banner after a donation */
+    .thanks { background: var(--moss); color: #10200a; font: 700 1.1rem var(--display); text-align: center; padding: .75rem 1rem; margin: 0; }
+    .thanks[hidden] { display: none; }
+
+    /* support */
+    .support { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.5rem; align-items: center; background: var(--panel); border: 3px solid var(--gold); box-shadow: 6px 6px 0 var(--gold-deep); padding: clamp(1.25rem, 4vw, 2.25rem); }
+    .support h2 { font-size: clamp(1.7rem, 3.6vw, 2.4rem); margin-bottom: .75rem; }
+    .support p { max-width: 36rem; }
+    .support p + p { margin-top: .75rem; color: var(--dim); font-size: 1.05rem; }
+    .support .buttons { flex-direction: column; align-items: stretch; text-align: center; }
+    .support .fine { color: var(--dim); font-size: .95rem; margin-top: .75rem; text-align: center; }
+
     footer { border-top: 3px solid var(--line); padding-block: 2rem 3rem; color: var(--dim); font-size: 1rem; }
     footer p + p { margin-top: .4rem; }
 
     @media (max-width: 52rem) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats div:nth-child(3) { border-left: 0; }
+      .stats div:nth-child(n+3) { border-top: 3px solid var(--line); }
+      .cards, .support { grid-template-columns: 1fr; }
       .row, .row.flip { grid-template-columns: 1fr; }
       .row.flip .frame, .row.flip .phone { order: 0; }
       .frame, .fair { box-shadow: 5px 5px 0 #000; }
@@ -199,20 +234,24 @@
   </style>
 </head>
 <body>
+  <p class="thanks" id="thanks" hidden>Thank you for supporting the Wealdmark. It means a lot.</p>
   <div class="wrap">
     <header class="bar">
       <a class="brand" href="./"><img src="icon.png" alt="" width="32" height="32" />Heroes of the Wealdmark</a>
-      <a class="nav" href="#world">The game</a>
+      <a class="nav" href="#features">Features</a>
+      <a class="nav" href="#world">The world</a>
       <a class="nav" href="#start">How to start</a>
       <a class="nav" href="#faq">Questions</a>
-      <a class="nav" href="#join">Join us</a>
+      <a class="nav" href="#support">Support</a>
+      <a class="btn mini primary" href="play/">Play free</a>
     </header>
 
     <main>
       <div class="hero">
         <h1>Heroes of the Wealdmark</h1>
-        <p class="tag">A free pixel RPG. Open beta now live.</p>
-        <p class="lede">Explore the Wealdmark, take on its monsters and build your hero through quests, crafting and skill training. Fights run in real time.</p>
+        <p class="eyebrow">Free to play &middot; Open beta &middot; Browser, tablet and phone</p>
+        <p class="tag">Forge your legend in the Wealdmark.</p>
+        <p class="lede">A pixel MMO with real-time fights, levels up to 100, twelve trades and a world that runs from Bellstone Plaza to the far passes. Make an account, pick a look and walk out the gate.</p>
         <div class="buttons">
           <a class="btn primary" href="play/">Play free</a>
           <a class="btn" href="play/#register">Create account</a>
@@ -224,6 +263,25 @@
         </figure>
       </div>
 
+      <div class="stats" aria-label="The game in numbers">
+        <div><b>88</b><span>monsters and bosses</span></div>
+        <div><b>76</b><span>quests</span></div>
+        <div><b>350</b><span>items, 120 recipes</span></div>
+        <div><b>17</b><span>teleport waystones</span></div>
+      </div>
+
+      <section class="block" id="features">
+        <h2>What you can do</h2>
+        <div class="cards">
+          <div class="card"><h3>Fight</h3><p>Real-time combat with an action bar, cooldowns and auto combat. Bosses mark the ground under you, so keep moving. Dungeons run three floors deep.</p></div>
+          <div class="card"><h3>Gather and craft</h3><p>Twelve trades: forestry, mining, fishing, hunting, herbalism, farming, excavation, smithing, cooking, crafting, alchemy and jewelcrafting.</p></div>
+          <div class="card"><h3>Explore</h3><p>Attune waystones and travel between them. Skill-gated shortcuts link far regions, and some you can build yourself.</p></div>
+          <div class="card"><h3>Quest</h3><p>Take on 76 quests from the people of the Reach, and earn gold, titles and gear for finishing them.</p></div>
+          <div class="card"><h3>Collect</h3><p>Gear comes in rarities with rolled mods. Fill your bestiary, take a companion along and wear what you earn.</p></div>
+          <div class="card"><h3>Play together</h3><p>One shared online world. Other heroes work, fight and trade alongside you.</p></div>
+        </div>
+      </section>
+
       <div class="row" id="world">
         <figure class="frame">
           <div class="title"><i></i><i></i><i></i>&nbsp;South road</div>
@@ -232,7 +290,7 @@
         <div>
           <h2>Real-time combat</h2>
           <p>Fights begin in the open world with no loading screens. Click a monster to engage it, or Shift-click to inspect it first. Abilities sit on an action bar with cooldowns, and auto combat is available when you prefer it.</p>
-          <p>The Reach is home to more than 30 monsters and bosses, from imps and wolves to quarry golems and salt crabs.</p>
+          <p>The world holds 88 monsters and bosses, from imps and wolves to quarry golems and salt crabs.</p>
         </div>
       </div>
 
@@ -282,6 +340,21 @@
         <details><summary>Do I need to download anything?</summary><p>Not for the open beta. You can play on desktop, tablet or phone. Tick "Keep me signed in" at login and you will not need your password again for up to 30 days.</p></details>
         <details><summary>I lost my password.</summary><p>Use "Forgot password?" on the login page, with the recovery key the game showed you when you made the account.</p></details>
         <details><summary>Can I play with others?</summary><p>Yes. The Reach is a shared online world, and other heroes play alongside you.</p></details>
+      <details><summary>Does donating give me anything in the game?</summary><p>No. Donations are a thank-you and cover hosting. Gold, gear and levels are earned through play for everyone.</p></details>
+      </section>
+
+      <section class="block" id="support">
+        <div class="support">
+          <div>
+            <h2>Support the Wealdmark</h2>
+            <p>The game is free and stays free. If you enjoy it, a donation helps pay for hosting and keeps new regions, quests and music coming.</p>
+            <p>Donations are a thank-you. They do not give gold, gear, levels or any other advantage in the game.</p>
+          </div>
+          <div>
+            <div class="buttons"><a class="btn primary" href="https://donate.stripe.com/9B69AT80sgWU9iC6V38AE09" rel="noopener">Donate</a></div>
+            <p class="fine">You choose the amount, from $3. Payment is handled by Stripe.</p>
+          </div>
+        </div>
       </section>
 
       <section class="block" id="join">
@@ -304,6 +377,7 @@
 
     <footer>
       <p>Heroes of the Wealdmark &copy; 2026 <a href="../">Maxed Skill Gaming</a>.</p>
+        <p><a href="privacy.html">Privacy policy</a> &middot; <a href="terms.html">Terms of use</a> &middot; No cookies, no tracking.</p>
       <p>Hero, NPC and world art is built on packs by <a href="https://www.kenney.nl">Kenney</a> (CC0).</p>
     </footer>
   </div>
@@ -323,6 +397,9 @@
         set('down', 'The realm is closed right now. Try again soon.');
       }
     })();
+  </script>
+  <script>
+    if (new URLSearchParams(location.search).get('thanks')) document.getElementById('thanks').hidden = false;
   </script>
 </body>
 </html>
