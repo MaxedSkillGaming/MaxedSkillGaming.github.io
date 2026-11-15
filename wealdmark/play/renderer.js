@@ -27,6 +27,7 @@ const PATCH_ERRORS = {
   manifest_fetch: 'Could not reach the patch server. Check your connection and try again.',
   manifest_invalid: 'The patch server sent data this version cannot read.',
   manifest_signature: 'The update could not be verified, so it was not installed.',
+  manifest_rollback: 'The update server offered an older version than the one installed, so it was ignored.',
   unsafe_path: 'The update contained an unsafe file and was rejected.',
   download_failed: 'A download failed. Try again.',
   hash_mismatch: 'A downloaded file was damaged and was rejected. Try again.',

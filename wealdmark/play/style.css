@@ -582,6 +582,8 @@ button.slot .slot-name { position: absolute; left: 0; right: 0; bottom: 1px; fon
 
 button.link { background: none; border: none; color: inherit; text-decoration: underline; cursor: pointer; padding: 4px 0; opacity: 0.8; }
 button.link:hover { opacity: 1; }
+.legal { margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--edge); text-align: center; }
+.legal a { color: var(--gold); white-space: nowrap; }
 
 .recovery-key { display: block; font-size: 1.3em; letter-spacing: 0.08em; padding: 10px; user-select: all; background: rgba(0, 0, 0, 0.35); }
 #recovery-tools { margin: 8px 0; }
@@ -653,7 +655,7 @@ button.link:hover { opacity: 1; }
   #rctl { top: 52px; right: 6px; }
   #mapbox { top: 80px; right: 6px; width: 110px; height: 164px; }
   #tracker { font-size: 11px; }
-  #toast { top: 100px; max-width: calc(calc(var(--vw, 100vw) * 1.0) - 24px); }
+  #toast { top: 208px; max-width: calc(calc(var(--vw, 100vw) * 1.0) - 24px); }
   #chat { left: 6px; bottom: 156px; width: calc(calc(var(--vw, 100vw) * 1.0) - 80px); height: auto; min-height: 0; }
   #chatlog { max-height: 90px; }
   button.act { min-height: 38px; }
@@ -1124,7 +1126,8 @@ button.qtrack.on { background: #2f6b3a; }
   /* the phone scales the HUD to half: keep the two frames at full size so text stays at 11px */
   #gameview > #vitals, #gameview > #tframe { zoom: 1; top: 8px; padding: 4px 6px; width: 170px; height: 92px; }
   #gameview > #vitals { left: 8px; }
-  #gameview > #tframe { left: 186px; }
+  /* target frame stacks under the player frame: the right column (Menu, rctl, map) is taken */
+  #gameview > #tframe { left: 8px; top: 108px; }
   #gameview > #hud { top: calc(82px / var(--ui, 1)); }
 }
 /* Bag and Journal flash gold three times when something lands in them. */
