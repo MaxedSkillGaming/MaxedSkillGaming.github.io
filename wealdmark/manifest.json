@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1794716847",
   "protocol": 7,
   "minShellVersion": "0.1.0",
   "server": "wss://tabs-marshall-built-established.trycloudflare.com",
@@ -121,9 +121,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 22007,
-      "sha256": "3c18472af0fc01f23f89da4809f7d5105ef24fea36659d5d01bbfe2f23259108",
-      "url": "c/3c18472af0fc01f23f89da4809f7d5105ef24fea36659d5d01bbfe2f23259108"
+      "size": 22308,
+      "sha256": "d8d18bb4afbbccb48f93c9b4c76a574749e18335cd33995f5207c2d894e0a385",
+      "url": "c/d8d18bb4afbbccb48f93c9b4c76a574749e18335cd33995f5207c2d894e0a385"
     },
     {
       "path": "ui/music/akash-chamber.ogg",
@@ -163,16 +163,16 @@
     },
     {
       "path": "ui/renderer.js",
-      "size": 15462,
-      "sha256": "24de5e13e9ec663de415b978394d05d3d536757d929fe76def4c920b7bdd58de",
-      "url": "c/24de5e13e9ec663de415b978394d05d3d536757d929fe76def4c920b7bdd58de"
+      "size": 15572,
+      "sha256": "8081aa77c56754b7a070cc8ac2b2dc31359c8e6e35627a96defc495f2090638f",
+      "url": "c/8081aa77c56754b7a070cc8ac2b2dc31359c8e6e35627a96defc495f2090638f"
     },
     {
       "path": "ui/style.css",
-      "size": 89392,
-      "sha256": "6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d",
-      "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
+      "size": 89655,
+      "sha256": "33743d2c49581fb5e1c5bf7b7eae3d982f5794783f97a7003a9a18b8cf85f2c9",
+      "url": "c/33743d2c49581fb5e1c5bf7b7eae3d982f5794783f97a7003a9a18b8cf85f2c9"
     }
   ],
-  "signature": "M8ZzTsdi021s1DrTBZzfeF3g2bLXtf4hmECR+29mHDbFb4WAjI141qSvjBsrg4eTm82ALmGU0KA+GL/7DxKVDw=="
+  "signature": "hELV6k92nB01RhXjb5D5Okp4fbMJfdCZQ8S/yabVtTh+QLwAeeVEbz/+25qUeyCV7/yiNwSw6bKlxcoknD9gAw=="
 }
