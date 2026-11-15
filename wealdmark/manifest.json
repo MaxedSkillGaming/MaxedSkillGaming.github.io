@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1794716847",
+  "version": "0.1.1794781396",
   "protocol": 7,
   "minShellVersion": "0.1.0",
   "server": "wss://tabs-marshall-built-established.trycloudflare.com",
@@ -91,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 459696,
-      "sha256": "92be01be3d2cf1c5553ee0b4ed9152c9cd8bc185bb3c4360588ab17e84181c01",
-      "url": "c/92be01be3d2cf1c5553ee0b4ed9152c9cd8bc185bb3c4360588ab17e84181c01"
+      "size": 405131,
+      "sha256": "eaf7262c276b5f856dc808a206467307f2856cab920d25c7adce1b99c0b38df4",
+      "url": "c/eaf7262c276b5f856dc808a206467307f2856cab920d25c7adce1b99c0b38df4"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -174,5 +174,5 @@
       "url": "c/33743d2c49581fb5e1c5bf7b7eae3d982f5794783f97a7003a9a18b8cf85f2c9"
     }
   ],
-  "signature": "hELV6k92nB01RhXjb5D5Okp4fbMJfdCZQ8S/yabVtTh+QLwAeeVEbz/+25qUeyCV7/yiNwSw6bKlxcoknD9gAw=="
+  "signature": "HOA12Lg64I/uglng+YR+cNgJ+yaDCpsY8BNy9mw8ms/wetz4j1uynz4cQumJi443qI4K0csPvhc0Qa+MJzP5CA=="
 }
