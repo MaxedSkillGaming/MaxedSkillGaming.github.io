@@ -20,8 +20,8 @@
     {
       "path": "data/items.json",
       "size": 59423,
-      "sha256": "a1a45341a7817a778d3eda50d6baeddb66c5a4635f65c49a284dfb47a294aced",
-      "url": "c/a1a45341a7817a778d3eda50d6baeddb66c5a4635f65c49a284dfb47a294aced"
+      "sha256": "fda169409e14b2a7542411066306d5ddf61a499f18a40497384e5781f642e203",
+      "url": "c/fda169409e14b2a7542411066306d5ddf61a499f18a40497384e5781f642e203"
     },
     {
       "path": "data/monsters.json",
@@ -55,9 +55,9 @@
     },
     {
       "path": "data/shops.json",
-      "size": 20381,
-      "sha256": "6444e947fc669056ce0cd3f3f3a3562fe0321e0d661d223aa418a24efe9c7d97",
-      "url": "c/6444e947fc669056ce0cd3f3f3a3562fe0321e0d661d223aa418a24efe9c7d97"
+      "size": 19328,
+      "sha256": "8f69fb2b6cdc5a4e7fa0a2fa404ae32255034f2ba599c9210836e46810a871fb",
+      "url": "c/8f69fb2b6cdc5a4e7fa0a2fa404ae32255034f2ba599c9210836e46810a871fb"
     },
     {
       "path": "data/shortcuts.json",
@@ -174,5 +174,5 @@
       "url": "c/6b71385fba9d421e5734a57a8ff3552c4d5f3de702215e3cc95065473523b51d"
     }
   ],
-  "signature": "1uWd19Q45KV2SRGnxtBuDH1iF4gUi65iRVGH/rcTIX0Ed5YoB4h+15hUbUsETVrEcYq3VrHfnFS1u0DRGDsMAQ=="
+  "signature": "M8ZzTsdi021s1DrTBZzfeF3g2bLXtf4hmECR+29mHDbFb4WAjI141qSvjBsrg4eTm82ALmGU0KA+GL/7DxKVDw=="
 }
