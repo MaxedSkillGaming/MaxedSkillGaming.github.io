@@ -8668,27 +8668,27 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     {
       scene: 'home',
       title: 'A House by the Road',
-      text: 'You grew up in a small house at the edge of the Wealdmark, where the road ran past the gate and never stopped. Travelers came through with stories. A woman who had stared down a troll. A man who sailed into a storm and came back with a name. You sat on the fence and heard every word.',
+      text: 'You grew up in a small house at the edge of the Wealdmark. The road ran past the gate and never stopped. Travelers came through all the time and they always had a story. There was a woman who stared down a troll. There was a man who sailed into a storm and came back with a name. You sat on the fence and listened to every word.',
     },
     {
       scene: 'dream',
       title: 'The Blank Part of the Map',
-      text: 'Every year you wanted it more. You swung a stick at the hedge and called it a sword. You drew the whole country from the stories, with its smoking peaks and its mist-wrapped isles in the far north, and left most of the page blank. You wanted to be the one who filled it in.',
+      text: 'Every year you wanted it more. You swung a stick at the hedge and called it a sword. You drew the whole country from what you heard, the smoking peaks and the misty isles up north. Most of the page was still blank. You wanted to be the one to fill it in.',
     },
     {
       scene: 'leaving',
       title: 'Morning',
-      text: 'One morning you were done waiting. You packed bread, a blanket and a sword that was a little too heavy. You left a note on the table and shut the door behind you. The sun was barely up. Nobody stopped you.',
+      text: 'One morning you\'d had enough of waiting. You packed some bread, a blanket and a sword that was a little too heavy. You left a note on the table and shut the door. It wasn\'t even full light yet. Nobody stopped you.',
     },
     {
       scene: 'road',
       title: 'Aldmoor',
-      text: 'The south road took three days. On the fourth morning you came over the last hill and saw smoke, a market, and a tower older than the walls. Nobody in Aldmoor knew your name. That was fine. You had come to earn one.',
+      text: 'The south road took three days. On the fourth morning you came over the last hill. There was smoke, a market and a tower older than the walls. Nobody in Aldmoor knew your name. That\'s fine. You\'d come to earn one.',
     },
     {
       scene: 'gate',
       title: 'The Guide',
-      text: 'A reeve named Ivy Penn met you at the gate. She looked at your boots and your sword and did not laugh. "Every hero starts here," she said, and held out a kit of tools. "Help folk. Explore. The land will notice." Somewhere far beneath your feet, something very large already had.',
+      text: 'The Guide met you at the gate. She looked at your boots and your sword and didn\'t laugh. "Every hero starts here," she said, and handed you a kit of tools. "Help folk. Explore. The land will notice." Somewhere far under your feet, something very large already had.',
     },
   ];
 
@@ -9523,7 +9523,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (welcome.intro) {
       playIntro(() => {
         window.wealdmark.send({ t: 'intro_done' });
-        toast('Talk to Reeve Ivy Penn near the bellstone to learn the basics.');
+        toast('Talk to the Guide near the bellstone to learn the basics.');
       });
     }
     G.raf = requestAnimationFrame(frame);
