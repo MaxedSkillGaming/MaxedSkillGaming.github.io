@@ -7288,26 +7288,74 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const body = $('dungeon-body');
     body.textContent = '';
     const party = G.party;
-    const p = document.createElement('p');
     const bits = (G.stats && G.stats.wallet && G.stats.wallet.iron_bits) || 0;
-    p.textContent = party ? `Entering takes your party of ${party.members.length}. Each hero pays ${DUNGEON_FEE} iron coins.` : `Entering alone costs ${DUNGEON_FEE} iron coins.`;
-    const have = document.createElement('p');
-    have.className = bits < DUNGEON_FEE ? 'bad' : 'muted';
-    have.textContent = `You carry ${bits} iron coins.`;
+    const level = (G.stats && G.stats.combatLevel) || 0;
+    // The gate you stand at: the nearest dungeon zone within gate reach (the server decides for real on Enter).
+    const me = G.self();
+    const dist = (z) => (me ? Math.max(z.x - me.x, 0, me.x - (z.x + z.w - 1)) + Math.max(z.y - me.y, 0, me.y - (z.y + z.h - 1)) : 1e9);
+    const site = G.map && me ? G.map.zones.filter((z) => z.kind === 'dungeon' && dist(z) <= 12).sort((a, b) => dist(a) - dist(b))[0] : null;
+    const rows = [];
+    const row = (label, value, cls) => {
+      const r = document.createElement('div');
+      r.className = 'dg-row';
+      const l = document.createElement('span');
+      l.textContent = label;
+      const v = document.createElement('span');
+      v.textContent = value;
+      if (cls) v.className = cls;
+      r.append(l, v);
+      rows.push(r);
+    };
+    let blocked = false;
+    let note = '';
+    let label = `Enter (${DUNGEON_FEE} iron coins each)`;
+    if (site) {
+      const h = document.createElement('h3');
+      h.textContent = site.name;
+      rows.push(h);
+      const need = site.minLevel || 0;
+      if (need) {
+        row('Level needed', `${need} (you ${level})`, level >= need ? 'ok' : 'bad');
+        if (level < need) blocked = true;
+      }
+      if (site.key) {
+        const keyName = (G.data && G.data.items.get(site.key) && G.data.items.get(site.key).name) || site.key;
+        const held = ((G.inv && G.inv.items) || []).reduce((n, s) => n + (s && s.id === site.key ? s.qty : 0), 0);
+        row('Opens with', `1 ${keyName}`);
+        row('You hold', String(held), held > 0 ? 'ok' : 'bad');
+        if (held < 1) blocked = true;
+        note = 'The leader spends the key on entry, even if the run is lost. No coin fee.';
+        label = 'Enter (use 1 key)';
+      } else {
+        row('Cost', party ? `${DUNGEON_FEE} iron coins each, party of ${party.members.length}` : `${DUNGEON_FEE} iron coins each`);
+        row('You carry', `${bits} iron coins`, bits < DUNGEON_FEE ? 'bad' : 'ok');
+        if (bits < DUNGEON_FEE) blocked = true;
+      }
+    } else {
+      note = 'Stand near a dungeon gate to see its cost.';
+      blocked = true;
+    }
     const enter = document.createElement('button');
     enter.type = 'button';
-    enter.className = 'act';
-    enter.textContent = `Enter (${DUNGEON_FEE} iron coins each)`;
+    enter.className = 'act' + (blocked ? ' unavailable' : '');
+    enter.textContent = blocked ? 'Enter (unavailable)' : label;
     enter.addEventListener('click', () => window.wealdmark.send({ t: 'dungeon', op: 'enter' }));
     const leave = document.createElement('button');
     leave.type = 'button';
     leave.className = 'act';
     leave.textContent = 'Walk out';
     leave.addEventListener('click', () => window.wealdmark.send({ t: 'dungeon', op: 'leave' }));
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.append(enter, leave);
-    body.append(p, have, row);
+    const btns = document.createElement('div');
+    btns.className = 'row';
+    btns.append(enter, leave);
+    body.append(...rows);
+    if (note) {
+      const n = document.createElement('p');
+      n.className = 'muted';
+      n.textContent = note;
+      body.append(n);
+    }
+    body.append(btns);
   }
 
   function renderJournal() {

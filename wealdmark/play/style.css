@@ -672,6 +672,10 @@ button.link:hover { opacity: 1; }
 #party-body .meter.mini span { position: absolute; inset: 0; text-align: center; font-size: 10px; line-height: 14px; }
 #party-name { width: 60%; }
 #panel-dungeon .bad { color: #e07070; }
+#panel-dungeon .ok { color: #8fd68f; }
+#panel-dungeon h3 { margin: 0 0 8px; font-size: 13px; color: var(--gold); }
+#panel-dungeon .dg-row { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+#panel-dungeon button.unavailable { opacity: 0.5; border-style: dashed; }
 .sslot { font-size: 10px; line-height: 1.1; flex-direction: column; gap: 1px; }
 .sslot.num { font-size: 15px; color: var(--gold); }
 .sslot.auto.on { border-color: #6fcf7f; }
