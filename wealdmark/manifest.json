@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1794781396",
+  "version": "0.1.1795099644",
   "protocol": 7,
   "minShellVersion": "0.1.0",
   "server": "wss://tabs-marshall-built-established.trycloudflare.com",
@@ -26,8 +26,8 @@
     {
       "path": "data/monsters.json",
       "size": 44328,
-      "sha256": "a1435d0589aa254ece72f62dbc110d545962c1128692e390b3917bcb6b8d0e0d",
-      "url": "c/a1435d0589aa254ece72f62dbc110d545962c1128692e390b3917bcb6b8d0e0d"
+      "sha256": "670a4c1b8224e9ebd3fa1d5573f50a2cfb2699cea0cb3c05ff236aca9f6a80a6",
+      "url": "c/670a4c1b8224e9ebd3fa1d5573f50a2cfb2699cea0cb3c05ff236aca9f6a80a6"
     },
     {
       "path": "data/nodes.json",
@@ -91,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 405131,
-      "sha256": "eaf7262c276b5f856dc808a206467307f2856cab920d25c7adce1b99c0b38df4",
-      "url": "c/eaf7262c276b5f856dc808a206467307f2856cab920d25c7adce1b99c0b38df4"
+      "size": 407113,
+      "sha256": "d2787db2cc97b6bc6aba184e1cbe5b0c69dea700782f4d8b80a619ebec8ca2c6",
+      "url": "c/d2787db2cc97b6bc6aba184e1cbe5b0c69dea700782f4d8b80a619ebec8ca2c6"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -169,10 +169,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 89655,
-      "sha256": "33743d2c49581fb5e1c5bf7b7eae3d982f5794783f97a7003a9a18b8cf85f2c9",
-      "url": "c/33743d2c49581fb5e1c5bf7b7eae3d982f5794783f97a7003a9a18b8cf85f2c9"
+      "size": 89993,
+      "sha256": "e6976f4c11afe7df14fb156ad2074195268ebcf27debef025bf008e52ef45964",
+      "url": "c/e6976f4c11afe7df14fb156ad2074195268ebcf27debef025bf008e52ef45964"
     }
   ],
-  "signature": "HOA12Lg64I/uglng+YR+cNgJ+yaDCpsY8BNy9mw8ms/wetz4j1uynz4cQumJi443qI4K0csPvhc0Qa+MJzP5CA=="
+  "signature": "tAsTNWmSZY+qgBoHhdBV+2fBclkIZI5Di63mA+pQYauACoPXpUiA2UVuk2/r8ZKfc/1o3YJM2JhnKE/FLnbJDQ=="
 }
