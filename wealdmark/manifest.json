@@ -1,9 +1,9 @@
 {
-  "version": "0.1.1795099644",
+  "version": "0.1.1795106174",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://tabs-marshall-built-established.trycloudflare.com",
-  "authUrl": "https://tommy-online-acdbentity-agreements.trycloudflare.com",
+  "server": "wss://suffered-appliances-beast-looking.trycloudflare.com",
+  "authUrl": "https://gospel-warrior-table-barrel.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -37,15 +37,15 @@
     },
     {
       "path": "data/npcs.json",
-      "size": 66739,
-      "sha256": "8db0c4d157dde8c6cc3af022b74ba4682640984c0cb2397292254f4a016df599",
-      "url": "c/8db0c4d157dde8c6cc3af022b74ba4682640984c0cb2397292254f4a016df599"
+      "size": 64116,
+      "sha256": "37e122276eaebe66b64ee02e2e5be5013fd6bf0a0c94060229e45a3cfd170b60",
+      "url": "c/37e122276eaebe66b64ee02e2e5be5013fd6bf0a0c94060229e45a3cfd170b60"
     },
     {
       "path": "data/quests.json",
-      "size": 81892,
-      "sha256": "3fc55dc01a0f99ed8b4e3ab1364c2e8e0c829f7257e0aec6f03a5847d5ac706d",
-      "url": "c/3fc55dc01a0f99ed8b4e3ab1364c2e8e0c829f7257e0aec6f03a5847d5ac706d"
+      "size": 81930,
+      "sha256": "f7ab7f2f9f4e8803af041416e814ac4edb928a25632ba3385f48527d97095d7c",
+      "url": "c/f7ab7f2f9f4e8803af041416e814ac4edb928a25632ba3385f48527d97095d7c"
     },
     {
       "path": "data/recipes.json",
@@ -55,9 +55,9 @@
     },
     {
       "path": "data/shops.json",
-      "size": 19328,
-      "sha256": "8f69fb2b6cdc5a4e7fa0a2fa404ae32255034f2ba599c9210836e46810a871fb",
-      "url": "c/8f69fb2b6cdc5a4e7fa0a2fa404ae32255034f2ba599c9210836e46810a871fb"
+      "size": 19335,
+      "sha256": "d25f43a06d6e0009b4f65446aed86d1db3c906c2cdb99776a56f314b303a533c",
+      "url": "c/d25f43a06d6e0009b4f65446aed86d1db3c906c2cdb99776a56f314b303a533c"
     },
     {
       "path": "data/shortcuts.json",
@@ -67,15 +67,15 @@
     },
     {
       "path": "data/stations.json",
-      "size": 19658,
-      "sha256": "d5f36aa5575d9a65a82e6d6c7736ce98f9f64569af0c89d79a3320e1da0e51c9",
-      "url": "c/d5f36aa5575d9a65a82e6d6c7736ce98f9f64569af0c89d79a3320e1da0e51c9"
+      "size": 19656,
+      "sha256": "19a6c79f3c1784dd7348fbef9b4713449bee67685d8a84292f7d9da298467655",
+      "url": "c/19a6c79f3c1784dd7348fbef9b4713449bee67685d8a84292f7d9da298467655"
     },
     {
       "path": "maps/mossgate.json",
-      "size": 1143977,
-      "sha256": "1de203ec06bd448b884da976fcf86c438eb114931927125d553afc4f42fc6f7e",
-      "url": "c/1de203ec06bd448b884da976fcf86c438eb114931927125d553afc4f42fc6f7e"
+      "size": 1143981,
+      "sha256": "8c76c8f6aabd54bd240442cd75740297c63049b32d07cf6949143c5ac1da93aa",
+      "url": "c/8c76c8f6aabd54bd240442cd75740297c63049b32d07cf6949143c5ac1da93aa"
     },
     {
       "path": "tiles/placeholder.png",
@@ -91,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 407113,
-      "sha256": "d2787db2cc97b6bc6aba184e1cbe5b0c69dea700782f4d8b80a619ebec8ca2c6",
-      "url": "c/d2787db2cc97b6bc6aba184e1cbe5b0c69dea700782f4d8b80a619ebec8ca2c6"
+      "size": 407130,
+      "sha256": "7bbaafb26bdd723b38f44868c72c450f3a0f4aca7e2af11b43247aa119e1dee5",
+      "url": "c/7bbaafb26bdd723b38f44868c72c450f3a0f4aca7e2af11b43247aa119e1dee5"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -174,5 +174,5 @@
       "url": "c/e6976f4c11afe7df14fb156ad2074195268ebcf27debef025bf008e52ef45964"
     }
   ],
-  "signature": "tAsTNWmSZY+qgBoHhdBV+2fBclkIZI5Di63mA+pQYauACoPXpUiA2UVuk2/r8ZKfc/1o3YJM2JhnKE/FLnbJDQ=="
+  "signature": "p7KdVwkoanb4wN6em7TxapIhW2IbgtPwS/JbW/lEpWRiCqohKBBItBT5UjsHwLqwPtbTQDbL0mgZUgN+f4SqCw=="
 }
