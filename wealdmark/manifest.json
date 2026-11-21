@@ -1,9 +1,9 @@
 {
-  "version": "0.1.1795235594",
+  "version": "0.1.1795237156",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://domestic-richards-gilbert-frequency.trycloudflare.com",
-  "authUrl": "https://aurora-dive-kansas-baptist.trycloudflare.com",
+  "server": "wss://noon-hughes-nutrition-connector.trycloudflare.com",
+  "authUrl": "https://cst-racing-numeric-acrylic.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -91,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 407673,
-      "sha256": "3cc8aba005f6ee2ca89c0cd93e210255fa4dd59cb392776f25ab09b3b713882f",
-      "url": "c/3cc8aba005f6ee2ca89c0cd93e210255fa4dd59cb392776f25ab09b3b713882f"
+      "size": 407655,
+      "sha256": "38f82eba9b9975dad50e9dc1ab92d7b2341b01bab095e0ccd89ea34c4562a148",
+      "url": "c/38f82eba9b9975dad50e9dc1ab92d7b2341b01bab095e0ccd89ea34c4562a148"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -169,10 +169,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 90262,
-      "sha256": "e2b3367d2a58ac6941cf14baf30a09e9e2ac632598ea659a85f317a4d72f4223",
-      "url": "c/e2b3367d2a58ac6941cf14baf30a09e9e2ac632598ea659a85f317a4d72f4223"
+      "size": 90144,
+      "sha256": "4f08955ce89f0b36c2e8ece6d4b1bd82ef4bf13a62cc447e9b2492aafd118ed0",
+      "url": "c/4f08955ce89f0b36c2e8ece6d4b1bd82ef4bf13a62cc447e9b2492aafd118ed0"
     }
   ],
-  "signature": "hrm7jU3Wem59w4jbhV0F5LUEM5vYpLHuSxRErQ7otCUr+Pl+wO6f8PfoyImqwvOCf166Fl/R9pfxo4S2vou/AA=="
+  "signature": "CtepqP6jHrBvR9umOUBmfDVfb4xWV1IHUie63FD73j7FDr0OtwupW/b0hFgeReBE4SIsNcDs58bMpUGhHcFLDA=="
 }
