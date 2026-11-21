@@ -1456,3 +1456,8 @@ button.slot.rare:not(.empty)::before, button.slot.legendary:not(.empty)::before 
   .pnode span { max-width: 84px; overflow: hidden; text-overflow: ellipsis; }
 }
 #world-scroll { background: #d9c79a; border-color: #3a2d1a; }
+
+/* Hero and World pop-ups: wider, 14px text, 32px rows. */
+.grp-pop { min-width: 148px; gap: 4px; }
+.wide-hud #toolbar .grp-pop button { height: 32px; padding: 0 12px; font-size: 14px !important; }
+.wide-hud #toolbar .grp:last-child .grp-pop { left: auto; right: 0; }

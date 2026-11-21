@@ -3090,9 +3090,13 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   function placeJournal() {
     const q = $('qtrack');
     const m = $('mapbox');
-    if (!q || !m || !m.offsetWidth) return;
+    const rc = $('rctl');
+    if (!q) return;
+    // Map hidden: hang under the Map / Hide UI buttons so the journal never floats mid-screen.
+    const anchor = m && m.offsetWidth ? m : rc && rc.offsetWidth ? rc : null;
+    if (!anchor) return;
     const z = parseFloat(getComputedStyle(q).zoom) || 1;
-    const mr = m.getBoundingClientRect();
+    const mr = anchor.getBoundingClientRect();
     q.style.left = 'auto';
     q.style.right = `${(window.innerWidth - mr.right) / z}px`;
     q.style.top = `${(mr.bottom + 8) / z}px`;
@@ -3284,6 +3288,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const apply = () => {
       $('mapbox').classList.toggle('off', !rview.map);
       $('r-map').classList.toggle('off', !rview.map);
+      placeJournal();
       try {
         localStorage.setItem('wealdmark.corner', JSON.stringify({ map: rview.map }));
       } catch {
@@ -6348,14 +6353,22 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     if (el.id === 'panel-bag') {
       el.style.height = 'auto';
       const avail = Math.max(160, (bottomPx - topPx - gap) / zw);
-      // Four across, seven down, all visible: the slots shrink (32px at the least) when the window is short.
+      // All 28 slots always show. Seven across by four down when the window is wide enough, else four across by seven down.
+      // The slots shrink (32px at the least) when the window is short.
       const g = $('bag-grid');
+      const bagW = Math.min(520, Math.max(W, pr.width / zw - 24));
+      el.style.width = px(bagW);
+      const cols = bagW >= 7 * 36 + 40 ? 7 : 4;
+      const rows = 28 / cols;
+      g.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
       el.style.maxHeight = 'none';
-      g.style.width = px(4 * 32 + 12);
+      g.style.width = px(cols * 32 + (cols - 1) * 4);
       // Chrome = everything except the grid, measured with the grid at its smallest and the panel unclamped.
       const chrome = (el.getBoundingClientRect().height - g.getBoundingClientRect().height) / zw;
-      const s = Math.max(32, Math.min(55, Math.floor((avail - chrome - 8 - 6 * 4) / 7)));
-      g.style.width = px(4 * s + 12);
+      const byH = Math.floor((avail - chrome - 8 - (rows - 1) * 4) / rows);
+      const byW = Math.floor((bagW - 40 - (cols - 1) * 4) / cols);
+      const s = Math.max(32, Math.min(64, byH, byW));
+      g.style.width = px(cols * s + (cols - 1) * 4);
       g.style.marginInline = 'auto';
       el.style.maxHeight = px(avail);
     }
@@ -9444,10 +9457,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       } catch {
         /* storage blocked: the pane stays as it is */
       }
-      renderJournal();
-    });
-    on($('qt-open'), 'click', () => {
-      if ($('panel-journal').classList.contains('hidden')) togglePanel('panel-journal');
       renderJournal();
     });
     setupBar();
