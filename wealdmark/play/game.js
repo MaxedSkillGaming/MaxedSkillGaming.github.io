@@ -34,6 +34,7 @@
   const ABILITY_INFO = {
     punch: ['Punch', '100% damage to an adjacent enemy. Fists, since you hold no weapon.'],
     slash: ['Slash', '100% damage to an adjacent enemy.'],
+    guard: ['Guard', 'Take less damage for the next few seconds. Uses your action in a turn fight. Key G.'],
     pine_nut_throw: ['Pine Nut Throw', 'A thrown pine nut. The Mind Goblin never runs out.'],
     pick_throw: ['Pick Throw', 'A mining pick thrown from five tiles away. The Foreman Below has a rack of them.'],
     wretch_bite: ['Wretch Bite', 'A bite that poisons. The venom ticks for three rounds.'],
@@ -157,7 +158,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
   /** [shape, colour] per ability; anything not listed gets a plain burst. */
   const ABILITY_ICON = {
     extra_shot: ['arrow2', '#c8e87b'], execute_shot: ['pistol', '#ff6a6a'],
-    punch: ['fist', '#e0b48c'], slash: ['sword', '#cfd6e4'], pine_nut_throw: ['nut', '#b08a52'], pick_throw: ['pick', '#b0b6c4'],
+    guard: ['tower', '#4a6aa0'], punch: ['fist', '#e0b48c'], slash: ['sword', '#cfd6e4'], pine_nut_throw: ['nut', '#b08a52'], pick_throw: ['pick', '#b0b6c4'],
     wretch_bite: ['fang', '#7bd88f'], crushing_strike: ['hammer', '#e07070'], dust_cloud: ['cloud', '#c8b090'], wing_buffet: ['wing', '#9aa0c0'], gore: ['tusk', '#d8c8a0'],
     multi_strike: ['crossed', '#f0a070'], power_strike: ['axe', '#f0c860'], rend: ['claw', '#e05a5a'], sunder_strike: ['crackshield', '#e05a5a'], war_cry: ['horn', '#f0c860'],
     whirlwind: ['spiral', '#cfd6e4'], execute: ['skull', '#ff6a6a'], shot: ['arrow', '#9ad87b'], multi_shot: ['arrows3', '#c8e87b'], aimed_shot: ['target', '#f0c860'],
@@ -3967,7 +3968,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
 
   /** Every ability the hero has unlocked: the basic attacks, then each skill with a rank in it. */
   function unlockedAbilities() {
-    const ids = [...BASIC_ATTACKS];
+    const ids = [...BASIC_ATTACKS, 'guard'];
     const ranks = (G.stats && G.stats.ranks) || {};
     for (const id of Object.keys(ranks)) if (ranks[id] > 0 && ABILITY_INFO[id] && !ids.includes(id)) ids.push(id);
     return ids;
@@ -3986,6 +3987,8 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const basic = { melee: heldWeapon() ? 'slash' : 'punch', range: 'shot', magic: 'fireball' }[style];
     const have = unlockedAbilities().filter((id) => !BASIC_ATTACKS.includes(id));
     const ids = [basic, ...have.filter((id) => ABILITY_STYLE[id] === style), ...have.filter((id) => ABILITY_STYLE[id] === 'defense')];
+    // Guard is a basic skill: it takes the last free slot until the player moves or clears it.
+    if (ids.length < BAR_SLOTS) ids.push('guard');
     return ids.slice(0, BAR_SLOTS).map((id) => ({ k: 'ability', id }));
   }
 
@@ -4030,6 +4033,7 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
     const info = ABILITY_INFO[entry.id];
     if (!G.fight) return fromKey ? undefined : openBarPicker('bar', i);
     if (!isMyTurn()) return toast(NOT_READY);
+    if (entry.id === 'guard') return sendFight({ t: 'guard' });
     const opt = G.fight.options.abilities.find((a) => a.id === entry.id);
     if (!opt) return toast(`${info ? info[0] : 'That ability'} needs a different weapon or shield.`);
     if (opt.reason === 'buff') return toast('Another buff of that kind is still running. Only one damage buff and one defensive buff can be held at a time.');
@@ -4153,7 +4157,9 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
         const info = ABILITY_INFO[entry.id];
         const opt = G.fight && G.fight.options ? G.fight.options.abilities.find((a) => a.id === entry.id) : null;
         const lines = [info ? `${info[0]}: ${info[1]}` : entry.id];
-        if (G.fight) {
+        if (G.fight && entry.id === 'guard') {
+          if (G.fight.rt) lines.push('Take less damage for the next few seconds.');
+        } else if (G.fight) {
           if (!opt) {
             on = false;
             lines.push('Needs a different weapon or shield.');
@@ -4336,15 +4342,6 @@ const DEBUFFS = new Set(['stunned', 'stagger', 'slow', 'bleed', 'poison', 'burn'
       }
       toast('You can swap weapons in a fight. Out of one, change your weapon in Gear (E) or from the bar.');
     });
-    if (G.fight) {
-      // Guard is a fight action, so its slot only shows during one.
-      const guard = el('button', 'sslot guard');
-      guard.type = 'button';
-      guard.append(el('b', '', 'GUARD'), el('span', 'hk', 'G'));
-      guard.title = G.fight.rt ? 'Guard (G). Take less damage for the next few seconds.' : 'Guard (G). Take less damage until your next turn.';
-      guard.addEventListener('click', () => (isMyTurn() ? sendFight({ t: 'guard' }) : toast(NOT_READY)));
-      right.append(guard);
-    }
     $('bar-l').replaceChildren(barSwitcher(style));
     $('bar-r').replaceChildren(barSwitcher(style));
     right.append(swap);
