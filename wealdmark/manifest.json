@@ -1,9 +1,9 @@
 {
-  "version": "0.1.1795237156",
+  "version": "0.1.1795274746",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://noon-hughes-nutrition-connector.trycloudflare.com",
-  "authUrl": "https://cst-racing-numeric-acrylic.trycloudflare.com",
+  "server": "wss://listings-binary-responding-approval.trycloudflare.com",
+  "authUrl": "https://statistics-missile-inches-tobago.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -174,5 +174,5 @@
       "url": "c/4f08955ce89f0b36c2e8ece6d4b1bd82ef4bf13a62cc447e9b2492aafd118ed0"
     }
   ],
-  "signature": "CtepqP6jHrBvR9umOUBmfDVfb4xWV1IHUie63FD73j7FDr0OtwupW/b0hFgeReBE4SIsNcDs58bMpUGhHcFLDA=="
+  "signature": "aBIldIGOm3vQj0aaOvnVHwvVDNwB70yjRjbNtiounrrUyvt7+MRO4TSW5+EbI74LcV7uIEXElBxUF6ww7NS6Dg=="
 }
