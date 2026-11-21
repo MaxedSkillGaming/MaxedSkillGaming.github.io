@@ -1,9 +1,9 @@
 {
-  "version": "0.1.1795106174",
+  "version": "0.1.1795235594",
   "protocol": 7,
   "minShellVersion": "0.1.0",
-  "server": "wss://suffered-appliances-beast-looking.trycloudflare.com",
-  "authUrl": "https://gospel-warrior-table-barrel.trycloudflare.com",
+  "server": "wss://domestic-richards-gilbert-frequency.trycloudflare.com",
+  "authUrl": "https://aurora-dive-kansas-baptist.trycloudflare.com",
   "files": [
     {
       "path": "data/anchors.json",
@@ -19,9 +19,9 @@
     },
     {
       "path": "data/items.json",
-      "size": 59423,
-      "sha256": "fda169409e14b2a7542411066306d5ddf61a499f18a40497384e5781f642e203",
-      "url": "c/fda169409e14b2a7542411066306d5ddf61a499f18a40497384e5781f642e203"
+      "size": 59422,
+      "sha256": "82d3fdbc0c6f0e560a7fabde852ab1a768b11d3998bffad57c3563c0371c66ef",
+      "url": "c/82d3fdbc0c6f0e560a7fabde852ab1a768b11d3998bffad57c3563c0371c66ef"
     },
     {
       "path": "data/monsters.json",
@@ -37,9 +37,9 @@
     },
     {
       "path": "data/npcs.json",
-      "size": 64116,
-      "sha256": "37e122276eaebe66b64ee02e2e5be5013fd6bf0a0c94060229e45a3cfd170b60",
-      "url": "c/37e122276eaebe66b64ee02e2e5be5013fd6bf0a0c94060229e45a3cfd170b60"
+      "size": 64086,
+      "sha256": "9239c6f8a62c747ae0c94f4a8843d58c2cbec49ce671ccd85a50eaa40c9ff03a",
+      "url": "c/9239c6f8a62c747ae0c94f4a8843d58c2cbec49ce671ccd85a50eaa40c9ff03a"
     },
     {
       "path": "data/quests.json",
@@ -56,8 +56,8 @@
     {
       "path": "data/shops.json",
       "size": 19335,
-      "sha256": "d25f43a06d6e0009b4f65446aed86d1db3c906c2cdb99776a56f314b303a533c",
-      "url": "c/d25f43a06d6e0009b4f65446aed86d1db3c906c2cdb99776a56f314b303a533c"
+      "sha256": "793285a7e355d5744622f7c563af1ee5777d4588f52a1136849a97d60aaf5aee",
+      "url": "c/793285a7e355d5744622f7c563af1ee5777d4588f52a1136849a97d60aaf5aee"
     },
     {
       "path": "data/shortcuts.json",
@@ -91,9 +91,9 @@
     },
     {
       "path": "ui/game.js",
-      "size": 407130,
-      "sha256": "7bbaafb26bdd723b38f44868c72c450f3a0f4aca7e2af11b43247aa119e1dee5",
-      "url": "c/7bbaafb26bdd723b38f44868c72c450f3a0f4aca7e2af11b43247aa119e1dee5"
+      "size": 407673,
+      "sha256": "3cc8aba005f6ee2ca89c0cd93e210255fa4dd59cb392776f25ab09b3b713882f",
+      "url": "c/3cc8aba005f6ee2ca89c0cd93e210255fa4dd59cb392776f25ab09b3b713882f"
     },
     {
       "path": "ui/hero-layers-catalog.js",
@@ -121,9 +121,9 @@
     },
     {
       "path": "ui/index.html",
-      "size": 22308,
-      "sha256": "d8d18bb4afbbccb48f93c9b4c76a574749e18335cd33995f5207c2d894e0a385",
-      "url": "c/d8d18bb4afbbccb48f93c9b4c76a574749e18335cd33995f5207c2d894e0a385"
+      "size": 22214,
+      "sha256": "ca7a519bd6d2fce78614d770bd8f50f6042a9b91a68b9206bfa9c1950843576c",
+      "url": "c/ca7a519bd6d2fce78614d770bd8f50f6042a9b91a68b9206bfa9c1950843576c"
     },
     {
       "path": "ui/music/akash-chamber.ogg",
@@ -169,10 +169,10 @@
     },
     {
       "path": "ui/style.css",
-      "size": 89993,
-      "sha256": "e6976f4c11afe7df14fb156ad2074195268ebcf27debef025bf008e52ef45964",
-      "url": "c/e6976f4c11afe7df14fb156ad2074195268ebcf27debef025bf008e52ef45964"
+      "size": 90262,
+      "sha256": "e2b3367d2a58ac6941cf14baf30a09e9e2ac632598ea659a85f317a4d72f4223",
+      "url": "c/e2b3367d2a58ac6941cf14baf30a09e9e2ac632598ea659a85f317a4d72f4223"
     }
   ],
-  "signature": "p7KdVwkoanb4wN6em7TxapIhW2IbgtPwS/JbW/lEpWRiCqohKBBItBT5UjsHwLqwPtbTQDbL0mgZUgN+f4SqCw=="
+  "signature": "hrm7jU3Wem59w4jbhV0F5LUEM5vYpLHuSxRErQ7otCUr+Pl+wO6f8PfoyImqwvOCf166Fl/R9pfxo4S2vou/AA=="
 }
